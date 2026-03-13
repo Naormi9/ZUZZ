@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button, ListingCard, Skeleton, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@zuzz/ui';
 import { api } from '@/lib/api';
 
@@ -154,9 +155,9 @@ export default function HomesPage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">נכסים מומלצים</h2>
-          <a href="/homes/search" className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+          <Link href="/homes/search" className="text-teal-600 hover:text-teal-700 text-sm font-medium">
             הצג הכל
-          </a>
+          </Link>
         </div>
 
         {loading ? (
@@ -199,9 +200,9 @@ export default function HomesPage() {
         ) : (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">אין נכסים מומלצים כרגע</p>
-            <a href="/homes/search" className="text-teal-600 hover:underline mt-2 inline-block">
+            <Link href="/homes/search" className="text-teal-600 hover:underline mt-2 inline-block">
               חפש נכסים
-            </a>
+            </Link>
           </div>
         )}
       </section>
@@ -211,13 +212,13 @@ export default function HomesPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-6">ערים פופולריות</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 'נתניה', 'ראשון לציון', 'פתח תקווה', 'אשדוד', 'רעננה', 'כפר סבא'].map((city) => (
-            <a
+            <Link
               key={city}
               href={`/homes/search?city=${encodeURIComponent(city)}`}
               className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-teal-300 hover:bg-teal-50 transition-colors"
             >
               {city}
-            </a>
+            </Link>
           ))}
         </div>
       </section>

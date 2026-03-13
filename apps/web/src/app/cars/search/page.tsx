@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -78,7 +78,19 @@ const HAND_OPTIONS = [
 
 const currentYear = new Date().getFullYear();
 
-export default function CarsSearchPage() {
+export default function CarsSearchPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-gray-500">טוען...</div>
+      </div>
+    }>
+      <CarsSearchPage />
+    </Suspense>
+  );
+}
+
+function CarsSearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 

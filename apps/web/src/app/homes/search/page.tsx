@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Button,
@@ -43,11 +43,16 @@ interface PropertyResult {
   };
 }
 
-interface SearchResponse {
-  data: PropertyResult[];
-  total: number;
-  page: number;
-  totalPages: number;
+interface SearchApiResponse {
+  success: boolean;
+  data: {
+    items: PropertyResult[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
 }
 
 const PROPERTY_TYPES = [
@@ -67,7 +72,15 @@ const SORT_OPTIONS = [
   { label: 'גודל: גדול לקטן', value: 'size_desc' },
 ];
 
-export default function HomesSearchPage() {
+export default function HomesSearchPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center text-gray-500">טוען...</div></div>}>
+      <HomesSearchPage />
+    </Suspense>
+  );
+}
+
+function HomesSearchPage() {
   const searchParams = useSearchParams();
   const [results, setResults] = useState<PropertyResult[]>([]);
   const [total, setTotal] = useState(0);
@@ -102,10 +115,10 @@ export default function HomesSearchPage() {
       setLoading(true);
       try {
         const query = buildQuery();
-        const res = await api.get<SearchResponse>(`/api/homes/search?${query}`);
-        setResults(res.data);
-        setTotal(res.total);
-        setTotalPages(res.totalPages);
+        const res = await api.get<SearchApiResponse>(`/api/homes/search?${query}`);
+        setResults(res.data.items);
+        setTotal(res.data.total);
+        setTotalPages(res.data.totalPages);
       } catch {
         setResults([]);
         setTotal(0);

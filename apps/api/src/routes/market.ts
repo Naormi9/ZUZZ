@@ -39,6 +39,45 @@ marketRouter.post('/', authenticate, async (req, res, next) => {
   }
 });
 
+// List market items (recent)
+marketRouter.get('/', optionalAuth, async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
+    const sort = (req.query.sort as string) || 'newest';
+
+    const where: any = { vertical: 'market', status: 'active' };
+
+    const orderBy: any = sort === 'price_asc' ? { priceAmount: 'asc' } : sort === 'price_desc' ? { priceAmount: 'desc' } : { createdAt: 'desc' };
+
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        include: {
+          media: { take: 1, orderBy: { order: 'asc' } },
+          marketDetails: true,
+          user: { select: { id: true, name: true } },
+        },
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.listing.count({ where }),
+    ]);
+
+    res.json({
+      success: true,
+      data: listings,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Search market
 marketRouter.get('/search', optionalAuth, async (req, res, next) => {
   try {
