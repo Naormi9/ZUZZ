@@ -19,10 +19,10 @@ export default function FeatureFlagsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleToggle = async (flagId: string) => {
+  const handleToggle = async (flagId: string, currentEnabled: boolean) => {
     setTogglingId(flagId);
     try {
-      const updated = await adminApi.toggleFeatureFlag(flagId);
+      const updated = await adminApi.toggleFeatureFlag(flagId, currentEnabled);
       setFlags((prev) => prev.map((f) => (f.id === flagId ? updated : f)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בעדכון דגל');
@@ -78,12 +78,15 @@ export default function FeatureFlagsPage() {
                         <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
                         <span
                           className={`admin-badge ${
-                            flag.enabled ? 'admin-badge-success' : 'admin-badge-neutral'
+                            flag.isEnabled ? 'admin-badge-success' : 'admin-badge-neutral'
                           }`}
                         >
-                          {flag.enabled ? 'פעיל' : 'כבוי'}
+                          {flag.isEnabled ? 'פעיל' : 'כבוי'}
                         </span>
                       </div>
+                      {flag.key && (
+                        <p className="font-mono text-xs text-gray-400">{flag.key}</p>
+                      )}
                       <p className="text-sm text-gray-500">{flag.description}</p>
                       <p className="text-xs text-gray-400">
                         עודכן לאחרונה: {formatDate(flag.updatedAt)}
@@ -94,16 +97,16 @@ export default function FeatureFlagsPage() {
                     <button
                       type="button"
                       role="switch"
-                      aria-checked={flag.enabled}
+                      aria-checked={flag.isEnabled}
                       disabled={togglingId === flag.id}
-                      onClick={() => handleToggle(flag.id)}
+                      onClick={() => handleToggle(flag.id, flag.isEnabled)}
                       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-                        flag.enabled ? 'bg-blue-600' : 'bg-gray-200'
+                        flag.isEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
                     >
                       <span
                         className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                          flag.enabled ? '-translate-x-5' : 'translate-x-0'
+                          flag.isEnabled ? '-translate-x-5' : 'translate-x-0'
                         }`}
                       />
                     </button>

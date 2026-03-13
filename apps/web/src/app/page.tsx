@@ -69,7 +69,7 @@ export default function HomePage() {
             {/* Search Bar */}
             <div className="mt-10">
               <form
-                action="/search"
+                action="/cars/search"
                 className="relative mx-auto max-w-2xl"
               >
                 <div className="flex items-center overflow-hidden rounded-xl bg-white shadow-lg">
@@ -127,7 +127,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">מודעות מובחרות</h2>
             <Link
-              href="/search"
+              href="/cars/search"
               className="text-sm font-medium text-brand-600 hover:text-brand-700"
             >
               הצג הכל ←
@@ -190,7 +190,7 @@ export default function HomePage() {
             פרסמו מודעה תוך דקות וקבלו חשיפה לקהל הנכון
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/listings/new">
+            <Link href="/cars/create">
               <Button
                 variant="outline"
                 className="border-white bg-white text-brand-700 hover:bg-brand-50"
@@ -198,7 +198,7 @@ export default function HomePage() {
                 פרסם מודעה חינם
               </Button>
             </Link>
-            <Link href="/search">
+            <Link href="/cars/search">
               <Button
                 variant="outline"
                 className="border-white/30 text-white hover:bg-white/10"

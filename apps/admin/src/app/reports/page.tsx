@@ -3,7 +3,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@zuzz/ui';
 import { Skeleton } from '@zuzz/ui';
-import { adminApi, type Report } from '@/lib/api';
+import { adminApi } from '@/lib/api';
+
+interface Report {
+  id: string;
+  listing: { title: string };
+  reason: string;
+  reportedBy: string;
+  status: 'open' | 'resolved' | 'dismissed';
+  createdAt: string;
+}
 
 const statusLabels: Record<Report['status'], string> = {
   open: 'פתוח',
@@ -21,23 +30,20 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [actioningId, setActioningId] = useState<string | null>(null);
 
   const fetchReports = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminApi.getReports({ page, limit: 20 });
-      setReports(response.data);
-      setTotalPages(response.totalPages);
+      const response = await adminApi.getReports();
+      setReports(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת דיווחים');
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, []);
 
   useEffect(() => {
     fetchReports();
@@ -122,9 +128,9 @@ export default function ReportsPage() {
                 ))
               : reports.map((report) => (
                   <tr key={report.id}>
-                    <td className="font-medium text-gray-900">{report.listingTitle}</td>
+                    <td className="font-medium text-gray-900">{report.listing?.title}</td>
                     <td className="max-w-xs truncate text-gray-600">{report.reason}</td>
-                    <td className="text-gray-600">{report.reporterName}</td>
+                    <td className="text-gray-600">{report.reportedBy}</td>
                     <td>
                       <span className={`admin-badge ${statusColors[report.status]}`}>
                         {statusLabels[report.status]}
@@ -161,31 +167,6 @@ export default function ReportsPage() {
           <div className="py-12 text-center text-gray-500">אין דיווחים</div>
         )}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            הקודם
-          </Button>
-          <span className="text-sm text-gray-600">
-            עמוד {page} מתוך {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            הבא
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

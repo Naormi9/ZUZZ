@@ -8,7 +8,7 @@ import { cn } from '@zuzz/ui';
 const navItems = [
   { label: 'ראשי', href: '/', icon: Home },
   { label: 'רכב', href: '/cars', icon: Car },
-  { label: 'פרסם', href: '/listings/new', icon: Plus, highlight: true },
+  { label: 'פרסם', href: '/cars/create', icon: Plus, highlight: true },
   { label: 'נדל"ן', href: '/homes', icon: Building2 },
   { label: 'שוק', href: '/market', icon: ShoppingBag },
 ] as const;

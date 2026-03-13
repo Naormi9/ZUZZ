@@ -38,7 +38,7 @@ export const uploadRouter = Router();
 // Upload media for listing
 uploadRouter.post('/listing/:listingId/media', authenticate, upload.array('files', 20), async (req, res, next) => {
   try {
-    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId } });
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
     if (!listing || listing.userId !== req.user!.id) {
       throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
     }
@@ -49,14 +49,14 @@ uploadRouter.post('/listing/:listingId/media', authenticate, upload.array('files
     }
 
     const existingCount = await prisma.listingMedia.count({
-      where: { listingId: req.params.listingId },
+      where: { listingId: req.params.listingId! },
     });
 
     const media = await Promise.all(
       files.map((file, index) =>
         prisma.listingMedia.create({
           data: {
-            listingId: req.params.listingId,
+            listingId: req.params.listingId!,
             url: `/uploads/${file.filename}`,
             thumbnailUrl: `/uploads/${file.filename}`,
             type: file.mimetype.startsWith('image/') ? 'image' : 'document',
@@ -77,7 +77,7 @@ uploadRouter.post('/listing/:listingId/media', authenticate, upload.array('files
 // Upload document for listing
 uploadRouter.post('/listing/:listingId/document', authenticate, upload.single('file'), async (req, res, next) => {
   try {
-    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId } });
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
     if (!listing || listing.userId !== req.user!.id) {
       throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
     }
@@ -89,7 +89,7 @@ uploadRouter.post('/listing/:listingId/document', authenticate, upload.single('f
 
     const doc = await prisma.listingDocument.create({
       data: {
-        listingId: req.params.listingId,
+        listingId: req.params.listingId!,
         type: req.body.type || 'other',
         url: `/uploads/${file.filename}`,
         name: file.originalname,

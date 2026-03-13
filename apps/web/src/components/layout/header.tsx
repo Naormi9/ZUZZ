@@ -42,7 +42,7 @@ export function Header() {
           <div className="flex items-center gap-2">
             {/* Search Icon - Desktop */}
             <Link
-              href="/search"
+              href="/cars/search"
               className="hidden rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 sm:flex"
             >
               <Search className="h-5 w-5" />
@@ -50,7 +50,7 @@ export function Header() {
             </Link>
 
             {/* Publish CTA */}
-            <Link href="/listings/new" className="hidden sm:block">
+            <Link href="/cars/create" className="hidden sm:block">
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 <span>פרסם מודעה</span>
@@ -111,14 +111,14 @@ export function Header() {
                 </Link>
               ))}
               <Link
-                href="/search"
+                href="/cars/search"
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
               >
                 חיפוש
               </Link>
               <div className="mt-2 px-4">
-                <Link href="/listings/new" className="block">
+                <Link href="/cars/create" className="block">
                   <Button className="w-full gap-1.5">
                     <Plus className="h-4 w-4" />
                     <span>פרסם מודעה</span>

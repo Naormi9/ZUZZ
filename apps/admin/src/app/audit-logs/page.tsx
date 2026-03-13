@@ -3,7 +3,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@zuzz/ui';
 import { Skeleton } from '@zuzz/ui';
-import { adminApi, type AuditLog } from '@/lib/api';
+import { adminApi } from '@/lib/api';
+
+interface AuditLog {
+  id: string;
+  user: { name: string };
+  action: string;
+  entityType: string;
+  entityId: string;
+  createdAt: string;
+  details?: string;
+}
 
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -16,9 +26,9 @@ export default function AuditLogsPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminApi.getAuditLogs({ page, limit: 30 });
+      const response = await adminApi.getAuditLogs({ page, pageSize: 30 });
       setLogs(response.data);
-      setTotalPages(response.totalPages);
+      setTotalPages(response.totalPages ?? 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת יומן פעולות');
     } finally {
@@ -82,15 +92,15 @@ export default function AuditLogsPage() {
                 ))
               : logs.map((log) => (
                   <tr key={log.id}>
-                    <td className="font-medium text-gray-900">{log.userName}</td>
+                    <td className="font-medium text-gray-900">{log.user?.name}</td>
                     <td>
                       <span className="admin-badge admin-badge-info">{log.action}</span>
                     </td>
-                    <td className="text-gray-600">{log.entity}</td>
+                    <td className="text-gray-600">{log.entityType}</td>
                     <td className="font-mono text-xs text-gray-500" dir="ltr">
                       {log.entityId}
                     </td>
-                    <td className="text-gray-600">{formatTimestamp(log.timestamp)}</td>
+                    <td className="text-gray-600">{formatTimestamp(log.createdAt)}</td>
                     <td className="max-w-xs truncate text-sm text-gray-500">
                       {log.details || '—'}
                     </td>

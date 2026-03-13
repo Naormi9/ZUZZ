@@ -5,19 +5,17 @@ import { Input } from '@zuzz/ui';
 import { Badge } from '@zuzz/ui';
 import { Button } from '@zuzz/ui';
 import { Skeleton } from '@zuzz/ui';
-import { adminApi, type User } from '@/lib/api';
+import { adminApi } from '@/lib/api';
 
-const statusLabels: Record<User['status'], string> = {
-  active: 'פעיל',
-  inactive: 'לא פעיל',
-  banned: 'חסום',
-};
-
-const statusColors: Record<User['status'], string> = {
-  active: 'admin-badge-success',
-  inactive: 'admin-badge-neutral',
-  banned: 'admin-badge-danger',
-};
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  roles: string[];
+  isActive: boolean;
+  _count?: { listings: number };
+  createdAt: string;
+}
 
 const roleLabels: Record<string, string> = {
   admin: 'מנהל',
@@ -39,9 +37,9 @@ export default function UsersPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminApi.getUsers({ search, page, limit: 20 });
+      const response = await adminApi.getUsers({ search, page, pageSize: 20 });
       setUsers(response.data);
-      setTotalPages(response.totalPages);
+      setTotalPages(response.totalPages ?? 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת משתמשים');
     } finally {
@@ -144,11 +142,11 @@ export default function UsersPage() {
                       </div>
                     </td>
                     <td className="text-gray-600">
-                      {new Intl.NumberFormat('he-IL').format(user.listingsCount)}
+                      {new Intl.NumberFormat('he-IL').format(user._count?.listings ?? 0)}
                     </td>
                     <td>
-                      <span className={`admin-badge ${statusColors[user.status]}`}>
-                        {statusLabels[user.status]}
+                      <span className={`admin-badge ${user.isActive ? 'admin-badge-success' : 'admin-badge-neutral'}`}>
+                        {user.isActive ? 'פעיל' : 'לא פעיל'}
                       </span>
                     </td>
                     <td className="text-gray-600">{formatDate(user.createdAt)}</td>
@@ -156,12 +154,12 @@ export default function UsersPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={togglingId === user.id || user.status === 'banned'}
+                        disabled={togglingId === user.id}
                         onClick={() => handleToggleStatus(user.id)}
                       >
                         {togglingId === user.id
                           ? 'מעדכן...'
-                          : user.status === 'active'
+                          : user.isActive
                             ? 'השבת'
                             : 'הפעל'}
                       </Button>

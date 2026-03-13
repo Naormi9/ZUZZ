@@ -1,110 +1,162 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Button, Spinner, EmptyState, Badge } from '@zuzz/ui';
-import { formatRelativeTime } from '@zuzz/shared-utils';
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { Button, Card, CardContent, Skeleton, Input } from '@zuzz/ui';
 import { api } from '@/lib/api';
-import { useAuthStore } from '@/lib/hooks/use-auth';
-
-interface ConversationItem {
-  id: string;
-  lastMessagePreview?: string;
-  lastMessageAt: string;
-  unreadCount: number;
-  otherUser: { id: string; name: string };
-  listing: { id: string; title: string; priceAmount: number; vertical: string };
-}
+import { useAuth } from '@/lib/hooks/use-auth';
+import { MessageCircle, Send, ArrowRight } from 'lucide-react';
 
 export default function MessagesPage() {
-  const { user } = useAuthStore();
-  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const { user, isAuthenticated } = useAuth();
+  const [conversations, setConversations] = useState<any[]>([]);
   const [selectedConv, setSelectedConv] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.get<{ data: ConversationItem[] }>('/api/messages/conversations')
-      .then(res => {
+    if (!isAuthenticated) return;
+    async function load() {
+      try {
+        const res = await api.get<{ success: boolean; data: any[] }>('/api/messages/conversations');
         setConversations(res.data);
-        if (res.data.length > 0) setSelectedConv(res.data[0].id);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    if (selectedConv) {
-      api.get<{ data: any[] }>(`/api/messages/conversations/${selectedConv}`)
-        .then(res => setMessages(res.data))
-        .catch(() => {});
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [selectedConv]);
+    load();
+  }, [isAuthenticated]);
 
-  const handleSend = async () => {
+  async function loadMessages(convId: string) {
+    setSelectedConv(convId);
+    try {
+      const res = await api.get<{ success: boolean; data: any[] }>(`/api/messages/conversations/${convId}`);
+      setMessages(res.data);
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function sendMessage() {
     if (!newMessage.trim() || !selectedConv) return;
+    setSending(true);
     try {
       await api.post('/api/messages/send', { conversationId: selectedConv, content: newMessage });
-      setMessages(prev => [...prev, { id: Date.now().toString(), senderId: user?.id, content: newMessage, createdAt: new Date().toISOString() }]);
       setNewMessage('');
-    } catch {}
-  };
+      await loadMessages(selectedConv);
+    } catch {
+      // ignore
+    } finally {
+      setSending(false);
+    }
+  }
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
-
-  if (conversations.length === 0) {
+  if (!isAuthenticated) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">הודעות</h1>
-        <EmptyState title="אין הודעות" description="כשתיצור קשר עם מוכר, השיחה תופיע כאן" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">יש להתחבר</h1>
+          <Link href="/auth/login"><Button>התחברות</Button></Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">הודעות</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px]">
-        {/* Conversation list */}
-        <div className="border rounded-xl overflow-y-auto">
-          {conversations.map(conv => (
-            <button key={conv.id} onClick={() => setSelectedConv(conv.id)}
-              className={`w-full text-start p-4 border-b last:border-0 hover:bg-gray-50 transition-colors ${selectedConv === conv.id ? 'bg-blue-50' : ''}`}>
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-sm">{conv.otherUser.name}</span>
-                {conv.unreadCount > 0 && (
-                  <Badge variant="default">{conv.unreadCount}</Badge>
-                )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ minHeight: '60vh' }}>
+        {/* Conversations List */}
+        <Card className="lg:col-span-1">
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="p-4 space-y-3">
+                {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full" />)}
               </div>
-              <p className="text-xs text-gray-500 truncate mt-0.5">{conv.listing.title}</p>
-              <p className="text-xs text-gray-400 truncate mt-0.5">{conv.lastMessagePreview}</p>
-              <p className="text-[10px] text-gray-300 mt-1">{formatRelativeTime(conv.lastMessageAt)}</p>
-            </button>
-          ))}
-        </div>
+            ) : conversations.length > 0 ? (
+              <div className="divide-y">
+                {conversations.map(conv => (
+                  <button
+                    key={conv.id}
+                    onClick={() => loadMessages(conv.id)}
+                    className={`w-full text-right p-4 hover:bg-gray-50 transition-colors ${selectedConv === conv.id ? 'bg-blue-50' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm text-gray-900">{conv.otherUser?.name}</span>
+                      {conv.unreadCount > 0 && (
+                        <span className="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {conv.unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 truncate">{conv.listing?.title}</p>
+                    {conv.lastMessagePreview && (
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">{conv.lastMessagePreview}</p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                <MessageCircle className="h-8 w-8 mx-auto text-gray-300 mb-2" />
+                <p className="text-sm">אין שיחות עדיין</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Messages */}
-        <div className="md:col-span-2 border rounded-xl flex flex-col">
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.map(msg => (
-              <div key={msg.id} className={`flex ${msg.senderId === user?.id ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[70%] rounded-xl px-4 py-2 text-sm ${msg.senderId === user?.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
-                  {msg.content}
+        <Card className="lg:col-span-2">
+          <CardContent className="p-0 flex flex-col" style={{ height: '60vh' }}>
+            {selectedConv ? (
+              <>
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {messages.map(msg => (
+                    <div key={msg.id} className={`flex ${msg.senderId === user?.id ? 'justify-start' : 'justify-end'}`}>
+                      <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
+                        msg.senderId === user?.id
+                          ? 'bg-blue-600 text-white rounded-br-sm'
+                          : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                      }`}>
+                        <p>{msg.content}</p>
+                        <p className={`text-[10px] mt-1 ${msg.senderId === user?.id ? 'text-blue-200' : 'text-gray-400'}`}>
+                          {new Date(msg.createdAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+                <div className="border-t p-3 flex gap-2">
+                  <Input
+                    value={newMessage}
+                    onChange={e => setNewMessage(e.target.value)}
+                    placeholder="הקלד הודעה..."
+                    className="flex-1"
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                  />
+                  <Button onClick={sendMessage} loading={sending} disabled={!newMessage.trim()}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-gray-400">
+                <div className="text-center">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-3" />
+                  <p>בחר שיחה מהרשימה</p>
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="p-3 border-t flex gap-2">
-            <input
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="כתוב הודעה..."
-              className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Button onClick={handleSend} disabled={!newMessage.trim()}>שלח</Button>
-          </div>
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

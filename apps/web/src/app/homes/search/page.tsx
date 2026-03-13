@@ -200,7 +200,7 @@ export default function HomesSearchPage() {
               </div>
 
               <Sheet>
-                <SheetTrigger asChild>
+                <SheetTrigger>
                   <Button variant="outline" className="lg:hidden">
                     סינון
                     {activeFilterCount > 0 && <Badge className="mr-1">{activeFilterCount}</Badge>}
