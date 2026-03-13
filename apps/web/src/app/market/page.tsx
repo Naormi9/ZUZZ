@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button, ListingCard, Skeleton, Card, CardContent } from '@zuzz/ui';
 import { api } from '@/lib/api';
 
@@ -76,7 +77,7 @@ export default function MarketPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-6">קטגוריות</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {CATEGORIES.map((cat) => (
-            <a
+            <Link
               key={cat.value}
               href={`/market/search?category=${cat.value}`}
               className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 hover:border-purple-300 hover:bg-purple-50 transition-colors group"
@@ -85,7 +86,7 @@ export default function MarketPage() {
               <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
                 {cat.label}
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -94,9 +95,9 @@ export default function MarketPage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">מודעות אחרונות</h2>
-          <a href="/market/search" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+          <Link href="/market/search" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
             הצג הכל
-          </a>
+          </Link>
         </div>
 
         {loading ? (
@@ -136,9 +137,9 @@ export default function MarketPage() {
         ) : (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">אין מודעות עדיין</p>
-            <a href="/market/create" className="text-purple-600 hover:underline mt-2 inline-block">
+            <Link href="/market/create" className="text-purple-600 hover:underline mt-2 inline-block">
               פרסם את המודעה הראשונה
-            </a>
+            </Link>
           </div>
         )}
       </section>

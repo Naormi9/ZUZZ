@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button, ListingCard, Skeleton, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@zuzz/ui';
 import { api } from '../../lib/api';
 
@@ -142,9 +143,9 @@ export default function CarsHomePage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">רכבים מומלצים</h2>
-          <a href="/cars/search" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+          <Link href="/cars/search" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
             הצג הכל ←
-          </a>
+          </Link>
         </div>
 
         {loading ? (
@@ -191,9 +192,9 @@ export default function CarsHomePage() {
         ) : (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">אין רכבים מומלצים כרגע</p>
-            <a href="/cars/search" className="text-blue-600 hover:underline mt-2 inline-block">
+            <Link href="/cars/search" className="text-blue-600 hover:underline mt-2 inline-block">
               חפש רכבים
-            </a>
+            </Link>
           </div>
         )}
       </section>

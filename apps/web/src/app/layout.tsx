@@ -1,16 +1,9 @@
 import type { Metadata } from 'next';
-import { Heebo } from 'next/font/google';
 import { Providers } from '@/lib/providers';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import './globals.css';
-
-const heebo = Heebo({
-  subsets: ['hebrew', 'latin'],
-  variable: '--font-heebo',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'ZUZZ — המקום שבו עסקאות זזות באמת',
@@ -25,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" className={heebo.variable}>
+    <html lang="he" dir="rtl">
       <body className="flex min-h-screen flex-col font-sans">
         <Providers>
           <Header />

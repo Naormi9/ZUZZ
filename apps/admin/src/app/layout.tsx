@@ -1,13 +1,6 @@
 import type { Metadata } from 'next';
-import { Heebo } from 'next/font/google';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import './globals.css';
-
-const heebo = Heebo({
-  subsets: ['hebrew', 'latin'],
-  variable: '--font-heebo',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'ZUZZ ניהול — לוח בקרה',
@@ -20,7 +13,7 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" className={heebo.variable}>
+    <html lang="he" dir="rtl">
       <body className="font-sans">
         <div className="flex min-h-screen">
           <AdminSidebar />

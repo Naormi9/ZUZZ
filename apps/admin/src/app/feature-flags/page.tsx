@@ -46,7 +46,7 @@ export default function FeatureFlagsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Feature Flags</h1>
-        <p className="mt-1 text-gray-500">ניהול דגלי פיצ'רים של הפלטפורמה</p>
+        <p className="mt-1 text-gray-500">ניהול דגלי פיצ&apos;רים של הפלטפורמה</p>
       </div>
 
       {/* Error */}
@@ -117,7 +117,7 @@ export default function FeatureFlagsPage() {
 
         {!loading && flags.length === 0 && (
           <div className="rounded-xl border border-gray-200 bg-white py-12 text-center text-gray-500">
-            אין דגלי פיצ'רים מוגדרים
+            אין דגלי פיצ&apos;רים מוגדרים
           </div>
         )}
       </div>
