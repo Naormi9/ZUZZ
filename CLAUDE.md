@@ -79,6 +79,8 @@ Key ideas:
 - admin
 - analytics
 - cms
+- logger (structured logging via Pino)
+- redis (shared Redis client)
 
 ## Important coding rules
 - Avoid hardcoding external vendor logic directly into feature code
@@ -102,19 +104,27 @@ Key ideas:
 
 ## Commands
 ```bash
-pnpm install         # Install all dependencies
-pnpm dev             # Start all apps in dev mode
-pnpm build           # Build all packages and apps
-pnpm lint            # Lint all packages
-pnpm typecheck       # Type-check all packages
-pnpm test            # Run all tests
-pnpm format          # Format code with Prettier
-pnpm db:generate     # Generate Prisma client
-pnpm db:push         # Push schema to database
-pnpm db:seed         # Seed demo data
-pnpm db:studio       # Open Prisma Studio GUI
-pnpm docker:up       # Start PostgreSQL, Redis, MinIO, MailHog
-pnpm docker:down     # Stop Docker services
+pnpm install           # Install all dependencies
+pnpm dev               # Start all apps in dev mode
+pnpm build             # Build all packages and apps
+pnpm lint              # Lint all packages (real ESLint)
+pnpm typecheck         # Type-check all packages
+pnpm test              # Run all tests (vitest)
+pnpm test:e2e          # Run Playwright E2E tests
+pnpm format            # Format code with Prettier
+pnpm db:generate       # Generate Prisma client
+pnpm db:push           # Push schema to database (dev only!)
+pnpm db:migrate:dev    # Create new migration (dev)
+pnpm db:migrate:deploy # Apply pending migrations (production)
+pnpm db:migrate:status # Check migration status
+pnpm db:seed           # Seed demo data
+pnpm db:studio         # Open Prisma Studio GUI
+pnpm db:backup         # Backup PostgreSQL
+pnpm db:restore        # Restore PostgreSQL from backup
+pnpm docker:up         # Start PostgreSQL, Redis, MinIO, MailHog
+pnpm docker:down       # Stop Docker services
+pnpm docker:prod:up    # Start production stack
+pnpm docker:prod:down  # Stop production stack
 ```
 
 ## When implementing new features

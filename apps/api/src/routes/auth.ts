@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { prisma } from '@zuzz/database';
 import { loginSchema, registerSchema, verifyOtpSchema } from '@zuzz/validation';
 import { generateOtp } from '@zuzz/shared-utils';
+import { createLogger } from '@zuzz/logger';
 import { signToken, authenticate } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+
+const logger = createLogger('api:auth');
 
 export const authRouter = Router();
 
@@ -25,7 +28,7 @@ authRouter.post('/login', async (req, res, next) => {
     });
 
     // TODO: Send email via email provider
-    console.log(`📧 OTP for ${email}: ${code}`);
+    logger.debug({ email, code }, 'OTP generated');
 
     res.json({ success: true, data: { message: 'קוד אימות נשלח לאימייל' } });
   } catch (err) {
@@ -65,7 +68,7 @@ authRouter.post('/register', async (req, res, next) => {
       data: { userId: user.id, email: data.email, code, type: 'login', expiresAt },
     });
 
-    console.log(`📧 OTP for ${data.email}: ${code}`);
+    logger.debug({ email: data.email, code }, 'OTP generated');
 
     res.status(201).json({
       success: true,
@@ -112,7 +115,7 @@ authRouter.post('/verify', async (req, res, next) => {
       data: { usedAt: new Date() },
     });
 
-    let user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new AppError(404, 'USER_NOT_FOUND', 'משתמש לא נמצא');
     }

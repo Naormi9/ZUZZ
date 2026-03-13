@@ -11,6 +11,7 @@ export interface AuthUser {
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: AuthUser;
@@ -18,18 +19,27 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.AUTH_SECRET || 'dev-secret-change-in-production-min32chars';
+function getJwtSecret(): string {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret || secret.length < 32) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('AUTH_SECRET must be set and at least 32 characters in production');
+    }
+    return 'dev-secret-change-in-production-min32chars';
+  }
+  return secret;
+}
 
 export function signToken(user: AuthUser): string {
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name, roles: user.roles },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: '7d' },
   );
 }
 
 export function verifyToken(token: string): AuthUser {
-  return jwt.verify(token, JWT_SECRET) as AuthUser;
+  return jwt.verify(token, getJwtSecret()) as AuthUser;
 }
 
 export async function authenticate(req: Request, _res: Response, next: NextFunction) {

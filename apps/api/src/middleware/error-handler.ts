@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { createLogger } from '@zuzz/logger';
+
+const logger = createLogger('api:error');
 
 export class AppError extends Error {
   constructor(
@@ -14,9 +17,13 @@ export class AppError extends Error {
 }
 
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  console.error('Error:', err);
-
   if (err instanceof AppError) {
+    if (err.statusCode >= 500) {
+      logger.error({ err, code: err.code }, err.message);
+      captureException(err);
+    } else {
+      logger.warn({ code: err.code, statusCode: err.statusCode }, err.message);
+    }
     return res.status(err.statusCode).json({
       success: false,
       error: {
@@ -44,6 +51,9 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     });
   }
 
+  logger.error({ err }, 'Unhandled error');
+  captureException(err);
+
   return res.status(500).json({
     success: false,
     error: {
@@ -51,4 +61,16 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
       message: 'שגיאת שרת פנימית',
     },
   });
+}
+
+/** Capture exception to Sentry if configured */
+function captureException(err: Error) {
+  try {
+    const Sentry = require('@sentry/node');
+    if (Sentry.isInitialized?.()) {
+      Sentry.captureException(err);
+    }
+  } catch {
+    // Sentry not installed or not configured — skip silently
+  }
 }

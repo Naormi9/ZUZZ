@@ -1,11 +1,28 @@
+// Sentry must be initialized before all other imports
+try {
+  if (process.env.SENTRY_DSN) {
+    const Sentry = require('@sentry/node');
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV ?? 'development',
+      tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    });
+  }
+} catch {
+  // Sentry not installed — continue without it
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
 import path from 'path';
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
+import pinoHttp from 'pino-http';
+import { createLogger } from '@zuzz/logger';
+import { disconnectRedis } from '@zuzz/redis';
+import { prisma } from '@zuzz/database';
 
 import { authRouter } from './routes/auth';
 import { usersRouter } from './routes/users';
@@ -23,7 +40,10 @@ import { analyticsRouter } from './routes/analytics';
 import { uploadRouter } from './routes/upload';
 import { healthRouter } from './routes/health';
 import { errorHandler } from './middleware/error-handler';
+import { globalRateLimiter, authRateLimiter, uploadRateLimiter } from './middleware/rate-limiter';
 import { setupWebSocket } from './websocket';
+
+const logger = createLogger('api');
 
 const app = express();
 const httpServer = createServer(app);
@@ -48,14 +68,15 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(morgan('dev'));
+app.use(pinoHttp({ logger: logger as any, autoLogging: { ignore: (req) => (req as any).url === '/api/health/live' } }));
+app.use(globalRateLimiter);
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Routes
 app.use('/api/health', healthRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authRateLimiter, authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/cars', carsRouter);
@@ -68,7 +89,7 @@ app.use('/api/leads', leadsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/analytics', analyticsRouter);
-app.use('/api/upload', uploadRouter);
+app.use('/api/upload', uploadRateLimiter, uploadRouter);
 
 // Error handling
 app.use(errorHandler);
@@ -78,8 +99,43 @@ setupWebSocket(io);
 
 const PORT = process.env.API_PORT || 4000;
 httpServer.listen(PORT, () => {
-  console.log(`🚀 ZUZZ API running on http://localhost:${PORT}`);
-  console.log(`📡 WebSocket ready on ws://localhost:${PORT}`);
+  logger.info({ port: PORT }, 'ZUZZ API started');
 });
+
+// Graceful shutdown
+let isShuttingDown = false;
+
+async function gracefulShutdown(signal: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  logger.info({ signal }, 'Shutting down gracefully...');
+
+  // Hard timeout to force exit
+  const forceTimer = setTimeout(() => {
+    logger.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 15_000);
+  forceTimer.unref();
+
+  try {
+    // Stop accepting new connections
+    httpServer.close();
+    io.close();
+
+    // Disconnect services
+    await prisma.$disconnect();
+    await disconnectRedis();
+
+    logger.info('Shutdown complete');
+    process.exit(0);
+  } catch (err) {
+    logger.error({ err }, 'Error during shutdown');
+    process.exit(1);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 export { app, io };

@@ -99,6 +99,10 @@ messagesRouter.post('/send', authenticate, async (req, res, next) => {
       throw new AppError(400, 'INVALID', 'תוכן ההודעה ריק');
     }
 
+    if (content.length > 5000) {
+      throw new AppError(400, 'INVALID', 'ההודעה ארוכה מדי (מקסימום 5000 תווים)');
+    }
+
     let conv;
 
     if (conversationId) {

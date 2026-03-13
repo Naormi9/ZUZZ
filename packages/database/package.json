@@ -8,11 +8,13 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:status": "prisma migrate status",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force",
     "typecheck": "tsc --noEmit",
-    "lint": "echo 'database lint ok'"
+    "lint": "eslint src/ --ext .ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.0"
