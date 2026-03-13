@@ -1,0 +1,853 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════
+// AUTH & USERS
+// ═══════════════════════════════════════
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  phone           String?
+  name            String
+  avatarUrl       String?
+  roles           String[]  @default(["user"])
+  isEmailVerified Boolean   @default(false)
+  isPhoneVerified Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  profile             UserProfile?
+  sessions            Session[]
+  otpCodes            OtpCode[]
+  listings            Listing[]
+  favorites           Favorite[]
+  savedSearches       SavedSearch[]
+  conversationsAsBuyer  Conversation[] @relation("BuyerConversations")
+  conversationsAsSeller Conversation[] @relation("SellerConversations")
+  messages            Message[]
+  leadsAsBuyer        Lead[]          @relation("BuyerLeads")
+  leadsAsSeller       Lead[]          @relation("SellerLeads")
+  notifications       Notification[]
+  payments            Payment[]
+  subscriptions       Subscription[]
+  organizationMembers OrganizationMember[]
+  auditLogs           AuditLog[]
+  moderationNotes     ModerationNote[]
+  cannedReplies       CannedReply[]
+  recentlyViewed      RecentlyViewed[]
+
+  @@index([email])
+  @@index([roles])
+  @@map("users")
+}
+
+model UserProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  displayName        String
+  bio                String?
+  avatarUrl          String?
+  city               String?
+  region             String?
+  website            String?
+  responseTimeMinutes Int?
+  responseRate       Int?     // 0-100
+  listingsCount      Int      @default(0)
+  soldCount          Int      @default(0)
+  verificationStatus String   @default("pending") // pending, verified, rejected
+  badges             Json     @default("[]")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  code      String
+  type      String   @default("login") // login, verify_email, verify_phone
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, code])
+  @@map("otp_codes")
+}
+
+// ═══════════════════════════════════════
+// ORGANIZATIONS
+// ═══════════════════════════════════════
+
+model Organization {
+  id                 String   @id @default(cuid())
+  name               String
+  type               String   // dealer, agency, developer, business
+  logoUrl            String?
+  description        String?
+  website            String?
+  phone              String?
+  email              String?
+  address            String?
+  city               String?
+  region             String?
+  lat                Float?
+  lng                Float?
+  licenseNumber      String?
+  verificationStatus String   @default("pending")
+  isActive           Boolean  @default(true)
+  metadata           Json     @default("{}")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  members       OrganizationMember[]
+  listings      Listing[]
+  subscriptions Subscription[]
+  dealerProfile DealerProfile?
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String   @default("member") // owner, admin, member
+  joinedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model DealerProfile {
+  id              String   @id @default(cuid())
+  organizationId  String   @unique
+  specialties     String[] @default([])
+  openingHours    Json?
+  avgResponseTime Int?
+  avgResponseRate Int?
+  rating          Float?
+  reviewCount     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("dealer_profiles")
+}
+
+// ═══════════════════════════════════════
+// LISTINGS (SHARED)
+// ═══════════════════════════════════════
+
+model Listing {
+  id                 String    @id @default(cuid())
+  userId             String
+  organizationId     String?
+  vertical           String    // cars, homes, market
+  status             String    @default("draft") // draft, pending_review, active, paused, sold, archived, rejected, expired
+  moderationStatus   String    @default("pending") // pending, approved, rejected, changes_requested, flagged
+  title              String
+  description        String?
+  priceAmount        Int
+  priceCurrency      String    @default("ILS")
+  isNegotiable       Boolean   @default(false)
+  city               String?
+  region             String?
+  neighborhood       String?
+  lat                Float?
+  lng                Float?
+  viewCount          Int       @default(0)
+  favoriteCount      Int       @default(0)
+  completenessScore  Int       @default(0)
+  trustScore         Int?
+  isFeatured         Boolean   @default(false)
+  isPromoted         Boolean   @default(false)
+  promotionExpiresAt DateTime?
+  publishedAt        DateTime?
+  expiresAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  user           User          @relation(fields: [userId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  media          ListingMedia[]
+  documents      ListingDocument[]
+  statusHistory  ListingStatusHistory[]
+  favorites      Favorite[]
+  conversations  Conversation[]
+  leads          Lead[]
+  promotions     Promotion[]
+  reports        ListingReport[]
+  carDetails     CarListing?
+  propertyDetails PropertyListing?
+  marketDetails  MarketListing?
+  trustFactors   TrustFactor[]
+  recentlyViewed RecentlyViewed[]
+
+  @@index([vertical, status])
+  @@index([userId])
+  @@index([city, region])
+  @@index([priceAmount])
+  @@index([createdAt])
+  @@index([publishedAt])
+  @@index([trustScore])
+  @@map("listings")
+}
+
+model ListingMedia {
+  id           String  @id @default(cuid())
+  listingId    String
+  url          String
+  thumbnailUrl String?
+  type         String  @default("image") // image, video
+  mimeType     String?
+  size         Int?
+  width        Int?
+  height       Int?
+  order        Int     @default(0)
+  alt          String?
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_media")
+}
+
+model ListingDocument {
+  id                 String   @id @default(cuid())
+  listingId          String
+  type               String   // vehicle_license, vehicle_test, insurance, etc.
+  url                String
+  name               String
+  verificationStatus String   @default("pending")
+  uploadedAt         DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_documents")
+}
+
+model ListingStatusHistory {
+  id         String   @id @default(cuid())
+  listingId  String
+  fromStatus String
+  toStatus   String
+  reason     String?
+  changedBy  String
+  createdAt  DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_status_history")
+}
+
+model ListingReport {
+  id          String   @id @default(cuid())
+  listingId   String
+  reportedBy  String
+  reason      String
+  description String?
+  status      String   @default("open") // open, investigating, resolved, dismissed
+  createdAt   DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@index([status])
+  @@map("listing_reports")
+}
+
+// ═══════════════════════════════════════
+// CAR LISTINGS
+// ═══════════════════════════════════════
+
+model CarListing {
+  id                    String    @id @default(cuid())
+  listingId             String    @unique
+  licensePlate          String?
+  vin                   String?
+  make                  String
+  model                 String
+  trim                  String?
+  year                  Int
+  firstRegistrationDate DateTime?
+  bodyType              String?
+  mileage               Int
+  handCount             Int       @default(0)
+  ownershipType         String    @default("private")
+  gearbox               String
+  fuelType              String
+  engineVolume          Int?
+  horsepower            Int?
+  seats                 Int?
+  color                 String?
+  interiorColor         String?
+  testUntil             DateTime?
+  sellerType            String    @default("private") // private, dealer, leasing_company
+
+  // Seller declarations
+  accidentDeclared      Boolean   @default(false)
+  accidentDetails       String?
+  engineReplaced        Boolean   @default(false)
+  gearboxReplaced       Boolean   @default(false)
+  frameDamage           Boolean   @default(false)
+  maintenanceHistory    String?   // full_agency, partial_agency, independent, none
+  numKeys               Int?
+  warrantyExists        Boolean   @default(false)
+  warrantyDetails       String?
+  recallStatus          String?   // none, open, resolved
+  personalImport        Boolean   @default(false)
+
+  // EV fields
+  isElectric            Boolean   @default(false)
+  batteryCapacity       Float?
+  batteryHealth         Int?
+  batteryWarrantyUntil  DateTime?
+  rangeKm               Int?
+  acChargeKw            Float?
+  dcChargeKw            Float?
+  chargeConnectorType   String?
+
+  features              String[]  @default([])
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([make, model])
+  @@index([year])
+  @@index([fuelType])
+  @@index([gearbox])
+  @@index([mileage])
+  @@index([sellerType])
+  @@map("car_listings")
+}
+
+// ═══════════════════════════════════════
+// PROPERTY LISTINGS
+// ═══════════════════════════════════════
+
+model PropertyListing {
+  id                 String    @id @default(cuid())
+  listingId          String    @unique
+  propertyType       String
+  listingType        String    @default("sale") // sale, rent, roommates
+  rooms              Float
+  bathrooms          Int       @default(1)
+  floor              Int?
+  totalFloors        Int?
+  sizeSqm            Float
+  balconySqm         Float?
+  gardenSqm          Float?
+  parkingSpots       Int?
+  condition          String
+  yearBuilt          Int?
+  isAccessible       Boolean   @default(false)
+  hasElevator        Boolean   @default(false)
+  hasSafeRoom        Boolean   @default(false)
+  hasStorage         Boolean   @default(false)
+  hasAirConditioning Boolean   @default(false)
+  hasCentralHeating  Boolean   @default(false)
+  hasSolarHeater     Boolean   @default(false)
+  furniture          String?   // none, partial, full
+  entryDate          DateTime?
+  isImmediate        Boolean   @default(false)
+  arnona             Int?
+  vaadBait           Int?
+  sellerType         String    @default("owner") // owner, agent, developer
+  projectId          String?
+  features           String[]  @default([])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  listing Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id])
+
+  @@index([propertyType, listingType])
+  @@index([rooms])
+  @@index([sizeSqm])
+  @@map("property_listings")
+}
+
+model Project {
+  id             String    @id @default(cuid())
+  name           String
+  developerId    String
+  description    String?
+  city           String
+  neighborhood   String?
+  address        String?
+  lat            Float?
+  lng            Float?
+  status         String    @default("planning") // planning, under_construction, partially_delivered, completed
+  totalUnits     Int?
+  availableUnits Int?
+  priceMin       Int?
+  priceMax       Int?
+  deliveryDate   DateTime?
+  media          Json      @default("[]")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  properties PropertyListing[]
+
+  @@map("projects")
+}
+
+// ═══════════════════════════════════════
+// MARKET LISTINGS
+// ═══════════════════════════════════════
+
+model MarketListing {
+  id                String   @id @default(cuid())
+  listingId         String   @unique
+  category          String
+  condition         String
+  brand             String?
+  attributes        Json     @default("{}")
+  shippingAvailable Boolean  @default(false)
+  isFreeDelivery    Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([category])
+  @@map("market_listings")
+}
+
+// ═══════════════════════════════════════
+// TRUST
+// ═══════════════════════════════════════
+
+model TrustFactor {
+  id          String   @id @default(cuid())
+  listingId   String
+  type        String
+  category    String   // identity, documentation, pricing, completeness, history, behavior, verification
+  status      String   // positive, negative, warning, neutral
+  weight      Float    @default(1)
+  score       Float    @default(0)
+  label       String
+  labelHe     String
+  description String?
+  createdAt   DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("trust_factors")
+}
+
+model VerificationRecord {
+  id         String    @id @default(cuid())
+  userId     String
+  type       String    // identity, phone, email, dealer_license, ownership
+  status     String    @default("pending") // pending, verified, rejected, expired
+  provider   String?
+  externalId String?
+  metadata   Json      @default("{}")
+  verifiedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@map("verification_records")
+}
+
+// ═══════════════════════════════════════
+// COMMUNICATION
+// ═══════════════════════════════════════
+
+model Conversation {
+  id                 String   @id @default(cuid())
+  listingId          String
+  buyerId            String
+  sellerId           String
+  lastMessageAt      DateTime @default(now())
+  lastMessagePreview String?
+  buyerUnreadCount   Int      @default(0)
+  sellerUnreadCount  Int      @default(0)
+  status             String   @default("active") // active, archived, blocked
+  createdAt          DateTime @default(now())
+
+  listing  Listing   @relation(fields: [listingId], references: [id])
+  buyer    User      @relation("BuyerConversations", fields: [buyerId], references: [id])
+  seller   User      @relation("SellerConversations", fields: [sellerId], references: [id])
+  messages Message[]
+
+  @@unique([listingId, buyerId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  type           String    @default("text") // text, system, offer, canned_reply
+  isRead         Boolean   @default(false)
+  readAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model Lead {
+  id          String    @id @default(cuid())
+  listingId   String
+  buyerId     String
+  sellerId    String
+  type        String    // contact, test_drive, inspection, financing, insurance, offer
+  status      String    @default("new") // new, contacted, qualified, converted, lost
+  message     String?
+  phone       String?
+  email       String?
+  metadata    Json      @default("{}")
+  respondedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id])
+  buyer   User    @relation("BuyerLeads", fields: [buyerId], references: [id])
+  seller  User    @relation("SellerLeads", fields: [sellerId], references: [id])
+
+  @@index([sellerId, status])
+  @@index([listingId])
+  @@map("leads")
+}
+
+model CannedReply {
+  id      String @id @default(cuid())
+  userId  String
+  label   String
+  content String
+  order   Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("canned_replies")
+}
+
+// ═══════════════════════════════════════
+// FAVORITES & SEARCH
+// ═══════════════════════════════════════
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+model SavedSearch {
+  id             String    @id @default(cuid())
+  userId         String
+  vertical       String
+  name           String?
+  filters        Json
+  alertEnabled   Boolean   @default(false)
+  alertFrequency String?   // instant, daily, weekly
+  lastAlertAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_searches")
+}
+
+model RecentlyViewed {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  viewedAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@map("recently_viewed")
+}
+
+// ═══════════════════════════════════════
+// BILLING
+// ═══════════════════════════════════════
+
+model Promotion {
+  id        String   @id @default(cuid())
+  listingId String
+  userId    String
+  type      String   // boost, highlight, featured, top_of_search, gallery
+  startAt   DateTime
+  endAt     DateTime
+  isActive  Boolean  @default(true)
+  amount    Int
+  currency  String   @default("ILS")
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id])
+
+  @@index([listingId])
+  @@map("promotions")
+}
+
+model Subscription {
+  id                 String    @id @default(cuid())
+  userId             String
+  organizationId     String?
+  plan               String    @default("free") // free, basic, pro, enterprise
+  status             String    @default("active") // active, past_due, cancelled, expired
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelledAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  user         User          @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  userId            String
+  amount            Int
+  currency          String   @default("ILS")
+  status            String   @default("pending") // pending, processing, completed, failed, refunded
+  provider          String   @default("sandbox")
+  providerPaymentId String?
+  description       String
+  metadata          Json     @default("{}")
+  createdAt         DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  invoices Invoice[]
+
+  @@index([userId])
+  @@map("payments")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  paymentId     String
+  invoiceNumber String   @unique
+  userId        String
+  amount        Int
+  tax           Int      @default(0)
+  total         Int
+  currency      String   @default("ILS")
+  items         Json
+  issuedAt      DateTime @default(now())
+  pdfUrl        String?
+
+  payment Payment @relation(fields: [paymentId], references: [id])
+
+  @@map("invoices")
+}
+
+// ═══════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  link      String?
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  channels  String[]  @default(["in_app"])
+  metadata  Json      @default("{}")
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ═══════════════════════════════════════
+// ADMIN & MODERATION
+// ═══════════════════════════════════════
+
+model ModerationCase {
+  id         String   @id @default(cuid())
+  listingId  String?
+  userId     String?
+  reportId   String?
+  type       String   // listing_review, user_report, fraud_detection, content_report
+  status     String   @default("open") // open, in_review, resolved, escalated
+  priority   String   @default("medium") // low, medium, high, critical
+  assignedTo String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  notes   ModerationNote[]
+  actions ModerationAction[]
+
+  @@index([status, priority])
+  @@map("moderation_cases")
+}
+
+model ModerationNote {
+  id       String   @id @default(cuid())
+  caseId   String
+  authorId String
+  content  String
+  createdAt DateTime @default(now())
+
+  case   ModerationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  author User           @relation(fields: [authorId], references: [id])
+
+  @@map("moderation_notes")
+}
+
+model ModerationAction {
+  id          String   @id @default(cuid())
+  caseId      String
+  action      String   // approve, reject, request_changes, suspend_user, archive_listing, mark_fraud, add_note
+  performedBy String
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  case ModerationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("moderation_actions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json     @default("{}")
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ═══════════════════════════════════════
+// CMS
+// ═══════════════════════════════════════
+
+model Article {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  type        String    @default("page") // page, guide, article, landing
+  title       String
+  titleHe     String?
+  content     String
+  contentHe   String?
+  excerpt     String?
+  coverImage  String?
+  seoTitle    String?
+  seoDescription String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([type, isPublished])
+  @@map("articles")
+}
+
+// ═══════════════════════════════════════
+// FEATURE FLAGS
+// ═══════════════════════════════════════
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  isEnabled   Boolean  @default(false)
+  rules       Json     @default("[]")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@map("feature_flags")
+}
+
+// ═══════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  type       String
+  userId     String?
+  sessionId  String?
+  properties Json     @default("{}")
+  source     String   @default("web")
+  userAgent  String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("analytics_events")
+}

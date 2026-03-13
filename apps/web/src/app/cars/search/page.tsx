@@ -1,0 +1,562 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardContent,
+  Input,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Skeleton,
+  Badge,
+  ListingCard,
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  EmptyState,
+} from '@zuzz/ui';
+import { api } from '@/lib/api';
+import { SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
+
+interface CarSearchResult {
+  id: string;
+  title: string;
+  price: { amount: number; currency: string };
+  isNegotiable: boolean;
+  media: { url: string; thumbnailUrl?: string }[];
+  location: { city: string };
+  trustScore: number;
+  isFeatured: boolean;
+  isPromoted: boolean;
+  car: {
+    make: string;
+    model: string;
+    year: number;
+    mileage: number;
+    gearbox: string;
+    fuelType: string;
+    hand: number;
+  };
+  trustFactors: { label: string; status: string }[];
+}
+
+interface SearchResponse {
+  data: CarSearchResult[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+const MAKES = [
+  'טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה',
+  'פולקסווגן', 'BMW', 'מרצדס', 'אאודי', 'ניסאן',
+  'סוזוקי', 'שברולט', 'סובארו', 'הונדה', 'רנו',
+  'פיג\'ו', 'סיטרואן', 'פורד', 'אופל', 'מיצובישי',
+];
+
+const FUEL_TYPES = [
+  { label: 'בנזין', value: 'petrol' },
+  { label: 'דיזל', value: 'diesel' },
+  { label: 'היברידי', value: 'hybrid' },
+  { label: 'חשמלי', value: 'electric' },
+  { label: 'גז', value: 'lpg' },
+];
+
+const GEARBOX_OPTIONS = [
+  { label: 'אוטומט', value: 'automatic' },
+  { label: 'ידני', value: 'manual' },
+  { label: 'רובוטי', value: 'robotic' },
+];
+
+const SORT_OPTIONS = [
+  { label: 'מחיר: נמוך לגבוה', value: 'price_asc' },
+  { label: 'מחיר: גבוה לנמוך', value: 'price_desc' },
+  { label: 'שנה: חדש', value: 'year_desc' },
+  { label: 'ק"מ: נמוך', value: 'mileage_asc' },
+  { label: 'אמון: גבוה', value: 'trust_desc' },
+  { label: 'חדש ביותר', value: 'newest' },
+];
+
+const HAND_OPTIONS = [
+  { label: 'יד ראשונה', value: '1' },
+  { label: 'עד יד שנייה', value: '2' },
+  { label: 'עד יד שלישית', value: '3' },
+  { label: 'עד יד רביעית', value: '4' },
+];
+
+const currentYear = new Date().getFullYear();
+
+export default function CarsSearchPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [results, setResults] = useState<CarSearchResult[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Filter state
+  const [make, setMake] = useState(searchParams.get('make') ?? '');
+  const [model, setModel] = useState(searchParams.get('model') ?? '');
+  const [yearFrom, setYearFrom] = useState(searchParams.get('yearFrom') ?? '');
+  const [yearTo, setYearTo] = useState(searchParams.get('yearTo') ?? '');
+  const [priceFrom, setPriceFrom] = useState(searchParams.get('priceFrom') ?? '');
+  const [priceTo, setPriceTo] = useState(searchParams.get('priceTo') ?? '');
+  const [fuelType, setFuelType] = useState(searchParams.get('fuelType') ?? '');
+  const [gearbox, setGearbox] = useState(searchParams.get('gearbox') ?? '');
+  const [maxMileage, setMaxMileage] = useState(searchParams.get('maxMileage') ?? '');
+  const [maxHand, setMaxHand] = useState(searchParams.get('maxHand') ?? '');
+  const [evOnly, setEvOnly] = useState(searchParams.get('evOnly') === 'true');
+  const [verifiedSeller, setVerifiedSeller] = useState(searchParams.get('verifiedSeller') === 'true');
+  const [noAccidents, setNoAccidents] = useState(searchParams.get('noAccidents') === 'true');
+  const [sort, setSort] = useState(searchParams.get('sort') ?? 'newest');
+  const [page, setPage] = useState(Number(searchParams.get('page') ?? '1'));
+
+  const buildQuery = useCallback(() => {
+    const params = new URLSearchParams();
+    if (make) params.set('make', make);
+    if (model) params.set('model', model);
+    if (yearFrom) params.set('yearFrom', yearFrom);
+    if (yearTo) params.set('yearTo', yearTo);
+    if (priceFrom) params.set('priceFrom', priceFrom);
+    if (priceTo) params.set('priceTo', priceTo);
+    if (fuelType) params.set('fuelType', fuelType);
+    if (gearbox) params.set('gearbox', gearbox);
+    if (maxMileage) params.set('maxMileage', maxMileage);
+    if (maxHand) params.set('maxHand', maxHand);
+    if (evOnly) params.set('evOnly', 'true');
+    if (verifiedSeller) params.set('verifiedSeller', 'true');
+    if (noAccidents) params.set('noAccidents', 'true');
+    if (sort) params.set('sort', sort);
+    params.set('page', String(page));
+    params.set('pageSize', '20');
+    return params.toString();
+  }, [make, model, yearFrom, yearTo, priceFrom, priceTo, fuelType, gearbox, maxMileage, maxHand, evOnly, verifiedSeller, noAccidents, sort, page]);
+
+  useEffect(() => {
+    async function fetchResults() {
+      setLoading(true);
+      try {
+        const query = buildQuery();
+        const res = await api.get<SearchResponse>(`/api/cars/search?${query}`);
+        setResults(res.data);
+        setTotal(res.total);
+        setTotalPages(res.totalPages);
+      } catch {
+        setResults([]);
+        setTotal(0);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchResults();
+  }, [buildQuery]);
+
+  function applyFilters() {
+    setPage(1);
+    setMobileFiltersOpen(false);
+    const query = buildQuery();
+    router.push(`/cars/search?${query}`);
+  }
+
+  function clearFilters() {
+    setMake('');
+    setModel('');
+    setYearFrom('');
+    setYearTo('');
+    setPriceFrom('');
+    setPriceTo('');
+    setFuelType('');
+    setGearbox('');
+    setMaxMileage('');
+    setMaxHand('');
+    setEvOnly(false);
+    setVerifiedSeller(false);
+    setNoAccidents(false);
+    setPage(1);
+  }
+
+  const activeFilterCount = [make, model, yearFrom, priceTo, fuelType, gearbox, maxMileage, maxHand, evOnly, verifiedSeller, noAccidents].filter(Boolean).length;
+
+  const filterContent = (
+    <div className="space-y-6">
+      {/* Make */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">יצרן</label>
+        <Select value={make} onValueChange={setMake}>
+          <SelectTrigger>
+            <SelectValue placeholder="כל היצרנים" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">כל היצרנים</SelectItem>
+            {MAKES.map((m) => (
+              <SelectItem key={m} value={m}>{m}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Model */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">דגם</label>
+        <Input
+          value={model}
+          onChange={(e) => setModel(e.target.value)}
+          placeholder="הקלד דגם..."
+        />
+      </div>
+
+      {/* Year Range */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">שנתון</label>
+        <div className="flex gap-2">
+          <Input
+            type="number"
+            value={yearFrom}
+            onChange={(e) => setYearFrom(e.target.value)}
+            placeholder="משנה"
+            min={2000}
+            max={currentYear}
+          />
+          <Input
+            type="number"
+            value={yearTo}
+            onChange={(e) => setYearTo(e.target.value)}
+            placeholder="עד שנה"
+            min={2000}
+            max={currentYear}
+          />
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">טווח מחירים</label>
+        <div className="flex gap-2">
+          <Input
+            type="number"
+            value={priceFrom}
+            onChange={(e) => setPriceFrom(e.target.value)}
+            placeholder="ממחיר"
+          />
+          <Input
+            type="number"
+            value={priceTo}
+            onChange={(e) => setPriceTo(e.target.value)}
+            placeholder="עד מחיר"
+          />
+        </div>
+      </div>
+
+      {/* Fuel Type */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">סוג דלק</label>
+        <Select value={fuelType} onValueChange={setFuelType}>
+          <SelectTrigger>
+            <SelectValue placeholder="כל הסוגים" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">כל הסוגים</SelectItem>
+            {FUEL_TYPES.map((f) => (
+              <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Gearbox */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">תיבת הילוכים</label>
+        <Select value={gearbox} onValueChange={setGearbox}>
+          <SelectTrigger>
+            <SelectValue placeholder="הכל" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">הכל</SelectItem>
+            {GEARBOX_OPTIONS.map((g) => (
+              <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Mileage */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">ק&quot;מ מקסימלי</label>
+        <Input
+          type="number"
+          value={maxMileage}
+          onChange={(e) => setMaxMileage(e.target.value)}
+          placeholder='ק"מ מקסימלי'
+        />
+      </div>
+
+      {/* Hand */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">יד</label>
+        <Select value={maxHand} onValueChange={setMaxHand}>
+          <SelectTrigger>
+            <SelectValue placeholder="כל הידות" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">כל הידות</SelectItem>
+            {HAND_OPTIONS.map((h) => (
+              <SelectItem key={h.value} value={h.value}>{h.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Checkboxes */}
+      <div className="space-y-3 border-t border-gray-200 pt-4">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={evOnly}
+            onChange={(e) => setEvOnly(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">חשמלי בלבד</span>
+        </label>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={verifiedSeller}
+            onChange={(e) => setVerifiedSeller(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">מוכר מאומת</span>
+        </label>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={noAccidents}
+            onChange={(e) => setNoAccidents(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">ללא תאונות</span>
+        </label>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 pt-2">
+        <Button onClick={applyFilters} className="flex-1">
+          החל סינון
+        </Button>
+        <Button variant="outline" onClick={clearFilters}>
+          נקה
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">חיפוש רכבים</h1>
+              {!loading && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {total > 0 ? `${total.toLocaleString('he-IL')} תוצאות` : 'אין תוצאות'}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Sort */}
+              <div className="hidden sm:block">
+                <Select value={sort} onValueChange={(v) => { setSort(v); setPage(1); }}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="מיון" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SORT_OPTIONS.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Mobile filter button */}
+              <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="lg:hidden gap-2">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span>סינון</span>
+                    {activeFilterCount > 0 && (
+                      <Badge className="mr-1">{activeFilterCount}</Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80 overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>סינון רכבים</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    {filterContent}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+
+          {/* Mobile sort */}
+          <div className="mt-3 sm:hidden">
+            <Select value={sort} onValueChange={(v) => { setSort(v); setPage(1); }}>
+              <SelectTrigger>
+                <SelectValue placeholder="מיון" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <Card>
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-semibold text-gray-900">סינון</h2>
+                  {activeFilterCount > 0 && (
+                    <Badge variant="secondary">{activeFilterCount} פעילים</Badge>
+                  )}
+                </div>
+                {filterContent}
+              </CardContent>
+            </Card>
+          </aside>
+
+          {/* Results */}
+          <div className="flex-1 min-w-0">
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <Card key={i} className="overflow-hidden">
+                    <Skeleton className="aspect-[4/3] w-full" />
+                    <CardContent className="p-4 space-y-2">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-6 w-1/3" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : results.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {results.map((car) => (
+                    <ListingCard
+                      key={car.id}
+                      id={car.id}
+                      title={car.title}
+                      price={car.price.amount}
+                      currency={car.price.currency}
+                      isNegotiable={car.isNegotiable}
+                      imageUrl={car.media[0]?.thumbnailUrl || car.media[0]?.url}
+                      city={car.location.city}
+                      trustScore={car.trustScore}
+                      isFeatured={car.isFeatured}
+                      isPromoted={car.isPromoted}
+                      details={[
+                        { label: 'שנה', value: String(car.car.year) },
+                        { label: 'ק"מ', value: car.car.mileage.toLocaleString('he-IL') },
+                        { label: 'תיבת הילוכים', value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני' },
+                      ]}
+                      badges={car.trustFactors
+                        .filter((f) => f.status === 'positive')
+                        .slice(0, 2)
+                        .map((f) => ({ label: f.label, variant: 'verified' as const }))}
+                      href={`/cars/${car.id}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                      <span>הקודם</span>
+                    </Button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                        let pageNum: number;
+                        if (totalPages <= 7) {
+                          pageNum = i + 1;
+                        } else if (page <= 4) {
+                          pageNum = i + 1;
+                        } else if (page >= totalPages - 3) {
+                          pageNum = totalPages - 6 + i;
+                        } else {
+                          pageNum = page - 3 + i;
+                        }
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setPage(pageNum)}
+                            className={`h-9 w-9 rounded-lg text-sm font-medium transition-colors ${
+                              page === pageNum
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      <span>הבא</span>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <EmptyState
+                title="לא נמצאו תוצאות"
+                description="נסה לשנות את הסינון או להרחיב את החיפוש"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
