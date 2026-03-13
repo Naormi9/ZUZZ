@@ -3,6 +3,7 @@ import { prisma } from '@zuzz/database';
 import { createListingBaseSchema, reportListingSchema } from '@zuzz/validation';
 import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { serializeListingDetail } from '../serializers/listing';
 
 export const listingsRouter = Router();
 
@@ -12,7 +13,12 @@ listingsRouter.get('/:id', optionalAuth, async (req, res, next) => {
     const listing = await prisma.listing.findUnique({
       where: { id: req.params.id },
       include: {
-        user: { select: { id: true, name: true, createdAt: true } },
+        user: {
+          include: {
+            profile: true,
+            organizationMembers: { include: { organization: true } },
+          },
+        },
         media: { orderBy: { order: 'asc' } },
         documents: true,
         carDetails: true,
@@ -54,10 +60,8 @@ listingsRouter.get('/:id', optionalAuth, async (req, res, next) => {
       isFavorited = !!fav;
     }
 
-    res.json({
-      success: true,
-      data: { ...listing, isFavorited },
-    });
+    const serialized = serializeListingDetail({ ...listing, isFavorited });
+    res.json({ success: true, data: serialized });
   } catch (err) {
     next(err);
   }
@@ -130,10 +134,10 @@ listingsRouter.post('/:id/report', authenticate, async (req, res, next) => {
 
     const report = await prisma.listingReport.create({
       data: {
-        listingId: req.params.id,
+        listingId: req.params.id!,
         reportedBy: req.user!.id,
         reason: data.reason,
-        description: data.description,
+        description: data.description ?? '',
       },
     });
 

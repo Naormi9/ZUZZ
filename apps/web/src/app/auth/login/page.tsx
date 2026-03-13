@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { Button, Card, CardContent, Input } from '@zuzz/ui';
-import { api } from '@/lib/api';
-import { useAuthStore } from '@/lib/hooks/use-auth';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'register' | 'verify'>('login');
@@ -12,13 +11,13 @@ export default function LoginPage() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { setAuth } = useAuthStore();
+  const { requestOtp, register, verifyOtp, devLogin } = useAuth();
 
   const handleLogin = async () => {
     setLoading(true);
     setError('');
     try {
-      await api.post('/api/auth/login', { email });
+      await requestOtp(email);
       setMode('verify');
     } catch (e: any) {
       setError(e.message || 'שגיאה בהתחברות');
@@ -31,7 +30,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      await api.post('/api/auth/register', { email, name });
+      await register(name, email);
       setMode('verify');
     } catch (e: any) {
       setError(e.message || 'שגיאה בהרשמה');
@@ -44,8 +43,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await api.post<{ data: { token: string; user: any } }>('/api/auth/verify', { email, code });
-      setAuth(res.data.token, res.data.user);
+      await verifyOtp(email, code);
       window.location.href = '/dashboard';
     } catch (e: any) {
       setError(e.message || 'קוד שגוי');
@@ -56,9 +54,9 @@ export default function LoginPage() {
 
   const handleDevLogin = async () => {
     setLoading(true);
+    setError('');
     try {
-      const res = await api.post<{ data: { token: string; user: any } }>('/api/auth/dev-login', { email });
-      setAuth(res.data.token, res.data.user);
+      await devLogin(email);
       window.location.href = '/dashboard';
     } catch (e: any) {
       setError(e.message || 'שגיאה');

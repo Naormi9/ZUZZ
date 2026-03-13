@@ -59,7 +59,7 @@ favoritesRouter.post('/:listingId', authenticate, async (req, res, next) => {
       where: {
         userId_listingId: {
           userId: req.user!.id,
-          listingId: req.params.listingId,
+          listingId: req.params.listingId!,
         },
       },
     });
@@ -67,16 +67,16 @@ favoritesRouter.post('/:listingId', authenticate, async (req, res, next) => {
     if (existing) {
       await prisma.favorite.delete({ where: { id: existing.id } });
       await prisma.listing.update({
-        where: { id: req.params.listingId },
+        where: { id: req.params.listingId! },
         data: { favoriteCount: { decrement: 1 } },
       });
       res.json({ success: true, data: { isFavorited: false } });
     } else {
       await prisma.favorite.create({
-        data: { userId: req.user!.id, listingId: req.params.listingId },
+        data: { userId: req.user!.id, listingId: req.params.listingId! },
       });
       await prisma.listing.update({
-        where: { id: req.params.listingId },
+        where: { id: req.params.listingId! },
         data: { favoriteCount: { increment: 1 } },
       });
       res.json({ success: true, data: { isFavorited: true } });

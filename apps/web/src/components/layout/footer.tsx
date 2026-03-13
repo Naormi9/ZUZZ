@@ -30,10 +30,10 @@ const footerSections = [
   {
     title: 'למפרסמים',
     links: [
-      { label: 'פרסם מודעה', href: '/listings/new' },
-      { label: 'פורטל סוחרים', href: '/dealers' },
-      { label: 'חבילות קידום', href: '/promotions' },
-      { label: 'מנויים עסקיים', href: '/subscriptions' },
+      { label: 'פרסם מודעה', href: '/cars/create' },
+      { label: 'פורטל סוחרים', href: '/cars' },
+      { label: 'חבילות קידום', href: '/cars' },
+      { label: 'מנויים עסקיים', href: '/cars' },
     ],
   },
 ] as const;

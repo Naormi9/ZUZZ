@@ -74,13 +74,13 @@ export default function HomesPage() {
     if (propertyType) params.set('propertyType', propertyType);
     if (rooms) {
       const [from, to] = rooms.split('-');
-      params.set('roomsFrom', from);
-      params.set('roomsTo', to);
+      params.set('roomsFrom', from ?? '');
+      params.set('roomsTo', to ?? '');
     }
     if (priceRange) {
       const [from, to] = priceRange.split('-');
-      params.set('priceFrom', from);
-      params.set('priceTo', to);
+      params.set('priceFrom', from ?? '');
+      params.set('priceTo', to ?? '');
     }
     window.location.href = `/homes/search?${params.toString()}`;
   }

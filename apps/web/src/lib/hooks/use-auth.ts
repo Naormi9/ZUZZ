@@ -8,7 +8,8 @@ interface User {
   email: string;
   phone?: string;
   avatarUrl?: string;
-  role: 'user' | 'dealer' | 'admin';
+  roles: string[];
+  profile?: any;
 }
 
 interface AuthState {
@@ -16,12 +17,17 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  loginWithPhone: (phone: string, code: string) => Promise<void>;
-  logout: () => void;
-  setUser: (user: User) => void;
-  setToken: (token: string) => void;
-  refreshUser: () => Promise<void>;
+
+  // OTP flow
+  requestOtp: (email: string) => Promise<void>;
+  register: (name: string, email: string, phone?: string) => Promise<void>;
+  verifyOtp: (email: string, code: string) => Promise<void>;
+  devLogin: (email: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshMe: () => Promise<void>;
+
+  // Internal
+  setAuth: (token: string, user: User) => void;
 }
 
 export const useAuth = create<AuthState>()(
@@ -32,72 +38,72 @@ export const useAuth = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
 
-      login: async (email: string, password: string) => {
+      requestOtp: async (email: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.post<{ user: User; token: string }>(
-            '/auth/login',
-            { email, password },
-          );
-          set({
-            user: response.user,
-            token: response.token,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          await api.post('/api/auth/login', { email });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      register: async (name: string, email: string, phone?: string) => {
+        set({ isLoading: true });
+        try {
+          await api.post('/api/auth/register', { email, name, phone });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      verifyOtp: async (email: string, code: string) => {
+        set({ isLoading: true });
+        try {
+          const res = await api.post<{ success: boolean; data: { token: string; user: User } }>('/api/auth/verify', { email, code });
+          const { token, user } = res.data;
+          set({ user, token, isAuthenticated: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
           throw error;
         }
       },
 
-      loginWithPhone: async (phone: string, code: string) => {
+      devLogin: async (email: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.post<{ user: User; token: string }>(
-            '/auth/login/phone',
-            { phone, code },
-          );
-          set({
-            user: response.user,
-            token: response.token,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          const res = await api.post<{ success: boolean; data: { token: string; user: any } }>('/api/auth/dev-login', { email });
+          const { token, user } = res.data;
+          set({ user, token, isAuthenticated: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
           throw error;
         }
       },
 
-      logout: () => {
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-        });
+      logout: async () => {
+        try {
+          await api.post('/api/auth/logout');
+        } catch {
+          // ignore logout errors
+        }
+        set({ user: null, token: null, isAuthenticated: false });
       },
 
-      setUser: (user: User) => {
-        set({ user, isAuthenticated: true });
-      },
-
-      setToken: (token: string) => {
-        set({ token });
-      },
-
-      refreshUser: async () => {
+      refreshMe: async () => {
         const { token } = get();
         if (!token) return;
-
         try {
-          const user = await api.get<User>('/auth/me', { token });
-          set({ user, isAuthenticated: true });
+          const res = await api.get<{ success: boolean; data: User }>('/api/auth/me');
+          set({ user: res.data, isAuthenticated: true });
         } catch (error) {
           if (error instanceof ApiError && error.status === 401) {
             set({ user: null, token: null, isAuthenticated: false });
           }
         }
+      },
+
+      setAuth: (token: string, user: User) => {
+        set({ token, user, isAuthenticated: true });
       },
     }),
     {
@@ -110,3 +116,6 @@ export const useAuth = create<AuthState>()(
     },
   ),
 );
+
+// Alias for backwards compatibility
+export const useAuthStore = useAuth;

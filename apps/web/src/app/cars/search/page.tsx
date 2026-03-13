@@ -26,34 +26,17 @@ import {
 import { api } from '@/lib/api';
 import { SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface CarSearchResult {
-  id: string;
-  title: string;
-  price: { amount: number; currency: string };
-  isNegotiable: boolean;
-  media: { url: string; thumbnailUrl?: string }[];
-  location: { city: string };
-  trustScore: number;
-  isFeatured: boolean;
-  isPromoted: boolean;
-  car: {
-    make: string;
-    model: string;
-    year: number;
-    mileage: number;
-    gearbox: string;
-    fuelType: string;
-    hand: number;
+interface SearchApiResponse {
+  success: boolean;
+  data: {
+    items: any[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasMore: boolean;
+    facets?: any;
   };
-  trustFactors: { label: string; status: string }[];
-}
-
-interface SearchResponse {
-  data: CarSearchResult[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 const MAKES = [
@@ -99,7 +82,7 @@ export default function CarsSearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [results, setResults] = useState<CarSearchResult[]>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -148,10 +131,10 @@ export default function CarsSearchPage() {
       setLoading(true);
       try {
         const query = buildQuery();
-        const res = await api.get<SearchResponse>(`/api/cars/search?${query}`);
-        setResults(res.data);
-        setTotal(res.total);
-        setTotalPages(res.totalPages);
+        const res = await api.get<SearchApiResponse>(`/api/cars/search?${query}`);
+        setResults(res.data.items);
+        setTotal(res.data.total);
+        setTotalPages(res.data.totalPages);
       } catch {
         setResults([]);
         setTotal(0);
@@ -395,7 +378,7 @@ export default function CarsSearchPage() {
 
               {/* Mobile filter button */}
               <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-                <SheetTrigger asChild>
+                <SheetTrigger>
                   <Button variant="outline" className="lg:hidden gap-2">
                     <SlidersHorizontal className="h-4 w-4" />
                     <span>סינון</span>
@@ -487,9 +470,9 @@ export default function CarsSearchPage() {
                         { label: 'תיבת הילוכים', value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני' },
                       ]}
                       badges={car.trustFactors
-                        .filter((f) => f.status === 'positive')
+                        .filter((f: { status: string; label: string }) => f.status === 'positive')
                         .slice(0, 2)
-                        .map((f) => ({ label: f.label, variant: 'verified' as const }))}
+                        .map((f: { status: string; label: string }) => ({ label: f.label, variant: 'verified' as const }))}
                       href={`/cars/${car.id}`}
                     />
                   ))}

@@ -59,6 +59,7 @@ interface CarListing {
   trustFactors: { key: string; label: string; status: string; description?: string }[];
   isFeatured: boolean;
   isPromoted: boolean;
+  isFavorited?: boolean;
   createdAt: string;
   car: {
     make: string;
@@ -143,10 +144,11 @@ export default function CarDetailPage() {
       setLoading(true);
       try {
         const [listingRes, similarRes] = await Promise.all([
-          api.get<CarListing>(`/api/listings/${id}`),
-          api.get<{ data: SimilarCar[] }>(`/api/listings/${id}/similar?limit=6`),
+          api.get<{ success: boolean; data: CarListing }>(`/api/listings/${id}`),
+          api.get<{ success: boolean; data: SimilarCar[] }>(`/api/cars/${id}/similar?limit=6`),
         ]);
-        setListing(listingRes);
+        setListing(listingRes.data);
+        setIsFavorited(listingRes.data.isFavorited ?? false);
         setSimilarCars(similarRes.data);
       } catch {
         // handled by empty state
@@ -163,12 +165,8 @@ export default function CarDetailPage() {
       return;
     }
     try {
-      if (isFavorited) {
-        await api.delete(`/api/favorites/${id}`);
-      } else {
-        await api.post('/api/favorites', { listingId: id });
-      }
-      setIsFavorited(!isFavorited);
+      const res = await api.post<{ success: boolean; data: { isFavorited: boolean } }>(`/api/favorites/${id}`);
+      setIsFavorited(res.data.isFavorited);
     } catch {
       // fail silently
     }

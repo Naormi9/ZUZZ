@@ -13,7 +13,7 @@ const metricCards = [
   { key: 'openReports' as const, label: 'דיווחים פתוחים', icon: '🚩', color: 'text-red-600', bg: 'bg-red-50' },
   { key: 'newUsersToday' as const, label: 'משתמשים חדשים היום', icon: '🆕', color: 'text-indigo-600', bg: 'bg-indigo-50' },
   { key: 'newListingsToday' as const, label: 'מודעות חדשות היום', icon: '📝', color: 'text-teal-600', bg: 'bg-teal-50' },
-  { key: 'messagesToday' as const, label: 'הודעות היום', icon: '💬', color: 'text-purple-600', bg: 'bg-purple-50' },
+  { key: 'messagesExchangedToday' as const, label: 'הודעות היום', icon: '💬', color: 'text-purple-600', bg: 'bg-purple-50' },
   { key: 'revenueThisMonth' as const, label: 'הכנסות החודש', icon: '💰', color: 'text-emerald-600', bg: 'bg-emerald-50' },
 ] as const;
 

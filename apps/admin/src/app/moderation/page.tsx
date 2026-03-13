@@ -6,7 +6,17 @@ import { Button } from '@zuzz/ui';
 import { Card, CardContent } from '@zuzz/ui';
 import { Input } from '@zuzz/ui';
 import { Skeleton } from '@zuzz/ui';
-import { adminApi, type ModerationItem } from '@/lib/api';
+import { adminApi } from '@/lib/api';
+
+interface ModerationItem {
+  id: string;
+  title: string;
+  category: string;
+  user: { name: string };
+  status: 'pending' | 'approved' | 'rejected' | 'flagged';
+  createdAt: string;
+  imageUrl?: string;
+}
 
 type ModerationStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -37,7 +47,7 @@ export default function ModerationPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminApi.getModerationQueue({ status: activeTab, limit: 50 });
+      const response = await adminApi.getModerationQueue({ status: activeTab, pageSize: 50 });
       setItems(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת תור המודרציה');
@@ -129,16 +139,16 @@ export default function ModerationPage() {
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
                             <h3 className="text-lg font-semibold text-gray-900">
-                              {item.listingTitle}
+                              {item.title}
                             </h3>
                             <span className={`admin-badge ${statusColors[item.status]}`}>
                               {statusLabels[item.status]}
                             </span>
                           </div>
                           <div className="flex gap-4 text-sm text-gray-500">
-                            <span>סוג: {item.listingType}</span>
-                            <span>מפרסם: {item.sellerName}</span>
-                            <span>הוגש: {formatDate(item.submittedAt)}</span>
+                            <span>סוג: {item.category}</span>
+                            <span>מפרסם: {item.user?.name}</span>
+                            <span>הוגש: {formatDate(item.createdAt)}</span>
                           </div>
                         </div>
 

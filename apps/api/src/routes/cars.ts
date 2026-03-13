@@ -3,6 +3,8 @@ import { prisma } from '@zuzz/database';
 import { carDetailsSchema, carSellerStatementsSchema, carPricingSchema, carSearchFiltersSchema } from '@zuzz/validation';
 import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { serializeListingCard, serializeSearchResults } from '../serializers/listing';
+import { computeAndPersistTrust } from '../lib/trust';
 
 export const carsRouter = Router();
 
@@ -197,42 +199,22 @@ carsRouter.post('/:id/publish', authenticate, async (req, res, next) => {
       throw new AppError(400, 'INCOMPLETE', 'יש להזין מיקום');
     }
 
-    // Compute completeness score
-    const car = listing.carDetails;
-    let filled = 0;
-    const total = 20;
-    if (car.make) filled++;
-    if (car.model) filled++;
-    if (car.year) filled++;
-    if (car.mileage >= 0) filled++;
-    if (car.gearbox) filled++;
-    if (car.fuelType) filled++;
-    if (car.color) filled++;
-    if (car.bodyType) filled++;
-    if (car.engineVolume) filled++;
-    if (car.horsepower) filled++;
-    if (car.seats) filled++;
-    if (car.testUntil) filled++;
-    if (car.handCount >= 0) filled++;
-    if (car.ownershipType) filled++;
-    if (car.maintenanceHistory) filled++;
-    if (car.numKeys) filled++;
-    if (listing.description) filled++;
-    if (listing.media.length > 0) filled++;
-    if (listing.priceAmount > 0) filled++;
-    if (listing.city) filled++;
-
-    const completenessScore = Math.round((filled / total) * 100);
-
-    const updated = await prisma.listing.update({
+    // Publish the listing first
+    await prisma.listing.update({
       where: { id: req.params.id },
       data: {
         status: 'active',
         moderationStatus: 'approved', // Auto-approve in MVP
         publishedAt: new Date(),
-        completenessScore,
         expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
       },
+    });
+
+    // Compute trust score, completeness, and persist factors via the trust engine
+    await computeAndPersistTrust(req.params.id!);
+
+    const updated = await prisma.listing.findUnique({
+      where: { id: req.params.id },
       include: { carDetails: true, media: true },
     });
 
@@ -242,14 +224,69 @@ carsRouter.post('/:id/publish', authenticate, async (req, res, next) => {
   }
 });
 
+// Get featured/recent cars for landing page
+carsRouter.get('/featured', async (_req, res, next) => {
+  try {
+    const listings = await prisma.listing.findMany({
+      where: {
+        vertical: 'cars',
+        status: 'active',
+      },
+      include: {
+        media: { take: 1, orderBy: { order: 'asc' } },
+        carDetails: true,
+        trustFactors: true,
+        user: { select: { id: true, name: true } },
+      },
+      orderBy: [{ isFeatured: 'desc' }, { isPromoted: 'desc' }, { publishedAt: 'desc' }],
+      take: 8,
+    });
+
+    res.json({ success: true, data: listings.map(serializeListingCard) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Search cars
 carsRouter.get('/search', optionalAuth, async (req, res, next) => {
   try {
-    const filters = carSearchFiltersSchema.parse(req.query);
+    // Normalize query params: accept both single values and arrays
+    const query: Record<string, any> = { ...req.query };
+    // Map frontend param names to backend schema names
+    if (query.maxMileage && !query.mileageTo) query.mileageTo = query.maxMileage;
+    if (query.maxHand && !query.handCountMax) query.handCountMax = query.maxHand;
+    if (query.evOnly === 'true' && !query.isElectric) query.isElectric = 'true';
+    // Ensure array fields accept single values
+    ['make', 'model', 'fuelType', 'gearbox', 'bodyType', 'color', 'sellerType', 'city', 'region'].forEach(key => {
+      if (query[key] && typeof query[key] === 'string') {
+        query[key] = [query[key]];
+      }
+    });
+
+    const filters = carSearchFiltersSchema.parse(query);
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
-    const sortBy = (req.query.sortBy as string) || 'createdAt';
-    const sortOrder = (req.query.sortOrder as string) || 'desc';
+
+    // Map sort string to sortBy/sortOrder
+    const sortParam = (req.query.sort as string) || '';
+    let sortBy = (req.query.sortBy as string) || 'createdAt';
+    let sortOrder = (req.query.sortOrder as string) || 'desc';
+    if (sortParam) {
+      const sortMap: Record<string, [string, string]> = {
+        'price_asc': ['price', 'asc'],
+        'price_desc': ['price', 'desc'],
+        'year_desc': ['year', 'desc'],
+        'year_asc': ['year', 'asc'],
+        'mileage_asc': ['mileage', 'asc'],
+        'mileage_desc': ['mileage', 'desc'],
+        'trust_desc': ['trustScore', 'desc'],
+        'newest': ['createdAt', 'desc'],
+      };
+      if (sortMap[sortParam]) {
+        [sortBy, sortOrder] = sortMap[sortParam];
+      }
+    }
 
     const where: any = {
       vertical: 'cars',
@@ -333,20 +370,12 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
 
     res.json({
       success: true,
-      data: {
-        items: listings,
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize),
-        hasMore: page * pageSize < total,
-        facets: [
-          { field: 'make', label: 'יצרן', values: facets[0].map((f) => ({ value: f.make, label: f.make, count: f._count.make })) },
-          { field: 'fuelType', label: 'סוג דלק', values: facets[1].map((f) => ({ value: f.fuelType, label: f.fuelType, count: f._count.fuelType })) },
-          { field: 'gearbox', label: 'תיבת הילוכים', values: facets[2].map((f) => ({ value: f.gearbox, label: f.gearbox, count: f._count.gearbox })) },
-          { field: 'bodyType', label: 'סוג מרכב', values: facets[3].filter((f) => f.bodyType).map((f) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })) },
-        ],
-      },
+      data: serializeSearchResults(listings, { total, page, pageSize }, [
+        { field: 'make', label: 'יצרן', values: facets[0].map((f) => ({ value: f.make, label: f.make, count: f._count.make })) },
+        { field: 'fuelType', label: 'סוג דלק', values: facets[1].map((f) => ({ value: f.fuelType, label: f.fuelType, count: f._count.fuelType })) },
+        { field: 'gearbox', label: 'תיבת הילוכים', values: facets[2].map((f) => ({ value: f.gearbox, label: f.gearbox, count: f._count.gearbox })) },
+        { field: 'bodyType', label: 'סוג מרכב', values: facets[3].filter((f) => f.bodyType).map((f) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })) },
+      ]),
     });
   } catch (err) {
     next(err);
@@ -417,12 +446,14 @@ carsRouter.get('/:id/similar', async (req, res, next) => {
       include: {
         media: { take: 1, orderBy: { order: 'asc' } },
         carDetails: true,
+        trustFactors: true,
+        user: { select: { id: true, name: true } },
       },
       take: 6,
       orderBy: { trustScore: 'desc' },
     });
 
-    res.json({ success: true, data: similar });
+    res.json({ success: true, data: similar.map(serializeListingCard) });
   } catch (err) {
     next(err);
   }

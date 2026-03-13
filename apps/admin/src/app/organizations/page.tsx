@@ -4,7 +4,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { Badge } from '@zuzz/ui';
 import { Button } from '@zuzz/ui';
 import { Skeleton } from '@zuzz/ui';
-import { adminApi, type Organization } from '@/lib/api';
+import { adminApi } from '@/lib/api';
+
+interface Organization {
+  id: string;
+  name: string;
+  type: string;
+  _count: { listings: number; members: number };
+  dealerProfile?: { verified: boolean } | null;
+  createdAt: string;
+}
 
 const typeLabels: Record<string, string> = {
   dealer: 'סוכנות רכב',
@@ -24,9 +33,8 @@ export default function OrganizationsPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminApi.getOrganizations({ page, limit: 20 });
-      setOrganizations(response.data);
-      setTotalPages(response.totalPages);
+      const orgs = await adminApi.getOrganizations() as Organization[];
+      setOrganizations(orgs);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת ארגונים');
     } finally {
@@ -94,13 +102,13 @@ export default function OrganizationsPage() {
                       </Badge>
                     </td>
                     <td className="text-gray-600">
-                      {new Intl.NumberFormat('he-IL').format(org.membersCount)}
+                      {new Intl.NumberFormat('he-IL').format(org._count?.members ?? 0)}
                     </td>
                     <td className="text-gray-600">
-                      {new Intl.NumberFormat('he-IL').format(org.listingsCount)}
+                      {new Intl.NumberFormat('he-IL').format(org._count?.listings ?? 0)}
                     </td>
                     <td>
-                      {org.verified ? (
+                      {org.dealerProfile?.verified ? (
                         <span className="admin-badge admin-badge-success">מאומת</span>
                       ) : (
                         <span className="admin-badge admin-badge-neutral">לא מאומת</span>

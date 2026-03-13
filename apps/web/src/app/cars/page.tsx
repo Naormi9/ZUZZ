@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Button, ListingCard, Skeleton, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@zuzz/ui';
 import { api } from '../../lib/api';
-import type { CarListing } from '@zuzz/types';
-import type { PaginatedResponse } from '@zuzz/types';
 
 const POPULAR_MAKES = [
   'טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה',
@@ -31,7 +29,7 @@ const YEAR_RANGES = [
 ];
 
 export default function CarsHomePage() {
-  const [featuredCars, setFeaturedCars] = useState<CarListing[]>([]);
+  const [featuredCars, setFeaturedCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMake, setSelectedMake] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
@@ -40,8 +38,8 @@ export default function CarsHomePage() {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const res = await api.get<PaginatedResponse<CarListing>>(
-          '/api/cars?featured=true&pageSize=8',
+        const res = await api.get<{ success: boolean; data: any[] }>(
+          '/api/cars/featured',
         );
         setFeaturedCars(res.data);
       } catch {
@@ -58,13 +56,13 @@ export default function CarsHomePage() {
     if (selectedMake) params.set('make', selectedMake);
     if (selectedPrice) {
       const [from, to] = selectedPrice.split('-');
-      params.set('priceFrom', from);
-      params.set('priceTo', to);
+      params.set('priceFrom', from ?? '');
+      params.set('priceTo', to ?? '');
     }
     if (selectedYear) {
       const [from, to] = selectedYear.split('-');
-      params.set('yearFrom', from);
-      params.set('yearTo', to);
+      params.set('yearFrom', from ?? '');
+      params.set('yearTo', to ?? '');
     }
     window.location.href = `/cars/search?${params.toString()}`;
   }
@@ -183,9 +181,9 @@ export default function CarsHomePage() {
                   { label: 'תיבת הילוכים', value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני' },
                 ]}
                 badges={car.trustFactors
-                  .filter((f) => f.status === 'positive')
+                  .filter((f: { status: string; label: string }) => f.status === 'positive')
                   .slice(0, 2)
-                  .map((f) => ({ label: f.label, variant: 'verified' as const }))}
+                  .map((f: { status: string; label: string }) => ({ label: f.label, variant: 'verified' as const }))}
                 href={`/cars/${car.id}`}
               />
             ))}

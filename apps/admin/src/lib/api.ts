@@ -19,16 +19,19 @@ class AdminApiClient {
         'Content-Type': 'application/json',
         ...headers,
       },
+      credentials: 'include',
       body: body ? JSON.stringify(body) : undefined,
       ...rest,
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'שגיאה לא צפויה' }));
+      const error = await response.json().catch(() => ({ message: 'שגיאה לא צפויה' })) as { message?: string };
       throw new ApiError(response.status, error.message || 'שגיאה בבקשה לשרת');
     }
 
-    return response.json();
+    const json = await response.json() as { success?: boolean; data?: T } & Record<string, unknown>;
+    // Unwrap the { success, data } envelope
+    return (json.data !== undefined ? json.data : json) as T;
   }
 
   async get<T>(endpoint: string): Promise<T> {
@@ -53,75 +56,70 @@ class AdminApiClient {
 
   // Dashboard
   getDashboardMetrics() {
-    return this.get<DashboardMetrics>('/admin/dashboard/metrics');
+    return this.get<DashboardMetrics>('/api/admin/metrics');
   }
 
   // Users
-  getUsers(params?: { search?: string; page?: number; limit?: number }) {
+  getUsers(params?: { search?: string; page?: number; pageSize?: number }) {
     const query = new URLSearchParams();
     if (params?.search) query.set('search', params.search);
     if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    return this.get<PaginatedResponse<User>>(`/admin/users?${query.toString()}`);
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    return this.get<PaginatedResponse<any>>(`/api/admin/users?${query.toString()}`);
   }
 
   toggleUserStatus(userId: string) {
-    return this.patch<User>(`/admin/users/${userId}/toggle-status`);
+    return this.patch<any>(`/api/admin/users/${userId}/toggle-active`);
   }
 
   // Moderation
-  getModerationQueue(params?: { status?: string; page?: number; limit?: number }) {
+  getModerationQueue(params?: { status?: string; page?: number; pageSize?: number }) {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
     if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    return this.get<PaginatedResponse<ModerationItem>>(`/admin/moderation?${query.toString()}`);
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    return this.get<PaginatedResponse<any>>(`/api/admin/moderation?${query.toString()}`);
   }
 
-  moderateItem(itemId: string, action: 'approve' | 'reject' | 'request_changes', reason?: string) {
-    return this.post(`/admin/moderation/${itemId}/${action}`, { reason });
+  moderateItem(listingId: string, action: 'approve' | 'reject' | 'request_changes' | 'flag', reason?: string) {
+    return this.post(`/api/admin/moderation/${listingId}/action`, { action, reason });
   }
 
   // Reports
-  getReports(params?: { status?: string; page?: number; limit?: number }) {
+  getReports(params?: { status?: string }) {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
-    if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    return this.get<PaginatedResponse<Report>>(`/admin/reports?${query.toString()}`);
+    return this.get<any[]>(`/api/admin/reports?${query.toString()}`);
   }
 
   resolveReport(reportId: string) {
-    return this.patch(`/admin/reports/${reportId}/resolve`);
+    return this.patch(`/api/admin/reports/${reportId}`, { status: 'resolved' });
   }
 
   dismissReport(reportId: string) {
-    return this.patch(`/admin/reports/${reportId}/dismiss`);
+    return this.patch(`/api/admin/reports/${reportId}`, { status: 'dismissed' });
   }
 
   // Organizations
-  getOrganizations(params?: { page?: number; limit?: number }) {
-    const query = new URLSearchParams();
-    if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    return this.get<PaginatedResponse<Organization>>(`/admin/organizations?${query.toString()}`);
+  getOrganizations() {
+    return this.get<any[]>('/api/admin/organizations');
   }
 
   // Feature Flags
   getFeatureFlags() {
-    return this.get<FeatureFlag[]>('/admin/feature-flags');
+    return this.get<FeatureFlag[]>('/api/admin/feature-flags');
   }
 
-  toggleFeatureFlag(flagId: string) {
-    return this.patch<FeatureFlag>(`/admin/feature-flags/${flagId}/toggle`);
+  toggleFeatureFlag(flagId: string, currentEnabled: boolean) {
+    return this.patch<FeatureFlag>(`/api/admin/feature-flags/${flagId}`, { isEnabled: !currentEnabled });
   }
 
   // Audit Logs
-  getAuditLogs(params?: { page?: number; limit?: number }) {
+  getAuditLogs(params?: { page?: number; pageSize?: number }) {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    return this.get<PaginatedResponse<AuditLog>>(`/admin/audit-logs?${query.toString()}`);
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    return this.get<PaginatedResponse<any>>(`/api/admin/audit-logs?${query.toString()}`);
   }
 }
 
@@ -143,74 +141,26 @@ export interface DashboardMetrics {
   openReports: number;
   newUsersToday: number;
   newListingsToday: number;
-  messagesToday: number;
+  messagesExchangedToday: number;
   revenueThisMonth: number;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-  listingsCount: number;
-  status: 'active' | 'inactive' | 'banned';
-  createdAt: string;
-}
-
-export interface ModerationItem {
-  id: string;
-  listingId: string;
-  listingTitle: string;
-  listingType: string;
-  sellerName: string;
-  status: 'pending' | 'approved' | 'rejected' | 'flagged';
-  submittedAt: string;
-  imageUrl?: string;
-}
-
-export interface Report {
-  id: string;
-  listingTitle: string;
-  reason: string;
-  reporterName: string;
-  status: 'open' | 'resolved' | 'dismissed';
-  createdAt: string;
-}
-
-export interface Organization {
-  id: string;
-  name: string;
-  type: string;
-  membersCount: number;
-  listingsCount: number;
-  verified: boolean;
-  createdAt: string;
 }
 
 export interface FeatureFlag {
   id: string;
+  key: string;
   name: string;
-  description: string;
-  enabled: boolean;
+  description: string | null;
+  isEnabled: boolean;
   updatedAt: string;
-}
-
-export interface AuditLog {
-  id: string;
-  userName: string;
-  action: string;
-  entity: string;
-  entityId: string;
-  timestamp: string;
-  details?: string;
+  createdAt: string;
 }
 
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
   page: number;
-  limit: number;
-  totalPages: number;
+  pageSize: number;
+  totalPages?: number;
 }
 
 export const adminApi = new AdminApiClient(API_BASE_URL);
