@@ -100,16 +100,22 @@ Key ideas:
 - Listing cards must be highly scannable
 - Trust information must be visible above the fold where possible
 
-## Commands to keep updated
-Document all real commands in README and keep this section synced:
-- install
-- dev
-- db setup
-- seed
-- test
-- lint
-- typecheck
-- build
+## Commands
+```bash
+pnpm install         # Install all dependencies
+pnpm dev             # Start all apps in dev mode
+pnpm build           # Build all packages and apps
+pnpm lint            # Lint all packages
+pnpm typecheck       # Type-check all packages
+pnpm test            # Run all tests
+pnpm format          # Format code with Prettier
+pnpm db:generate     # Generate Prisma client
+pnpm db:push         # Push schema to database
+pnpm db:seed         # Seed demo data
+pnpm db:studio       # Open Prisma Studio GUI
+pnpm docker:up       # Start PostgreSQL, Redis, MinIO, MailHog
+pnpm docker:down     # Stop Docker services
+```
 
 ## When implementing new features
 1. Update plan
