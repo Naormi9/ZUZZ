@@ -21,6 +21,11 @@ export function createEmailProvider(config: import('./types').EmailConfig): Emai
       return new SmtpEmailProvider(config);
     }
     case 'mock': {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(
+          'Mock email provider is not allowed in production. Configure SMTP credentials.',
+        );
+      }
       const { MockEmailProvider } =
         require('./providers/mock') as typeof import('./providers/mock');
       return new MockEmailProvider();
