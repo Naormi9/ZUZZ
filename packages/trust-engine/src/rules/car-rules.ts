@@ -1,9 +1,5 @@
 import type { CarListing, CarDetails, TrustFactor } from '@zuzz/types';
-import type {
-  TrustRuleDefinition,
-  RuleEvaluationContext,
-  EvaluatedRule,
-} from './common-rules';
+import type { TrustRuleDefinition, RuleEvaluationContext, EvaluatedRule } from './common-rules';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -153,8 +149,7 @@ export const testValidityRule: TrustRuleDefinition = {
 
     const testDate = new Date(car.testUntil);
     const now = new Date();
-    const daysUntilExpiry =
-      (testDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    const daysUntilExpiry = (testDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
 
     if (daysUntilExpiry > 60) {
       return {
@@ -223,7 +218,7 @@ export const mileageConsistencyRule: TrustRuleDefinition = {
         score: 0.2,
         status: 'warning',
         label: 'Unusually low mileage for vehicle age',
-        labelHe: 'קילומטראז\' נמוך באופן חשוד ביחס לגיל הרכב',
+        labelHe: "קילומטראז' נמוך באופן חשוד ביחס לגיל הרכב",
       };
     }
 
@@ -236,7 +231,7 @@ export const mileageConsistencyRule: TrustRuleDefinition = {
         score: 1,
         status: 'positive',
         label: 'Mileage consistent with vehicle age',
-        labelHe: 'קילומטראז\' תואם לגיל הרכב',
+        labelHe: "קילומטראז' תואם לגיל הרכב",
       };
     }
 
@@ -249,7 +244,7 @@ export const mileageConsistencyRule: TrustRuleDefinition = {
         score: 0.6,
         status: 'neutral',
         label: 'Higher than average mileage',
-        labelHe: 'קילומטראז\' גבוה מהממוצע',
+        labelHe: "קילומטראז' גבוה מהממוצע",
       };
     }
 
@@ -261,7 +256,7 @@ export const mileageConsistencyRule: TrustRuleDefinition = {
       score: 0.3,
       status: 'warning',
       label: 'Very high mileage',
-      labelHe: 'קילומטראז\' גבוה מאוד',
+      labelHe: "קילומטראז' גבוה מאוד",
     };
   },
 };
@@ -385,8 +380,7 @@ export const documentationCompletenessRule: TrustRuleDefinition = {
     }
 
     const coverageRatio = coveredCount / importantDocTypes.length;
-    const verificationBonus =
-      docs.length > 0 ? verifiedDocs.length / docs.length : 0;
+    const verificationBonus = docs.length > 0 ? verifiedDocs.length / docs.length : 0;
 
     // Weighted: 70% coverage, 30% verification status
     const score = coverageRatio * 0.7 + verificationBonus * 0.3;

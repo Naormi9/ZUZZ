@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { prisma } from '@zuzz/database';
-import { carDetailsSchema, carSellerStatementsSchema, carPricingSchema, carSearchFiltersSchema } from '@zuzz/validation';
+import {
+  carDetailsSchema,
+  carSellerStatementsSchema,
+  carPricingSchema,
+  carSearchFiltersSchema,
+} from '@zuzz/validation';
 import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
 import { serializeListingCard, serializeSearchResults } from '../serializers/listing';
@@ -76,7 +81,9 @@ carsRouter.put('/:id/details', authenticate, async (req, res, next) => {
         model: data.model,
         trim: data.trim,
         year: data.year,
-        firstRegistrationDate: data.firstRegistrationDate ? new Date(data.firstRegistrationDate) : null,
+        firstRegistrationDate: data.firstRegistrationDate
+          ? new Date(data.firstRegistrationDate)
+          : null,
         bodyType: data.bodyType,
         mileage: data.mileage,
         handCount: data.handCount,
@@ -204,7 +211,7 @@ carsRouter.post('/:id/publish', authenticate, async (req, res, next) => {
       where: { id: req.params.id },
       data: {
         status: 'active',
-        moderationStatus: 'approved', // Auto-approve in MVP
+        moderationStatus: 'pending', // Goes live immediately but flagged for async moderation review
         publishedAt: new Date(),
         expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
       },
@@ -258,7 +265,17 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
     if (query.maxHand && !query.handCountMax) query.handCountMax = query.maxHand;
     if (query.evOnly === 'true' && !query.isElectric) query.isElectric = 'true';
     // Ensure array fields accept single values
-    ['make', 'model', 'fuelType', 'gearbox', 'bodyType', 'color', 'sellerType', 'city', 'region'].forEach(key => {
+    [
+      'make',
+      'model',
+      'fuelType',
+      'gearbox',
+      'bodyType',
+      'color',
+      'sellerType',
+      'city',
+      'region',
+    ].forEach((key) => {
       if (query[key] && typeof query[key] === 'string') {
         query[key] = [query[key]];
       }
@@ -274,14 +291,14 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
     let sortOrder = (req.query.sortOrder as string) || 'desc';
     if (sortParam) {
       const sortMap: Record<string, [string, string]> = {
-        'price_asc': ['price', 'asc'],
-        'price_desc': ['price', 'desc'],
-        'year_desc': ['year', 'desc'],
-        'year_asc': ['year', 'asc'],
-        'mileage_asc': ['mileage', 'asc'],
-        'mileage_desc': ['mileage', 'desc'],
-        'trust_desc': ['trustScore', 'desc'],
-        'newest': ['createdAt', 'desc'],
+        price_asc: ['price', 'asc'],
+        price_desc: ['price', 'desc'],
+        year_desc: ['year', 'desc'],
+        year_asc: ['year', 'asc'],
+        mileage_asc: ['mileage', 'asc'],
+        mileage_desc: ['mileage', 'desc'],
+        trust_desc: ['trustScore', 'desc'],
+        newest: ['createdAt', 'desc'],
       };
       if (sortMap[sortParam]) {
         [sortBy, sortOrder] = sortMap[sortParam];
@@ -362,19 +379,54 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
 
     // Facets
     const facets = await Promise.all([
-      prisma.carListing.groupBy({ by: ['make'], _count: { make: true }, orderBy: { _count: { make: 'desc' } }, take: 20 }),
+      prisma.carListing.groupBy({
+        by: ['make'],
+        _count: { make: true },
+        orderBy: { _count: { make: 'desc' } },
+        take: 20,
+      }),
       prisma.carListing.groupBy({ by: ['fuelType'], _count: { fuelType: true } }),
       prisma.carListing.groupBy({ by: ['gearbox'], _count: { gearbox: true } }),
-      prisma.carListing.groupBy({ by: ['bodyType'], _count: { bodyType: true }, where: { bodyType: { not: null } } }),
+      prisma.carListing.groupBy({
+        by: ['bodyType'],
+        _count: { bodyType: true },
+        where: { bodyType: { not: null } },
+      }),
     ]);
 
     res.json({
       success: true,
       data: serializeSearchResults(listings, { total, page, pageSize }, [
-        { field: 'make', label: 'יצרן', values: facets[0].map((f) => ({ value: f.make, label: f.make, count: f._count.make })) },
-        { field: 'fuelType', label: 'סוג דלק', values: facets[1].map((f) => ({ value: f.fuelType, label: f.fuelType, count: f._count.fuelType })) },
-        { field: 'gearbox', label: 'תיבת הילוכים', values: facets[2].map((f) => ({ value: f.gearbox, label: f.gearbox, count: f._count.gearbox })) },
-        { field: 'bodyType', label: 'סוג מרכב', values: facets[3].filter((f) => f.bodyType).map((f) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })) },
+        {
+          field: 'make',
+          label: 'יצרן',
+          values: facets[0].map((f) => ({ value: f.make, label: f.make, count: f._count.make })),
+        },
+        {
+          field: 'fuelType',
+          label: 'סוג דלק',
+          values: facets[1].map((f) => ({
+            value: f.fuelType,
+            label: f.fuelType,
+            count: f._count.fuelType,
+          })),
+        },
+        {
+          field: 'gearbox',
+          label: 'תיבת הילוכים',
+          values: facets[2].map((f) => ({
+            value: f.gearbox,
+            label: f.gearbox,
+            count: f._count.gearbox,
+          })),
+        },
+        {
+          field: 'bodyType',
+          label: 'סוג מרכב',
+          values: facets[3]
+            .filter((f) => f.bodyType)
+            .map((f) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })),
+        },
       ]),
     });
   } catch (err) {
@@ -469,17 +521,32 @@ carsRouter.get('/lookup/:plate', async (req, res, next) => {
     // Mock response
     const mockVehicles: Record<string, any> = {
       '1234567': {
-        make: 'Toyota', model: 'Corolla', year: 2022,
-        engineVolume: 1800, fuelType: 'hybrid', gearbox: 'automatic',
-        color: 'לבן', bodyType: 'sedan', seats: 5,
-        testUntil: '2025-12-01', ownershipType: 'private',
+        make: 'Toyota',
+        model: 'Corolla',
+        year: 2022,
+        engineVolume: 1800,
+        fuelType: 'hybrid',
+        gearbox: 'automatic',
+        color: 'לבן',
+        bodyType: 'sedan',
+        seats: 5,
+        testUntil: '2025-12-01',
+        ownershipType: 'private',
       },
       '7654321': {
-        make: 'Tesla', model: 'Model Y', year: 2024,
-        fuelType: 'electric', gearbox: 'automatic',
-        color: 'שחור', bodyType: 'suv', seats: 5,
-        testUntil: '2027-06-01', ownershipType: 'private',
-        isElectric: true, batteryCapacity: 75, rangeKm: 533,
+        make: 'Tesla',
+        model: 'Model Y',
+        year: 2024,
+        fuelType: 'electric',
+        gearbox: 'automatic',
+        color: 'שחור',
+        bodyType: 'suv',
+        seats: 5,
+        testUntil: '2027-06-01',
+        ownershipType: 'private',
+        isElectric: true,
+        batteryCapacity: 75,
+        rangeKm: 533,
       },
     };
 

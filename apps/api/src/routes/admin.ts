@@ -32,7 +32,10 @@ adminRouter.get('/metrics', async (_req, res, next) => {
       prisma.listing.count({ where: { createdAt: { gte: today } } }),
       prisma.message.count({ where: { createdAt: { gte: today } } }),
       prisma.listingReport.count({ where: { status: 'open' } }),
-      prisma.payment.aggregate({ where: { status: 'completed', createdAt: { gte: thisMonth } }, _sum: { amount: true } }),
+      prisma.payment.aggregate({
+        where: { status: 'completed', createdAt: { gte: thisMonth } },
+        _sum: { amount: true },
+      }),
     ]);
 
     res.json({
@@ -57,7 +60,7 @@ adminRouter.get('/metrics', async (_req, res, next) => {
 adminRouter.get('/users', async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
     const search = req.query.search as string;
 
     const where: any = {};
@@ -129,9 +132,9 @@ adminRouter.patch('/users/:id/toggle-active', async (req, res, next) => {
 // Moderation queue
 adminRouter.get('/moderation', async (req, res, next) => {
   try {
-    const status = req.query.status as string || 'pending';
+    const status = (req.query.status as string) || 'pending';
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
     const where: any = { moderationStatus: status };
 
@@ -210,9 +213,10 @@ adminRouter.post('/moderation/:listingId/action', async (req, res, next) => {
         userId: listing.userId,
         type: action === 'approve' ? 'listing_approved' : 'listing_rejected',
         title: action === 'approve' ? 'מודעה אושרה' : 'מודעה נדחתה',
-        body: action === 'approve'
-          ? `המודעה "${listing.title}" אושרה ופורסמה`
-          : `המודעה "${listing.title}" נדחתה${reason ? ': ' + reason : ''}`,
+        body:
+          action === 'approve'
+            ? `המודעה "${listing.title}" אושרה ופורסמה`
+            : `המודעה "${listing.title}" נדחתה${reason ? ': ' + reason : ''}`,
         link: `/listings/${listing.id}`,
       },
     });
@@ -226,7 +230,7 @@ adminRouter.post('/moderation/:listingId/action', async (req, res, next) => {
 // Reports
 adminRouter.get('/reports', async (req, res, next) => {
   try {
-    const status = req.query.status as string || 'open';
+    const status = (req.query.status as string) || 'open';
     const reports = await prisma.listingReport.findMany({
       where: { status },
       include: {
@@ -402,7 +406,7 @@ adminRouter.patch('/feature-flags/:id', async (req, res, next) => {
 adminRouter.get('/audit-logs', async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 50;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 50, 100);
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({

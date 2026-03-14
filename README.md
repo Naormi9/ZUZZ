@@ -10,18 +10,18 @@ A Hebrew-first, RTL-native, trust-centric classifieds and transaction platform f
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Monorepo | pnpm + Turborepo |
+| Layer    | Technology                             |
+| -------- | -------------------------------------- |
+| Monorepo | pnpm + Turborepo                       |
 | Frontend | Next.js 15 (App Router) + Tailwind CSS |
-| Backend | Express + TypeScript |
-| Database | PostgreSQL + PostGIS + pg_trgm |
-| Cache | Redis |
-| Storage | MinIO (S3-compatible) |
-| ORM | Prisma |
-| Auth | JWT + Email OTP |
-| Realtime | Socket.IO |
-| CI | GitHub Actions |
+| Backend  | Express + TypeScript                   |
+| Database | PostgreSQL + PostGIS + pg_trgm         |
+| Cache    | Redis                                  |
+| Storage  | MinIO (S3-compatible)                  |
+| ORM      | Prisma                                 |
+| Auth     | JWT + Email OTP                        |
+| Realtime | Socket.IO                              |
+| CI       | GitHub Actions                         |
 
 ## Quick Start
 
@@ -39,12 +39,12 @@ pnpm dev
 
 ## Services
 
-| Service | URL |
-|---------|-----|
-| Web App | http://localhost:3000 |
-| Admin Panel | http://localhost:3001 |
-| API | http://localhost:4000 |
-| MailHog | http://localhost:8025 |
+| Service       | URL                   |
+| ------------- | --------------------- |
+| Web App       | http://localhost:3000 |
+| Admin Panel   | http://localhost:3001 |
+| API           | http://localhost:4000 |
+| MailHog       | http://localhost:8025 |
 | MinIO Console | http://localhost:9001 |
 
 ## Commands
@@ -104,12 +104,12 @@ infrastructure/ — Docker configs, scripts
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | System architecture overview |
-| [docs/local-setup.md](docs/local-setup.md) | Local development setup guide |
-| [docs/deployment.md](docs/deployment.md) | Deployment guide & checklist |
-| [docs/runbooks.md](docs/runbooks.md) | Operational runbooks |
+| Document                                     | Description                   |
+| -------------------------------------------- | ----------------------------- |
+| [docs/architecture.md](docs/architecture.md) | System architecture overview  |
+| [docs/local-setup.md](docs/local-setup.md)   | Local development setup guide |
+| [docs/deployment.md](docs/deployment.md)     | Deployment guide & checklist  |
+| [docs/runbooks.md](docs/runbooks.md)         | Operational runbooks          |
 
 ## Testing
 

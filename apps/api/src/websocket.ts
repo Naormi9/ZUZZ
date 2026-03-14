@@ -49,7 +49,10 @@ export function setupWebSocket(io: Server) {
 
         if (!isBuyer && !isSeller) {
           socket.emit('error', { message: 'Access denied' });
-          logger.warn({ userId: user.id, conversationId }, 'Unauthorized conversation join attempt');
+          logger.warn(
+            { userId: user.id, conversationId },
+            'Unauthorized conversation join attempt',
+          );
           return;
         }
 

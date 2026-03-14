@@ -1,7 +1,13 @@
 import { prisma } from '@zuzz/database';
 import { TrustEngine } from '@zuzz/trust-engine';
 import type { ListingBase, ListingVertical, MediaItem } from '@zuzz/types';
-import type { Listing, CarListing, ListingMedia, ListingDocument, UserProfile } from '@zuzz/database';
+import type {
+  Listing,
+  CarListing,
+  ListingMedia,
+  ListingDocument,
+  UserProfile,
+} from '@zuzz/database';
 
 const engine = new TrustEngine();
 
@@ -30,18 +36,20 @@ function toListingBase(listing: ListingWithRelations): ListingBase {
     price: { amount: listing.priceAmount, currency: listing.priceCurrency as any },
     isNegotiable: listing.isNegotiable,
     location: { city: listing.city ?? undefined, region: listing.region ?? undefined },
-    media: (listing.media ?? []).map((m: ListingMedia): MediaItem => ({
-      id: m.id,
-      url: m.url,
-      thumbnailUrl: m.thumbnailUrl ?? undefined,
-      type: m.type as any,
-      mimeType: m.mimeType ?? '',
-      size: m.size ?? 0,
-      width: m.width ?? undefined,
-      height: m.height ?? undefined,
-      order: m.order,
-      alt: m.alt ?? undefined,
-    })),
+    media: (listing.media ?? []).map(
+      (m: ListingMedia): MediaItem => ({
+        id: m.id,
+        url: m.url,
+        thumbnailUrl: m.thumbnailUrl ?? undefined,
+        type: m.type as any,
+        mimeType: m.mimeType ?? '',
+        size: m.size ?? 0,
+        width: m.width ?? undefined,
+        height: m.height ?? undefined,
+        order: m.order,
+        alt: m.alt ?? undefined,
+      }),
+    ),
     viewCount: listing.viewCount,
     favoriteCount: listing.favoriteCount,
     completenessScore: listing.completenessScore,
@@ -108,7 +116,9 @@ function toListingBase(listing: ListingWithRelations): ListingBase {
 /**
  * Computes trust score and factors for a listing, then persists them to the DB.
  */
-export async function computeAndPersistTrust(listingId: string): Promise<{ trustScore: number; completenessScore: number }> {
+export async function computeAndPersistTrust(
+  listingId: string,
+): Promise<{ trustScore: number; completenessScore: number }> {
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
     include: {
@@ -125,23 +135,27 @@ export async function computeAndPersistTrust(listingId: string): Promise<{ trust
 
   // Compute trust score
   const trustResult = engine.computeScore(listingBase, {
-    sellerProfile: listing.user?.profile ? {
-      id: listing.user.profile.id,
-      userId: listing.user.profile.userId,
-      displayName: listing.user.profile.displayName,
-      bio: listing.user.profile.bio ?? undefined,
-      avatarUrl: listing.user.profile.avatarUrl ?? undefined,
-      city: listing.user.profile.city ?? undefined,
-      region: listing.user.profile.region ?? undefined,
-      responseTimeMinutes: listing.user.profile.responseTimeMinutes ?? undefined,
-      responseRate: listing.user.profile.responseRate ?? undefined,
-      listingsCount: listing.user.profile.listingsCount,
-      soldCount: listing.user.profile.soldCount,
-      verificationStatus: listing.user.profile.verificationStatus as any,
-      badges: Array.isArray(listing.user.profile.badges) ? listing.user.profile.badges as any[] : [],
-      createdAt: listing.user.profile.createdAt,
-      updatedAt: listing.user.profile.updatedAt,
-    } as any : undefined,
+    sellerProfile: listing.user?.profile
+      ? ({
+          id: listing.user.profile.id,
+          userId: listing.user.profile.userId,
+          displayName: listing.user.profile.displayName,
+          bio: listing.user.profile.bio ?? undefined,
+          avatarUrl: listing.user.profile.avatarUrl ?? undefined,
+          city: listing.user.profile.city ?? undefined,
+          region: listing.user.profile.region ?? undefined,
+          responseTimeMinutes: listing.user.profile.responseTimeMinutes ?? undefined,
+          responseRate: listing.user.profile.responseRate ?? undefined,
+          listingsCount: listing.user.profile.listingsCount,
+          soldCount: listing.user.profile.soldCount,
+          verificationStatus: listing.user.profile.verificationStatus as any,
+          badges: Array.isArray(listing.user.profile.badges)
+            ? (listing.user.profile.badges as any[])
+            : [],
+          createdAt: listing.user.profile.createdAt,
+          updatedAt: listing.user.profile.updatedAt,
+        } as any)
+      : undefined,
   });
 
   // Compute completeness
@@ -152,7 +166,7 @@ export async function computeAndPersistTrust(listingId: string): Promise<{ trust
 
   if (trustResult.factors.length > 0) {
     await prisma.trustFactor.createMany({
-      data: trustResult.factors.map(f => ({
+      data: trustResult.factors.map((f) => ({
         listingId,
         type: f.type,
         category: f.category,

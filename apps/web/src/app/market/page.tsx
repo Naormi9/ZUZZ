@@ -61,10 +61,7 @@ export default function MarketPage() {
               קנה ומכור כל דבר — עם אמון מובנה ומוכרים מזוהים.
             </p>
             <div className="mt-6">
-              <Button
-                onClick={() => (window.location.href = '/market/create')}
-                className="px-8"
-              >
+              <Button onClick={() => (window.location.href = '/market/create')} className="px-8">
                 פרסם מודעה חינם
               </Button>
             </div>
@@ -95,7 +92,10 @@ export default function MarketPage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">מודעות אחרונות</h2>
-          <Link href="/market/search" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+          <Link
+            href="/market/search"
+            className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+          >
             הצג הכל
           </Link>
         </div>
@@ -127,9 +127,7 @@ export default function MarketPage() {
                 city={item.location.city}
                 trustScore={item.trustScore}
                 vertical="market"
-                details={[
-                  { label: 'מצב', value: getConditionLabel(item.condition) },
-                ]}
+                details={[{ label: 'מצב', value: getConditionLabel(item.condition) }]}
                 href={`/market/${item.id}`}
               />
             ))}
@@ -137,7 +135,10 @@ export default function MarketPage() {
         ) : (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">אין מודעות עדיין</p>
-            <Link href="/market/create" className="text-purple-600 hover:underline mt-2 inline-block">
+            <Link
+              href="/market/create"
+              className="text-purple-600 hover:underline mt-2 inline-block"
+            >
               פרסם את המודעה הראשונה
             </Link>
           </div>

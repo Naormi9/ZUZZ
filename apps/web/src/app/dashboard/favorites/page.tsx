@@ -32,7 +32,9 @@ export default function FavoritesPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
@@ -44,7 +46,7 @@ export default function FavoritesPage() {
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <Card key={i} className="overflow-hidden">
               <Skeleton className="aspect-[4/3] w-full" />
               <CardContent className="p-4 space-y-2">
@@ -56,12 +58,16 @@ export default function FavoritesPage() {
         </div>
       ) : favorites.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {favorites.map(listing => (
+          {favorites.map((listing) => (
             <Link key={listing.id} href={`/cars/${listing.id}`}>
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <div className="aspect-[4/3] bg-gray-200">
                   {listing.media?.[0] && (
-                    <img src={listing.media[0].url} alt={listing.title} className="w-full h-full object-cover" />
+                    <img
+                      src={listing.media[0].url}
+                      alt={listing.title}
+                      className="w-full h-full object-cover"
+                    />
                   )}
                 </div>
                 <CardContent className="p-4">
@@ -81,7 +87,9 @@ export default function FavoritesPage() {
           <p className="font-medium">אין מועדפים עדיין</p>
           <p className="text-sm mt-1">סמן מודעות כמועדפות ותמצא אותן כאן</p>
           <Link href="/cars/search">
-            <Button variant="outline" className="mt-4">חפש רכבים</Button>
+            <Button variant="outline" className="mt-4">
+              חפש רכבים
+            </Button>
           </Link>
         </div>
       )}

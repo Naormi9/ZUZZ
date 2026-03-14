@@ -38,7 +38,7 @@ const carFields: FieldDefinition[] = [
   { path: 'car.make', required: true, label: 'Make', labelHe: 'יצרן' },
   { path: 'car.model', required: true, label: 'Model', labelHe: 'דגם' },
   { path: 'car.year', required: true, label: 'Year', labelHe: 'שנה' },
-  { path: 'car.mileage', required: true, label: 'Mileage', labelHe: 'קילומטראז\'' },
+  { path: 'car.mileage', required: true, label: 'Mileage', labelHe: "קילומטראז'" },
   { path: 'car.handCount', required: true, label: 'Hand count', labelHe: 'מספר יד' },
   { path: 'car.gearbox', required: true, label: 'Gearbox', labelHe: 'תיבת הילוכים' },
   { path: 'car.fuelType', required: true, label: 'Fuel type', labelHe: 'סוג דלק' },
@@ -51,7 +51,12 @@ const carFields: FieldDefinition[] = [
   { path: 'car.licensePlate', required: false, label: 'License plate', labelHe: 'מספר רישוי' },
   { path: 'car.vin', required: false, label: 'VIN', labelHe: 'מספר שלדה' },
   { path: 'car.trim', required: false, label: 'Trim level', labelHe: 'רמת גימור' },
-  { path: 'car.maintenanceHistory', required: false, label: 'Maintenance history', labelHe: 'היסטוריית טיפולים' },
+  {
+    path: 'car.maintenanceHistory',
+    required: false,
+    label: 'Maintenance history',
+    labelHe: 'היסטוריית טיפולים',
+  },
   { path: 'car.features', required: false, label: 'Features', labelHe: 'תוספות' },
   { path: 'documents', required: false, label: 'Documents', labelHe: 'מסמכים' },
 ];
@@ -197,10 +202,7 @@ export function computeCompleteness(
     score: Math.round(score),
     filledFields: filledCount,
     totalFields,
-    missingFields: [
-      ...missingRequired.map((f) => f.path),
-      ...missingOptional.map((f) => f.path),
-    ],
+    missingFields: [...missingRequired.map((f) => f.path), ...missingOptional.map((f) => f.path)],
     suggestions,
   };
 }

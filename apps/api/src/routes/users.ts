@@ -60,7 +60,7 @@ usersRouter.put('/profile', authenticate, async (req, res, next) => {
 usersRouter.get('/:id/listings', async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({

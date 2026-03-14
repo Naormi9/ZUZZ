@@ -14,9 +14,5 @@ export type {
 export { SandboxPaymentProvider } from './payments/sandbox';
 
 // Vehicle Data
-export type {
-  VehicleDataProvider,
-  VehicleData,
-  VehicleLookupResult,
-} from './vehicle/types';
+export type { VehicleDataProvider, VehicleData, VehicleLookupResult } from './vehicle/types';
 export { MockVehicleDataProvider } from './vehicle/mock';

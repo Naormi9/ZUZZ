@@ -38,9 +38,7 @@ export class S3StorageProvider implements StorageProvider {
     const buffer = Buffer.isBuffer(body) ? body : await this.streamToBuffer(body);
 
     if (options.maxSize && buffer.length > options.maxSize) {
-      throw new Error(
-        `File size ${buffer.length} exceeds maximum allowed size ${options.maxSize}`
-      );
+      throw new Error(`File size ${buffer.length} exceeds maximum allowed size ${options.maxSize}`);
     }
 
     const command = new PutObjectCommand({

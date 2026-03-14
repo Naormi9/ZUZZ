@@ -1,9 +1,11 @@
 # CLAUDE.md — ZUZZ Repository Memory
 
 ## Project identity
+
 ZUZZ is a Hebrew-first, RTL-native, trust-centric classifieds and transaction platform for Israel.
 
 Mission:
+
 - Not just a listings board
 - A transaction platform with strong trust infrastructure
 - Cars first, then Homes, then Market
@@ -12,6 +14,7 @@ Brand line:
 ZUZZ — המקום שבו עסקאות זזות באמת
 
 ## Product priorities
+
 1. Cars-first depth
 2. Shared platform reuse
 3. Trust by default
@@ -21,9 +24,12 @@ ZUZZ — המקום שבו עסקאות זזות באמת
 7. Hebrew-first and RTL-native everywhere
 
 ## Core verticals
+
 ### ZUZZ Cars
+
 Most important vertical.
 Key ideas:
+
 - Listing by license plate / VIN / manual fallback
 - Trust score
 - Verified owner / verified dealer badges
@@ -34,21 +40,26 @@ Key ideas:
 - Dealer portal
 
 ### ZUZZ Homes
+
 Second vertical.
 Key ideas:
+
 - Map-first discovery
 - Verified owner / verified agent / verified developer
 - Project pages
 - Saved searches and lead forms
 
 ### ZUZZ Market
+
 Third vertical.
 Key ideas:
+
 - Reuse listing/messaging/moderation/trust framework
 - Structured categories
 - Lightweight seller trust
 
 ## Technical principles
+
 - Monorepo
 - Type-safe end to end
 - Reusable shared packages
@@ -62,6 +73,7 @@ Key ideas:
 - Production-minded architecture
 
 ## Packages/modules to preserve
+
 - auth
 - users/profiles
 - listings
@@ -83,6 +95,7 @@ Key ideas:
 - redis (shared Redis client)
 
 ## Important coding rules
+
 - Avoid hardcoding external vendor logic directly into feature code
 - Keep domains modular
 - Prefer explicit types
@@ -94,6 +107,7 @@ Key ideas:
 - Favor clean simple architecture over clever abstractions
 
 ## UX rules
+
 - Fast first
 - Clear CTA hierarchy
 - Strong empty/skeleton/error states
@@ -103,6 +117,7 @@ Key ideas:
 - Trust information must be visible above the fold where possible
 
 ## Commands
+
 ```bash
 # Development
 pnpm install           # Install all dependencies
@@ -138,6 +153,7 @@ pnpm docker:prod:down  # Stop production stack
 ```
 
 ## When implementing new features
+
 1. Update plan
 2. Check existing domain boundaries
 3. Reuse shared types/components if possible
@@ -145,7 +161,9 @@ pnpm docker:prod:down  # Stop production stack
 5. Update docs if behavior or commands changed
 
 ## If using Claude Code subagents
+
 Prefer focused subagents with narrow responsibilities:
+
 - ui-system
 - backend-domain
 - search-ranking
@@ -154,6 +172,7 @@ Prefer focused subagents with narrow responsibilities:
 - docs-devex
 
 ## Security & hardening notes
+
 - Rate limiting is Redis-backed, controlled by `RATE_LIMIT_ENABLED` env var
 - Rate limiters exist for: global, auth, upload, messages, leads, reports
 - Analytics summary endpoint requires admin/moderator role
@@ -171,12 +190,14 @@ Prefer focused subagents with narrow responsibilities:
 - Production config rejects: placeholder AUTH_SECRET, minioadmin storage creds, localhost URLs, disabled rate limiting, mock providers
 
 ## Test coverage
+
 - API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (15), promotions (7), subscriptions (5)
 - Trust engine: unit tests
 - E2E: Playwright tests for cars flow
 - All tests run via `pnpm test` in CI
 
 ## SEO & Growth Architecture
+
 - robots.txt via Next.js route handler (blocks /api, /dashboard, /auth, /create)
 - Sitemap with static pages, cars-by-make, cars-by-city, homes-by-city
 - Dynamic metadata for car detail pages (make/model/year/price in title)
@@ -193,6 +214,7 @@ Prefer focused subagents with narrow responsibilities:
 - Full documentation: docs/seo.md
 
 ## Documentation
+
 - docs/architecture.md — System architecture
 - docs/local-setup.md — Local dev setup
 - docs/deployment.md — Deployment guide & checklist
@@ -203,6 +225,7 @@ Prefer focused subagents with narrow responsibilities:
 - docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
 
 ## Dealer Portal
+
 - Organization model: create org → pending verification → admin approves/rejects → verified/suspended
 - Roles: owner, admin, member — with permission checks via `requireOrgMember()`
 - Dealer onboarding: `/dealer/onboarding` → POST /api/organizations
@@ -214,6 +237,7 @@ Prefer focused subagents with narrow responsibilities:
 - API routes: /api/organizations, /api/promotions, /api/subscriptions
 
 ## Deployment readiness
+
 - Environment validated eagerly on API startup (fail-fast)
 - Production rejects unsafe defaults (placeholder secrets, localhost URLs, disabled rate limiting)
 - Health endpoints: /api/health/live, /api/health, /api/health/ready, /api/health/startup
@@ -226,6 +250,7 @@ Prefer focused subagents with narrow responsibilities:
 - Deploy workflow: manual dispatch with staging/production targets
 
 ## Non-goals
+
 - Do not turn this into a shallow clone
 - Do not optimize for ad clutter
 - Do not overbuild every future vertical before Cars is strong

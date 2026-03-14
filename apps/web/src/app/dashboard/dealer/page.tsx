@@ -5,7 +5,17 @@ import Link from 'next/link';
 import { Button, Card, CardContent, Skeleton, Badge } from '@zuzz/ui';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { Building2, Package, Users, TrendingUp, Eye, Heart, Megaphone, CreditCard, Settings } from 'lucide-react';
+import {
+  Building2,
+  Package,
+  Users,
+  TrendingUp,
+  Eye,
+  Heart,
+  Megaphone,
+  CreditCard,
+  Settings,
+} from 'lucide-react';
 
 interface OrgData {
   id: string;
@@ -36,11 +46,15 @@ export default function DealerDashboardPage() {
     if (!isAuthenticated) return;
     async function load() {
       try {
-        const orgsRes = await api.get<{ success: boolean; data: OrgData[] }>('/api/organizations/my');
+        const orgsRes = await api.get<{ success: boolean; data: OrgData[] }>(
+          '/api/organizations/my',
+        );
         const myOrg = orgsRes.data[0];
         if (myOrg) {
           setOrg(myOrg);
-          const analyticsRes = await api.get<{ success: boolean; data: Analytics }>(`/api/organizations/${myOrg.id}/analytics`);
+          const analyticsRes = await api.get<{ success: boolean; data: Analytics }>(
+            `/api/organizations/${myOrg.id}/analytics`,
+          );
           setAnalytics(analyticsRes.data);
         }
       } catch {
@@ -57,7 +71,9 @@ export default function DealerDashboardPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
@@ -86,14 +102,52 @@ export default function DealerDashboardPage() {
     rejected: { label: 'נדחה', color: 'bg-red-100 text-red-700' },
   };
 
-  const statCards = analytics ? [
-    { label: 'מודעות פעילות', value: analytics.activeListings, icon: Package, color: 'text-brand-500 bg-brand-100', href: '/dashboard/dealer/inventory' },
-    { label: 'לידים חדשים', value: analytics.newLeads, icon: Users, color: 'text-purple-600 bg-purple-100', href: '/dashboard/dealer/leads' },
-    { label: 'צפיות', value: analytics.totalViews, icon: Eye, color: 'text-blue-600 bg-blue-100', href: '/dashboard/dealer/inventory' },
-    { label: 'מועדפים', value: analytics.totalFavorites, icon: Heart, color: 'text-red-600 bg-red-100', href: '/dashboard/dealer/inventory' },
-    { label: 'קידומים פעילים', value: analytics.activePromotions, icon: Megaphone, color: 'text-amber-600 bg-amber-100', href: '/dashboard/dealer/promotions' },
-    { label: 'סה"כ לידים', value: analytics.totalLeads, icon: TrendingUp, color: 'text-green-600 bg-green-100', href: '/dashboard/dealer/leads' },
-  ] : [];
+  const statCards = analytics
+    ? [
+        {
+          label: 'מודעות פעילות',
+          value: analytics.activeListings,
+          icon: Package,
+          color: 'text-brand-500 bg-brand-100',
+          href: '/dashboard/dealer/inventory',
+        },
+        {
+          label: 'לידים חדשים',
+          value: analytics.newLeads,
+          icon: Users,
+          color: 'text-purple-600 bg-purple-100',
+          href: '/dashboard/dealer/leads',
+        },
+        {
+          label: 'צפיות',
+          value: analytics.totalViews,
+          icon: Eye,
+          color: 'text-blue-600 bg-blue-100',
+          href: '/dashboard/dealer/inventory',
+        },
+        {
+          label: 'מועדפים',
+          value: analytics.totalFavorites,
+          icon: Heart,
+          color: 'text-red-600 bg-red-100',
+          href: '/dashboard/dealer/inventory',
+        },
+        {
+          label: 'קידומים פעילים',
+          value: analytics.activePromotions,
+          icon: Megaphone,
+          color: 'text-amber-600 bg-amber-100',
+          href: '/dashboard/dealer/promotions',
+        },
+        {
+          label: 'סה"כ לידים',
+          value: analytics.totalLeads,
+          icon: TrendingUp,
+          color: 'text-green-600 bg-green-100',
+          href: '/dashboard/dealer/leads',
+        },
+      ]
+    : [];
 
   const navLinks = [
     { label: 'ניהול מלאי', href: '/dashboard/dealer/inventory', icon: Package },
@@ -115,11 +169,15 @@ export default function DealerDashboardPage() {
             <>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-gray-900">{org?.name}</h1>
-                <Badge className={`text-xs ${STATUS_MAP[org?.verificationStatus || 'pending']?.color}`}>
+                <Badge
+                  className={`text-xs ${STATUS_MAP[org?.verificationStatus || 'pending']?.color}`}
+                >
                   {STATUS_MAP[org?.verificationStatus || 'pending']?.label}
                 </Badge>
               </div>
-              <p className="text-gray-500 text-sm mt-1">פורטל סוחר · {org?.myRole === 'owner' ? 'בעלים' : org?.myRole}</p>
+              <p className="text-gray-500 text-sm mt-1">
+                פורטל סוחר · {org?.myRole === 'owner' ? 'בעלים' : org?.myRole}
+              </p>
             </>
           )}
         </div>
@@ -130,25 +188,27 @@ export default function DealerDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {loading ? (
-          Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24" />)
-        ) : (
-          statCards.map((stat) => (
-            <Link key={stat.label} href={stat.href}>
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value.toLocaleString('he-IL')}</p>
-                    <p className="text-xs text-gray-500">{stat.label}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
-        )}
+        {loading
+          ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24" />)
+          : statCards.map((stat) => (
+              <Link key={stat.label} href={stat.href}>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}
+                    >
+                      <stat.icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {stat.value.toLocaleString('he-IL')}
+                      </p>
+                      <p className="text-xs text-gray-500">{stat.label}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
       </div>
 
       {/* Quick Nav */}

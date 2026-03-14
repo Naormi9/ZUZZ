@@ -8,34 +8,25 @@ export class SmtpEmailProvider implements EmailProvider {
   private defaultFrom: string;
 
   constructor(config: EmailConfig) {
-    this.defaultFrom = config.fromName
-      ? `"${config.fromName}" <${config.from}>`
-      : config.from;
+    this.defaultFrom = config.fromName ? `"${config.fromName}" <${config.from}>` : config.from;
 
     this.transporter = nodemailer.createTransport({
       host: config.host,
       port: config.port ?? 587,
       secure: config.secure ?? false,
-      auth:
-        config.user && config.pass
-          ? { user: config.user, pass: config.pass }
-          : undefined,
+      auth: config.user && config.pass ? { user: config.user, pass: config.pass } : undefined,
     });
   }
 
   async send(options: SendEmailOptions): Promise<SendEmailResult> {
     const from = options.fromName
       ? `"${options.fromName}" <${options.from ?? this.defaultFrom}>`
-      : options.from ?? this.defaultFrom;
+      : (options.from ?? this.defaultFrom);
 
     const result = await this.transporter.sendMail({
       from,
       to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-      cc: options.cc
-        ? Array.isArray(options.cc)
-          ? options.cc.join(', ')
-          : options.cc
-        : undefined,
+      cc: options.cc ? (Array.isArray(options.cc) ? options.cc.join(', ') : options.cc) : undefined,
       bcc: options.bcc
         ? Array.isArray(options.bcc)
           ? options.bcc.join(', ')

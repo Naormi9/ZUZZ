@@ -18,9 +18,18 @@ export default function DashboardPage() {
     async function load() {
       try {
         const [listingsRes, favRes, msgRes, leadsRes] = await Promise.all([
-          api.get<{ success: boolean; data: { data: any[]; total: number } }>('/api/listings/my/all?pageSize=5').catch(() => ({ data: { data: [], total: 0 } })),
-          api.get<{ success: boolean; data: { total: number } }>('/api/favorites?pageSize=1').catch(() => ({ data: { total: 0 } })),
-          api.get<{ success: boolean; data: { unreadCount: number } }>('/api/messages/unread-count').catch(() => ({ data: { unreadCount: 0 } })),
+          api
+            .get<{
+              success: boolean;
+              data: { data: any[]; total: number };
+            }>('/api/listings/my/all?pageSize=5')
+            .catch(() => ({ data: { data: [], total: 0 } })),
+          api
+            .get<{ success: boolean; data: { total: number } }>('/api/favorites?pageSize=1')
+            .catch(() => ({ data: { total: 0 } })),
+          api
+            .get<{ success: boolean; data: { unreadCount: number } }>('/api/messages/unread-count')
+            .catch(() => ({ data: { unreadCount: 0 } })),
           api.get<{ success: boolean; data: any[] }>('/api/leads').catch(() => ({ data: [] })),
         ]);
         setStats({
@@ -44,22 +53,54 @@ export default function DashboardPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר כדי לגשת ללוח הבקרה</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
   }
 
   const statCards = [
-    { label: 'המודעות שלי', value: stats.listings, icon: Car, href: '/dashboard', color: 'text-brand-500 bg-brand-100' },
-    { label: 'מועדפים', value: stats.favorites, icon: Heart, href: '/dashboard/favorites', color: 'text-red-600 bg-red-100' },
-    { label: 'הודעות חדשות', value: stats.messages, icon: MessageCircle, href: '/dashboard/messages', color: 'text-green-600 bg-green-100' },
-    { label: 'לידים', value: stats.leads, icon: Users, href: '/dashboard/leads', color: 'text-purple-600 bg-purple-100' },
+    {
+      label: 'המודעות שלי',
+      value: stats.listings,
+      icon: Car,
+      href: '/dashboard',
+      color: 'text-brand-500 bg-brand-100',
+    },
+    {
+      label: 'מועדפים',
+      value: stats.favorites,
+      icon: Heart,
+      href: '/dashboard/favorites',
+      color: 'text-red-600 bg-red-100',
+    },
+    {
+      label: 'הודעות חדשות',
+      value: stats.messages,
+      icon: MessageCircle,
+      href: '/dashboard/messages',
+      color: 'text-green-600 bg-green-100',
+    },
+    {
+      label: 'לידים',
+      value: stats.leads,
+      icon: Users,
+      href: '/dashboard/leads',
+      color: 'text-purple-600 bg-purple-100',
+    },
   ];
 
   const STATUS_LABELS: Record<string, string> = {
-    draft: 'טיוטה', active: 'פעילה', paused: 'מושהית', sold: 'נמכרה',
-    archived: 'בארכיון', pending_review: 'ממתינה לאישור', rejected: 'נדחתה', expired: 'פגה תוקף',
+    draft: 'טיוטה',
+    active: 'פעילה',
+    paused: 'מושהית',
+    sold: 'נמכרה',
+    archived: 'בארכיון',
+    pending_review: 'ממתינה לאישור',
+    rejected: 'נדחתה',
+    expired: 'פגה תוקף',
   };
 
   return (
@@ -70,21 +111,28 @@ export default function DashboardPage() {
           <p className="text-gray-500 text-sm mt-1">לוח הבקרה שלך</p>
         </div>
         <Link href="/cars/create">
-          <Button className="gap-2"><Plus className="h-4 w-4" />פרסם מודעה</Button>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            פרסם מודעה
+          </Button>
         </Link>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statCards.map(stat => (
+        {statCards.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}
+                >
                   <stat.icon className="h-6 w-6" />
                 </div>
                 <div>
-                  {loading ? <Skeleton className="h-7 w-12" /> : (
+                  {loading ? (
+                    <Skeleton className="h-7 w-12" />
+                  ) : (
                     <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                   )}
                   <p className="text-xs text-gray-500">{stat.label}</p>
@@ -103,32 +151,51 @@ export default function DashboardPage() {
           </div>
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
             </div>
           ) : myListings.length > 0 ? (
             <div className="space-y-3">
-              {myListings.map(listing => (
-                <Link key={listing.id} href={listing.status === 'draft' ? `/cars/create` : `/cars/${listing.id}`}>
+              {myListings.map((listing) => (
+                <Link
+                  key={listing.id}
+                  href={listing.status === 'draft' ? `/cars/create` : `/cars/${listing.id}`}
+                >
                   <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors border">
                     <div className="w-16 h-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
                       {listing.media?.[0] && (
-                        <img src={listing.media[0].url} alt="" className="w-full h-full object-cover" />
+                        <img
+                          src={listing.media[0].url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{listing.title || 'טיוטה ללא שם'}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {listing.title || 'טיוטה ללא שם'}
+                      </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Badge variant="secondary" className="text-xs">
                           {STATUS_LABELS[listing.status] || listing.status}
                         </Badge>
                         {listing.priceAmount > 0 && (
-                          <span className="text-xs text-gray-500">₪{listing.priceAmount.toLocaleString()}</span>
+                          <span className="text-xs text-gray-500">
+                            ₪{listing.priceAmount.toLocaleString()}
+                          </span>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-400">
-                      <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{listing.viewCount}</span>
-                      <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{listing.favoriteCount}</span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {listing.viewCount}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-3 w-3" />
+                        {listing.favoriteCount}
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -140,7 +207,9 @@ export default function DashboardPage() {
               <p className="font-medium">אין מודעות עדיין</p>
               <p className="text-sm mt-1">פרסם את המודעה הראשונה שלך</p>
               <Link href="/cars/create">
-                <Button variant="outline" className="mt-4">פרסם מודעה</Button>
+                <Button variant="outline" className="mt-4">
+                  פרסם מודעה
+                </Button>
               </Link>
             </div>
           )}

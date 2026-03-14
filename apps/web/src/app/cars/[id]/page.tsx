@@ -166,7 +166,9 @@ export default function CarDetailPage() {
       return;
     }
     try {
-      const res = await api.post<{ success: boolean; data: { isFavorited: boolean } }>(`/api/favorites/${id}`);
+      const res = await api.post<{ success: boolean; data: { isFavorited: boolean } }>(
+        `/api/favorites/${id}`,
+      );
       setIsFavorited(res.data.isFavorited);
     } catch {
       // fail silently
@@ -245,42 +247,73 @@ export default function CarDetailPage() {
     { icon: Zap, label: 'כוח סוס', value: car.horsepower ? `${car.horsepower} כ"ס` : '-' },
     { icon: Users, label: 'מושבים', value: String(car.seats) },
     { icon: Palette, label: 'צבע', value: car.color },
-    { icon: ClipboardCheck, label: 'טסט עד', value: car.testUntil ? new Date(car.testUntil).toLocaleDateString('he-IL') : '-' },
+    {
+      icon: ClipboardCheck,
+      label: 'טסט עד',
+      value: car.testUntil ? new Date(car.testUntil).toLocaleDateString('he-IL') : '-',
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* JSON-LD structured data */}
       <CarDetailJsonLd
-        data={listing ? {
-          id: listing.id,
-          title: listing.title,
-          description: listing.description,
-          make: car.make,
-          model: car.model,
-          year: car.year,
-          mileage: car.mileage,
-          gearbox: car.gearbox,
-          fuelType: car.fuelType,
-          color: car.color,
-          price: listing.price.amount,
-          currency: listing.price.currency,
-          city: listing.location.city,
-          imageUrl: listing.media[0]?.url,
-          sellerName: listing.seller.name,
-        } : null}
+        data={
+          listing
+            ? {
+                id: listing.id,
+                title: listing.title,
+                description: listing.description,
+                make: car.make,
+                model: car.model,
+                year: car.year,
+                mileage: car.mileage,
+                gearbox: car.gearbox,
+                fuelType: car.fuelType,
+                color: car.color,
+                price: listing.price.amount,
+                currency: listing.price.currency,
+                city: listing.location.city,
+                imageUrl: listing.media[0]?.url,
+                sellerName: listing.seller.name,
+              }
+            : null
+        }
       />
 
       {/* Breadcrumbs */}
       <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 pt-4 text-sm text-gray-500">
         <ol className="flex flex-wrap items-center gap-1">
-          <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
-          <li><span className="mx-1 text-gray-300">/</span></li>
-          <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
-          <li><span className="mx-1 text-gray-300">/</span></li>
-          <li><Link href={`/cars/search?make=${encodeURIComponent(car.make)}`} className="hover:text-gray-700">{car.make}</Link></li>
-          <li><span className="mx-1 text-gray-300">/</span></li>
-          <li className="text-gray-700 font-medium">{car.make} {car.model} {car.year}</li>
+          <li>
+            <Link href="/" className="hover:text-gray-700">
+              ראשי
+            </Link>
+          </li>
+          <li>
+            <span className="mx-1 text-gray-300">/</span>
+          </li>
+          <li>
+            <Link href="/cars" className="hover:text-gray-700">
+              רכב
+            </Link>
+          </li>
+          <li>
+            <span className="mx-1 text-gray-300">/</span>
+          </li>
+          <li>
+            <Link
+              href={`/cars/search?make=${encodeURIComponent(car.make)}`}
+              className="hover:text-gray-700"
+            >
+              {car.make}
+            </Link>
+          </li>
+          <li>
+            <span className="mx-1 text-gray-300">/</span>
+          </li>
+          <li className="text-gray-700 font-medium">
+            {car.make} {car.model} {car.year}
+          </li>
         </ol>
       </nav>
 
@@ -305,7 +338,11 @@ export default function CarDetailPage() {
                       <ChevronLeft className="h-6 w-6" />
                     </button>
                     <button
-                      onClick={() => setActiveImage((prev) => (prev - 1 + listing.media.length) % listing.media.length)}
+                      onClick={() =>
+                        setActiveImage(
+                          (prev) => (prev - 1 + listing.media.length) % listing.media.length,
+                        )
+                      }
                       className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
                     >
                       <ChevronRight className="h-6 w-6" />
@@ -326,7 +363,9 @@ export default function CarDetailPage() {
                       key={media.id}
                       onClick={() => setActiveImage(idx)}
                       className={`flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${
-                        idx === activeImage ? 'border-brand-500' : 'border-transparent opacity-70 hover:opacity-100'
+                        idx === activeImage
+                          ? 'border-brand-500'
+                          : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
                     >
                       <img
@@ -356,18 +395,19 @@ export default function CarDetailPage() {
             <div>
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    {listing.title}
-                  </h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{listing.title}</h1>
                   <p className="text-sm text-gray-500 mt-1">
-                    {listing.location.city} {listing.location.area ? `- ${listing.location.area}` : ''}
+                    {listing.location.city}{' '}
+                    {listing.location.area ? `- ${listing.location.area}` : ''}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={toggleFavorite}
                     className={`p-2 rounded-full border transition-colors ${
-                      isFavorited ? 'bg-red-50 border-red-200 text-red-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      isFavorited
+                        ? 'bg-red-50 border-red-200 text-red-600'
+                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
                     }`}
                   >
                     <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
@@ -393,9 +433,7 @@ export default function CarDetailPage() {
                   {listing.price.currency === 'ILS' ? '₪' : '$'}
                   {listing.price.amount.toLocaleString('he-IL')}
                 </span>
-                {listing.isNegotiable && (
-                  <Badge variant="secondary">ניתן למשא ומתן</Badge>
-                )}
+                {listing.isNegotiable && <Badge variant="secondary">ניתן למשא ומתן</Badge>}
               </div>
 
               {/* Trust Score */}
@@ -438,7 +476,9 @@ export default function CarDetailPage() {
                     {car.batteryCapacity && (
                       <div className="bg-white rounded-lg p-4 text-center">
                         <p className="text-xs text-gray-500">קיבולת סוללה</p>
-                        <p className="text-xl font-bold text-green-700">{car.batteryCapacity} kWh</p>
+                        <p className="text-xl font-bold text-green-700">
+                          {car.batteryCapacity} kWh
+                        </p>
                       </div>
                     )}
                     {car.chargingTime && (
@@ -472,16 +512,28 @@ export default function CarDetailPage() {
                   <div className="space-y-3">
                     {listing.sellerStatements.map((statement) => (
                       <div key={statement.key} className="flex items-start gap-3">
-                        <div className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center ${
-                          statement.value ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                        }`}>
+                        <div
+                          className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center ${
+                            statement.value
+                              ? 'bg-green-100 text-green-600'
+                              : 'bg-red-100 text-red-600'
+                          }`}
+                        >
                           {statement.value ? (
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           ) : (
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              <path
+                                fillRule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           )}
                         </div>
@@ -515,7 +567,10 @@ export default function CarDetailPage() {
                         <FileText className="h-5 w-5 text-gray-400 flex-shrink-0" />
                         <span className="text-sm text-gray-700 flex-1">{doc.label}</span>
                         {doc.verified && (
-                          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-green-100 text-green-700"
+                          >
                             <Shield className="h-3 w-3 ml-1" />
                             מאומת
                           </Badge>
@@ -538,10 +593,15 @@ export default function CarDetailPage() {
                   <div className="space-y-3">
                     {listing.trustFactors.map((factor) => (
                       <div key={factor.key} className="flex items-start gap-3">
-                        <div className={`flex-shrink-0 mt-0.5 w-2 h-2 rounded-full ${
-                          factor.status === 'positive' ? 'bg-green-500' :
-                          factor.status === 'negative' ? 'bg-red-500' : 'bg-gray-300'
-                        }`} />
+                        <div
+                          className={`flex-shrink-0 mt-0.5 w-2 h-2 rounded-full ${
+                            factor.status === 'positive'
+                              ? 'bg-green-500'
+                              : factor.status === 'negative'
+                                ? 'bg-red-500'
+                                : 'bg-gray-300'
+                          }`}
+                        />
                         <div>
                           <p className="text-sm font-medium text-gray-900">{factor.label}</p>
                           {factor.description && (
@@ -590,8 +650,16 @@ export default function CarDetailPage() {
                     {leadSent ? (
                       <div className="text-center py-4">
                         <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                          <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            className="w-6 h-6 text-green-600"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </div>
                         <p className="text-sm font-medium text-gray-900">הפרטים נשלחו בהצלחה</p>
@@ -638,7 +706,11 @@ export default function CarDetailPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     {listing.seller.avatarUrl ? (
-                      <img src={listing.seller.avatarUrl} alt={listing.seller.name} className="w-full h-full object-cover" />
+                      <img
+                        src={listing.seller.avatarUrl}
+                        alt={listing.seller.name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="text-lg font-semibold text-gray-500">
                         {listing.seller.name.charAt(0)}
@@ -656,13 +728,19 @@ export default function CarDetailPage() {
                       )}
                     </div>
                     <p className="text-xs text-gray-500">
-                      ב-ZUZZ מאז {new Date(listing.seller.memberSince).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}
+                      ב-ZUZZ מאז{' '}
+                      {new Date(listing.seller.memberSince).toLocaleDateString('he-IL', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
                     </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="bg-gray-50 rounded-lg p-2">
-                    <p className="text-lg font-bold text-gray-900">{listing.seller.listingsCount}</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {listing.seller.listingsCount}
+                    </p>
                     <p className="text-xs text-gray-500">מודעות</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-2">
@@ -719,7 +797,10 @@ export default function CarDetailPage() {
                 רכבים ב{listing.location.city}
               </Link>
             )}
-            <Link href="/cars" className="text-sm text-brand-600 hover:text-brand-800 hover:underline">
+            <Link
+              href="/cars"
+              className="text-sm text-brand-600 hover:text-brand-800 hover:underline"
+            >
               כל הרכבים
             </Link>
           </div>

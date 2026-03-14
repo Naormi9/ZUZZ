@@ -95,9 +95,7 @@ describe('POST /api/auth/login', () => {
     });
     mockPrisma.otpCode.create.mockResolvedValueOnce({});
 
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'test@example.com' });
+    const res = await request(app).post('/api/auth/login').send({ email: 'test@example.com' });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -107,9 +105,7 @@ describe('POST /api/auth/login', () => {
   it('returns 404 when user does not exist', async () => {
     mockPrisma.user.findUnique.mockResolvedValueOnce(null);
 
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'unknown@example.com' });
+    const res = await request(app).post('/api/auth/login').send({ email: 'unknown@example.com' });
 
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
@@ -117,9 +113,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('returns 400 for invalid email', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'bad-email' });
+    const res = await request(app).post('/api/auth/login').send({ email: 'bad-email' });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -200,14 +194,10 @@ describe('POST /api/auth/verify', () => {
 
   it('increments attempts on failed verification', async () => {
     const latestOtp = { id: 'otp-latest' };
-    mockPrisma.otpCode.findFirst
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(latestOtp);
+    mockPrisma.otpCode.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(latestOtp);
     mockPrisma.otpCode.update.mockResolvedValueOnce({});
 
-    await request(app)
-      .post('/api/auth/verify')
-      .send({ email: 'test@example.com', code: '000000' });
+    await request(app).post('/api/auth/verify').send({ email: 'test@example.com', code: '000000' });
 
     expect(mockPrisma.otpCode.update).toHaveBeenCalledWith({
       where: { id: 'otp-latest' },
@@ -252,9 +242,7 @@ describe('GET /api/auth/me', () => {
         organizationMembers: [],
       });
 
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -273,9 +261,7 @@ describe('GET /api/auth/me', () => {
   it('returns 401 when token is expired', async () => {
     const token = generateExpiredToken(testUser);
 
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -283,9 +269,7 @@ describe('GET /api/auth/me', () => {
   });
 
   it('returns 401 when token is malformed', async () => {
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', 'Bearer invalid-token');
+    const res = await request(app).get('/api/auth/me').set('Authorization', 'Bearer invalid-token');
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -303,9 +287,7 @@ describe('GET /api/auth/me', () => {
       isActive: false,
     });
 
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -332,9 +314,7 @@ describe('GET /api/auth/me', () => {
         organizationMembers: [],
       });
 
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Cookie', `token=${token}`);
+    const res = await request(app).get('/api/auth/me').set('Cookie', `token=${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

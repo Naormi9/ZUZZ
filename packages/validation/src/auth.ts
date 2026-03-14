@@ -18,9 +18,11 @@ export const verifyOtpSchema = z.object({
 export const updateProfileSchema = z.object({
   displayName: z.string().min(2).max(100).optional(),
   bio: z.string().max(500).optional(),
-  location: z.object({
-    city: z.string().optional(),
-    region: z.string().optional(),
-  }).optional(),
+  location: z
+    .object({
+      city: z.string().optional(),
+      region: z.string().optional(),
+    })
+    .optional(),
   website: z.string().url().optional().or(z.literal('')),
 });

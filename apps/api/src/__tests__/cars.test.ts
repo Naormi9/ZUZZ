@@ -71,9 +71,7 @@ describe('POST /api/cars', () => {
 
     mockPrisma.listing.create.mockResolvedValueOnce(draftListing);
 
-    const res = await request(app)
-      .post('/api/cars')
-      .set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).post('/api/cars').set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -184,9 +182,7 @@ describe('PUT /api/cars/:id/details', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    const res = await request(app)
-      .put('/api/cars/listing-1/details')
-      .send(validDetails);
+    const res = await request(app).put('/api/cars/listing-1/details').send(validDetails);
 
     expect(res.status).toBe(401);
   });
@@ -321,9 +317,7 @@ describe('PUT /api/cars/:id/pricing', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    const res = await request(app)
-      .put('/api/cars/listing-1/pricing')
-      .send(validPricing);
+    const res = await request(app).put('/api/cars/listing-1/pricing').send(validPricing);
 
     expect(res.status).toBe(401);
   });
@@ -580,14 +574,31 @@ describe('GET /api/cars/featured', () => {
         viewCount: 100,
         favoriteCount: 15,
         description: null,
-        media: [{ id: 'm1', url: '/uploads/img.jpg', thumbnailUrl: '/uploads/img.jpg', type: 'image', order: 0 }],
+        media: [
+          {
+            id: 'm1',
+            url: '/uploads/img.jpg',
+            thumbnailUrl: '/uploads/img.jpg',
+            type: 'image',
+            order: 0,
+          },
+        ],
         carDetails: {
-          make: 'Toyota', model: 'Corolla', trim: null,
-          year: 2022, mileage: 30000, handCount: 1,
-          gearbox: 'automatic', fuelType: 'petrol',
-          engineVolume: 1800, horsepower: 140,
-          seats: 5, color: 'white', bodyType: 'sedan',
-          isElectric: false, sellerType: null,
+          make: 'Toyota',
+          model: 'Corolla',
+          trim: null,
+          year: 2022,
+          mileage: 30000,
+          handCount: 1,
+          gearbox: 'automatic',
+          fuelType: 'petrol',
+          engineVolume: 1800,
+          horsepower: 140,
+          seats: 5,
+          color: 'white',
+          bodyType: 'sedan',
+          isElectric: false,
+          sellerType: null,
         },
         trustFactors: [],
         user: { id: 'user-1', name: 'Seller' },

@@ -32,7 +32,9 @@ export function getStorage(): StorageProvider {
       accessKeyId: process.env.STORAGE_ACCESS_KEY,
       secretAccessKey: process.env.STORAGE_SECRET_KEY,
       forcePathStyle: true, // Required for MinIO
-      publicUrl: process.env.STORAGE_PUBLIC_URL || `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET || 'zuzz-media'}`,
+      publicUrl:
+        process.env.STORAGE_PUBLIC_URL ||
+        `${process.env.STORAGE_ENDPOINT}/${process.env.STORAGE_BUCKET || 'zuzz-media'}`,
     });
   } else {
     const uploadDir = process.env.UPLOAD_DIR || 'uploads';

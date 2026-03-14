@@ -2,12 +2,12 @@
 
 ## Brand Palette
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `brand-black` | `#1B1B1B` | Primary text, dark backgrounds |
-| `brand-charcoal` | `#323232` | Secondary text, dark gradients |
-| `brand-cream` | `#FFE7D0` | Accent backgrounds, hero text on dark |
-| `brand-orange` | `#FC6E20` | Primary action color, brand accent |
+| Token            | Hex       | Usage                                 |
+| ---------------- | --------- | ------------------------------------- |
+| `brand-black`    | `#1B1B1B` | Primary text, dark backgrounds        |
+| `brand-charcoal` | `#323232` | Secondary text, dark gradients        |
+| `brand-cream`    | `#FFE7D0` | Accent backgrounds, hero text on dark |
+| `brand-orange`   | `#FC6E20` | Primary action color, brand accent    |
 
 The orange palette has a full scale from `brand-50` (#FFF4EB) to `brand-950` (#441706), defined in `packages/ui/src/theme/brand-tokens.ts`.
 
@@ -54,13 +54,13 @@ Use Tailwind brand classes directly:
 
 On white (`#FFFFFF`):
 
-| Color | Ratio | WCAG AA | Use for |
-|-------|-------|---------|---------|
-| `brand-500` (#FC6E20) | 3.0:1 | Large text only | Buttons (bold 14px+), icons, decorative |
-| `brand-600` (#E55A0D) | 3.7:1 | Large text only | Hover states |
-| `brand-700` (#C04A0A) | 5.0:1 | Normal text | Small text links, body text |
-| `brand-black` (#1B1B1B) | 17.6:1 | AAA | Primary body text |
-| `brand-charcoal` (#323232) | 12.6:1 | AAA | Secondary body text |
+| Color                      | Ratio  | WCAG AA         | Use for                                 |
+| -------------------------- | ------ | --------------- | --------------------------------------- |
+| `brand-500` (#FC6E20)      | 3.0:1  | Large text only | Buttons (bold 14px+), icons, decorative |
+| `brand-600` (#E55A0D)      | 3.7:1  | Large text only | Hover states                            |
+| `brand-700` (#C04A0A)      | 5.0:1  | Normal text     | Small text links, body text             |
+| `brand-black` (#1B1B1B)    | 17.6:1 | AAA             | Primary body text                       |
+| `brand-charcoal` (#323232) | 12.6:1 | AAA             | Secondary body text                     |
 
 **Rule**: Never use `brand-500` for `text-sm` or smaller text on white backgrounds. Use `brand-700` or darker.
 

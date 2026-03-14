@@ -1,114 +1,116 @@
 import { z } from 'zod';
 
-const envSchema = z.object({
-  DATABASE_URL: z.string().url(),
-  REDIS_URL: z.string().url(),
-  AUTH_SECRET: z.string().min(32),
-  AUTH_URL: z.string().url().optional(),
-  STORAGE_ENDPOINT: z.string(),
-  STORAGE_ACCESS_KEY: z.string(),
-  STORAGE_SECRET_KEY: z.string(),
-  STORAGE_BUCKET: z.string().default('zuzz-media'),
-  STORAGE_REGION: z.string().default('us-east-1'),
-  STORAGE_PUBLIC_URL: z.string().url().optional(),
-  SMTP_HOST: z.string().default('localhost'),
-  SMTP_PORT: z.coerce.number().default(1025),
-  SMTP_SECURE: z.coerce.boolean().default(false),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().email().default('noreply@zuzz.co.il'),
-  API_URL: z.string().url().default('http://localhost:4000'),
-  API_PORT: z.coerce.number().default(4000),
-  NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:4000'),
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
-  NEXT_PUBLIC_ADMIN_URL: z.string().url().default('http://localhost:3001'),
-  NEXT_PUBLIC_WS_URL: z.string().default('ws://localhost:4000'),
-  MAPS_PROVIDER: z.enum(['mock', 'google', 'mapbox']).default('mock'),
-  MAPS_API_KEY: z.string().optional(),
-  PAYMENT_PROVIDER: z.enum(['sandbox', 'stripe', 'tranzilla']).default('sandbox'),
-  PAYMENT_API_KEY: z.string().optional(),
-  FEATURE_FLAGS_PROVIDER: z.enum(['local', 'launchdarkly']).default('local'),
-  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  SENTRY_DSN: z.string().url().optional(),
-  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
-  RATE_LIMIT_ENABLED: z.coerce.boolean().default(false),
-}).superRefine((data, ctx) => {
-  const isProd = data.NODE_ENV === 'production';
+const envSchema = z
+  .object({
+    DATABASE_URL: z.string().url(),
+    REDIS_URL: z.string().url(),
+    AUTH_SECRET: z.string().min(32),
+    AUTH_URL: z.string().url().optional(),
+    STORAGE_ENDPOINT: z.string(),
+    STORAGE_ACCESS_KEY: z.string(),
+    STORAGE_SECRET_KEY: z.string(),
+    STORAGE_BUCKET: z.string().default('zuzz-media'),
+    STORAGE_REGION: z.string().default('us-east-1'),
+    STORAGE_PUBLIC_URL: z.string().url().optional(),
+    SMTP_HOST: z.string().default('localhost'),
+    SMTP_PORT: z.coerce.number().default(1025),
+    SMTP_SECURE: z.coerce.boolean().default(false),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
+    SMTP_FROM: z.string().email().default('noreply@zuzz.co.il'),
+    API_URL: z.string().url().default('http://localhost:4000'),
+    API_PORT: z.coerce.number().default(4000),
+    NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:4000'),
+    NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+    NEXT_PUBLIC_ADMIN_URL: z.string().url().default('http://localhost:3001'),
+    NEXT_PUBLIC_WS_URL: z.string().default('ws://localhost:4000'),
+    MAPS_PROVIDER: z.enum(['mock', 'google', 'mapbox']).default('mock'),
+    MAPS_API_KEY: z.string().optional(),
+    PAYMENT_PROVIDER: z.enum(['sandbox', 'stripe', 'tranzilla']).default('sandbox'),
+    PAYMENT_API_KEY: z.string().optional(),
+    FEATURE_FLAGS_PROVIDER: z.enum(['local', 'launchdarkly']).default('local'),
+    LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    SENTRY_DSN: z.string().url().optional(),
+    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+    RATE_LIMIT_ENABLED: z.coerce.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    const isProd = data.NODE_ENV === 'production';
 
-  if (isProd) {
-    if (data.AUTH_SECRET.includes('change-me') || data.AUTH_SECRET.includes('dev-secret')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'AUTH_SECRET must not contain placeholder values in production',
-        path: ['AUTH_SECRET'],
-      });
+    if (isProd) {
+      if (data.AUTH_SECRET.includes('change-me') || data.AUTH_SECRET.includes('dev-secret')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'AUTH_SECRET must not contain placeholder values in production',
+          path: ['AUTH_SECRET'],
+        });
+      }
+      if (data.STORAGE_ACCESS_KEY === 'minioadmin') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'STORAGE_ACCESS_KEY must not be default value in production',
+          path: ['STORAGE_ACCESS_KEY'],
+        });
+      }
+      if (data.STORAGE_SECRET_KEY === 'minioadmin') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'STORAGE_SECRET_KEY must not be default value in production',
+          path: ['STORAGE_SECRET_KEY'],
+        });
+      }
+      if (data.MAPS_PROVIDER === 'mock') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'MAPS_PROVIDER must not be mock in production',
+          path: ['MAPS_PROVIDER'],
+        });
+      }
+      if (data.PAYMENT_PROVIDER === 'sandbox') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'PAYMENT_PROVIDER must not be sandbox in production',
+          path: ['PAYMENT_PROVIDER'],
+        });
+      }
+      if (!data.RATE_LIMIT_ENABLED) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'RATE_LIMIT_ENABLED must be true in production',
+          path: ['RATE_LIMIT_ENABLED'],
+        });
+      }
+      if (data.SMTP_HOST === 'localhost') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'SMTP_HOST must not be localhost in production',
+          path: ['SMTP_HOST'],
+        });
+      }
+      if (data.DATABASE_URL.includes('localhost') || data.DATABASE_URL.includes('zuzz_dev')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'DATABASE_URL appears to use local/dev values in production',
+          path: ['DATABASE_URL'],
+        });
+      }
+      if (data.REDIS_URL.includes('localhost')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'REDIS_URL appears to use localhost in production',
+          path: ['REDIS_URL'],
+        });
+      }
+      if (data.NEXT_PUBLIC_APP_URL.includes('localhost')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'NEXT_PUBLIC_APP_URL must not use localhost in production',
+          path: ['NEXT_PUBLIC_APP_URL'],
+        });
+      }
     }
-    if (data.STORAGE_ACCESS_KEY === 'minioadmin') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'STORAGE_ACCESS_KEY must not be default value in production',
-        path: ['STORAGE_ACCESS_KEY'],
-      });
-    }
-    if (data.STORAGE_SECRET_KEY === 'minioadmin') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'STORAGE_SECRET_KEY must not be default value in production',
-        path: ['STORAGE_SECRET_KEY'],
-      });
-    }
-    if (data.MAPS_PROVIDER === 'mock') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'MAPS_PROVIDER must not be mock in production',
-        path: ['MAPS_PROVIDER'],
-      });
-    }
-    if (data.PAYMENT_PROVIDER === 'sandbox') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'PAYMENT_PROVIDER must not be sandbox in production',
-        path: ['PAYMENT_PROVIDER'],
-      });
-    }
-    if (!data.RATE_LIMIT_ENABLED) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'RATE_LIMIT_ENABLED must be true in production',
-        path: ['RATE_LIMIT_ENABLED'],
-      });
-    }
-    if (data.SMTP_HOST === 'localhost') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'SMTP_HOST must not be localhost in production',
-        path: ['SMTP_HOST'],
-      });
-    }
-    if (data.DATABASE_URL.includes('localhost') || data.DATABASE_URL.includes('zuzz_dev')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'DATABASE_URL appears to use local/dev values in production',
-        path: ['DATABASE_URL'],
-      });
-    }
-    if (data.REDIS_URL.includes('localhost')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'REDIS_URL appears to use localhost in production',
-        path: ['REDIS_URL'],
-      });
-    }
-    if (data.NEXT_PUBLIC_APP_URL.includes('localhost')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'NEXT_PUBLIC_APP_URL must not use localhost in production',
-        path: ['NEXT_PUBLIC_APP_URL'],
-      });
-    }
-  }
-});
+  });
 
 export type EnvConfig = z.infer<typeof envSchema>;
 

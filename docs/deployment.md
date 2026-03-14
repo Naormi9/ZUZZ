@@ -4,13 +4,14 @@
 
 ZUZZ deploys three applications, each as a Docker container:
 
-| Component | Image | Port | Description |
-|-----------|-------|------|-------------|
-| API | `zuzz-api` | 4000 | Express + Socket.IO backend |
-| Web | `zuzz-web` | 3000 | Next.js public marketplace |
-| Admin | `zuzz-admin` | 3001 | Next.js admin backoffice |
+| Component | Image        | Port | Description                 |
+| --------- | ------------ | ---- | --------------------------- |
+| API       | `zuzz-api`   | 4000 | Express + Socket.IO backend |
+| Web       | `zuzz-web`   | 3000 | Next.js public marketplace  |
+| Admin     | `zuzz-admin` | 3001 | Next.js admin backoffice    |
 
 Dependencies:
+
 - PostgreSQL 16 with PostGIS, pg_trgm, unaccent, uuid-ossp
 - Redis 7
 - S3-compatible object storage (MinIO for dev, any S3 for production)
@@ -20,29 +21,30 @@ Dependencies:
 
 See `.env.example` for the full list. Critical production variables:
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string (not localhost in production) |
-| `REDIS_URL` | Yes | Redis connection string (not localhost in production) |
-| `AUTH_SECRET` | Yes | Min 32 chars, no placeholder values |
-| `STORAGE_ENDPOINT` | Yes | S3-compatible endpoint |
-| `STORAGE_ACCESS_KEY` | Yes | Not `minioadmin` in production |
-| `STORAGE_SECRET_KEY` | Yes | Not `minioadmin` in production |
-| `STORAGE_PUBLIC_URL` | Optional | CDN or public URL for stored objects |
-| `SMTP_HOST` | Yes | Not `localhost` in production |
-| `SMTP_USER` | Prod | SMTP credentials |
-| `SMTP_PASS` | Prod | SMTP credentials |
-| `NODE_ENV` | Yes | Must be `production` |
-| `RATE_LIMIT_ENABLED` | Yes (prod) | Must be `true` in production |
-| `SENTRY_DSN` | Recommended | Error tracking |
-| `NEXT_PUBLIC_APP_URL` | Yes | Not localhost in production |
-| `NEXT_PUBLIC_ADMIN_URL` | Yes | Admin app URL |
+| Variable                | Required    | Notes                                                      |
+| ----------------------- | ----------- | ---------------------------------------------------------- |
+| `DATABASE_URL`          | Yes         | PostgreSQL connection string (not localhost in production) |
+| `REDIS_URL`             | Yes         | Redis connection string (not localhost in production)      |
+| `AUTH_SECRET`           | Yes         | Min 32 chars, no placeholder values                        |
+| `STORAGE_ENDPOINT`      | Yes         | S3-compatible endpoint                                     |
+| `STORAGE_ACCESS_KEY`    | Yes         | Not `minioadmin` in production                             |
+| `STORAGE_SECRET_KEY`    | Yes         | Not `minioadmin` in production                             |
+| `STORAGE_PUBLIC_URL`    | Optional    | CDN or public URL for stored objects                       |
+| `SMTP_HOST`             | Yes         | Not `localhost` in production                              |
+| `SMTP_USER`             | Prod        | SMTP credentials                                           |
+| `SMTP_PASS`             | Prod        | SMTP credentials                                           |
+| `NODE_ENV`              | Yes         | Must be `production`                                       |
+| `RATE_LIMIT_ENABLED`    | Yes (prod)  | Must be `true` in production                               |
+| `SENTRY_DSN`            | Recommended | Error tracking                                             |
+| `NEXT_PUBLIC_APP_URL`   | Yes         | Not localhost in production                                |
+| `NEXT_PUBLIC_ADMIN_URL` | Yes         | Admin app URL                                              |
 
 The `@zuzz/config` package validates environment **eagerly on API startup**. If critical vars are missing or unsafe defaults are detected in production, the app will **fail to start** with a clear error message.
 
 ### Production safety checks
 
 In `NODE_ENV=production`, the config validator rejects:
+
 - Placeholder `AUTH_SECRET` values
 - Default `minioadmin` storage credentials
 - `MAPS_PROVIDER=mock`
@@ -87,6 +89,7 @@ pnpm db:migrate:deploy
 5. **Verify** health: `curl /api/health/ready`
 
 If you have an existing database from `db:push` (no migration history):
+
 ```bash
 # Mark the initial migration as already applied
 cd packages/database && npx prisma migrate resolve --applied 0_init
@@ -95,6 +98,7 @@ cd packages/database && npx prisma migrate resolve --applied 0_init
 ### Rollback guidance
 
 Prisma does not support automatic migration rollback. Options:
+
 1. **Create a new "undo" migration** with the reverse SQL
 2. **Restore from backup** using `pnpm db:restore` or `pg_restore`
 3. For non-destructive migrations (adding columns/tables), rollback may not be needed
@@ -114,12 +118,12 @@ docker build -f apps/admin/Dockerfile -t zuzz-admin .
 
 ## Health Checks
 
-| Endpoint | Purpose | Expected |
-|----------|---------|----------|
-| `GET /api/health/live` | Liveness probe | `200 { status: "ok" }` |
-| `GET /api/health` | Full health (DB + Redis + timings) | `200` or `503` |
-| `GET /api/health/ready` | Readiness probe | `200 { ready: true }` |
-| `GET /api/health/startup` | Startup probe | `200 { started: true }` |
+| Endpoint                  | Purpose                            | Expected                |
+| ------------------------- | ---------------------------------- | ----------------------- |
+| `GET /api/health/live`    | Liveness probe                     | `200 { status: "ok" }`  |
+| `GET /api/health`         | Full health (DB + Redis + timings) | `200` or `503`          |
+| `GET /api/health/ready`   | Readiness probe                    | `200 { ready: true }`   |
+| `GET /api/health/startup` | Startup probe                      | `200 { started: true }` |
 
 - Use `/api/health/live` for container liveness checks
 - Use `/api/health/ready` for load balancer readiness and deploy gating
@@ -142,6 +146,7 @@ docker build -f apps/admin/Dockerfile -t zuzz-admin .
 ## Deployment Checklist
 
 ### Pre-deploy
+
 - [ ] All CI checks pass (lint, typecheck, test, build, e2e)
 - [ ] Database backup created
 - [ ] Database migrations applied
@@ -152,6 +157,7 @@ docker build -f apps/admin/Dockerfile -t zuzz-admin .
 - [ ] Sentry DSN configured (recommended)
 
 ### Post-deploy
+
 - [ ] `/api/health/ready` returns `{ ready: true }`
 - [ ] `/api/health` shows all services connected
 - [ ] Web app loads at configured URL
@@ -178,6 +184,7 @@ See `docs/staging-deploy.md` for detailed staging setup instructions.
 Email uses `@zuzz/email` with SMTP support (nodemailer). When `SMTP_HOST` is set, emails are sent via SMTP. When unset, falls back to console logging (dev only).
 
 For production:
+
 ```
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
@@ -195,13 +202,13 @@ For production, set `STORAGE_PUBLIC_URL` to point to a CDN or direct S3 URL for 
 
 ## Observability
 
-| Feature | Status | Configuration |
-|---------|--------|---------------|
-| Structured logging (Pino) | Active | `LOG_LEVEL` env var, JSON in production |
-| Request correlation IDs | Active | `X-Request-ID` header |
-| Sentry error tracking | Ready | Set `SENTRY_DSN` to enable |
-| Sensitive data redaction | Active | Auth headers, cookies, passwords redacted from logs |
-| OpenTelemetry tracing | Prepared | See `apps/api/src/instrumentation.ts` |
+| Feature                   | Status   | Configuration                                       |
+| ------------------------- | -------- | --------------------------------------------------- |
+| Structured logging (Pino) | Active   | `LOG_LEVEL` env var, JSON in production             |
+| Request correlation IDs   | Active   | `X-Request-ID` header                               |
+| Sentry error tracking     | Ready    | Set `SENTRY_DSN` to enable                          |
+| Sensitive data redaction  | Active   | Auth headers, cookies, passwords redacted from logs |
+| OpenTelemetry tracing     | Prepared | See `apps/api/src/instrumentation.ts`               |
 
 ## Known Deferred Items
 

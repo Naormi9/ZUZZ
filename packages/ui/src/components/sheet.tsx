@@ -10,7 +10,15 @@ interface SheetContextValue {
 
 const SheetContext = React.createContext<SheetContextValue>({ open: false, setOpen: () => {} });
 
-function Sheet({ children, open: controlledOpen, onOpenChange }: { children: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) {
+function Sheet({
+  children,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
@@ -22,7 +30,15 @@ function SheetTrigger({ children }: { children: React.ReactNode }) {
   return <div onClick={() => setOpen(true)}>{children}</div>;
 }
 
-function SheetContent({ children, className, side = 'right' }: { children: React.ReactNode; className?: string; side?: 'left' | 'right' | 'bottom' }) {
+function SheetContent({
+  children,
+  className,
+  side = 'right',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  side?: 'left' | 'right' | 'bottom';
+}) {
   const { open, setOpen } = React.useContext(SheetContext);
   if (!open) return null;
 
@@ -35,8 +51,13 @@ function SheetContent({ children, className, side = 'right' }: { children: React
   return (
     <div className="fixed inset-0 z-50">
       <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
-      <div className={cn('fixed bg-white shadow-xl p-6 overflow-y-auto', sideClasses[side], className)}>
-        <button onClick={() => setOpen(false)} className="absolute top-4 end-4 text-gray-400 hover:text-gray-600">
+      <div
+        className={cn('fixed bg-white shadow-xl p-6 overflow-y-auto', sideClasses[side], className)}
+      >
+        <button
+          onClick={() => setOpen(false)}
+          className="absolute top-4 end-4 text-gray-400 hover:text-gray-600"
+        >
           ✕
         </button>
         {children}

@@ -63,9 +63,7 @@ export function Footer() {
               />
               <span className="hidden text-2xl font-bold text-brand-black">ZUZZ</span>
             </Link>
-            <p className="mt-3 text-sm text-gray-600">
-              המקום שבו עסקאות זזות באמת
-            </p>
+            <p className="mt-3 text-sm text-gray-600">המקום שבו עסקאות זזות באמת</p>
             <p className="mt-1 text-xs text-gray-400">
               פלטפורמת המסחר המובילה בישראל — רכב, נדל&quot;ן ושוק עם תשתית אמון מובנית.
             </p>
@@ -74,9 +72,7 @@ export function Footer() {
           {/* Link Sections */}
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-semibold text-gray-900">
-                {section.title}
-              </h3>
+              <h3 className="text-sm font-semibold text-gray-900">{section.title}</h3>
               <ul className="mt-3 space-y-2">
                 {section.links.map((link) => (
                   <li key={`${link.href}-${link.label}`}>
@@ -99,22 +95,13 @@ export function Footer() {
             &copy; {new Date().getFullYear()} ZUZZ. כל הזכויות שמורות.
           </p>
           <div className="flex items-center gap-4">
-            <Link
-              href="/terms"
-              className="text-xs text-gray-400 hover:text-gray-600"
-            >
+            <Link href="/terms" className="text-xs text-gray-400 hover:text-gray-600">
               תנאי שימוש
             </Link>
-            <Link
-              href="/privacy"
-              className="text-xs text-gray-400 hover:text-gray-600"
-            >
+            <Link href="/privacy" className="text-xs text-gray-400 hover:text-gray-600">
               פרטיות
             </Link>
-            <Link
-              href="/accessibility"
-              className="text-xs text-gray-400 hover:text-gray-600"
-            >
+            <Link href="/accessibility" className="text-xs text-gray-400 hover:text-gray-600">
               נגישות
             </Link>
           </div>

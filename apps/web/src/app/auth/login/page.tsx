@@ -81,7 +81,11 @@ export default function LoginPage() {
             />
             <h1 className="hidden text-2xl font-bold text-brand-500">ZUZZ</h1>
             <p className="text-gray-500 mt-1">
-              {mode === 'verify' ? 'הזן את הקוד שנשלח לאימייל' : mode === 'register' ? 'הרשמה' : 'התחברות'}
+              {mode === 'verify'
+                ? 'הזן את הקוד שנשלח לאימייל'
+                : mode === 'register'
+                  ? 'הרשמה'
+                  : 'התחברות'}
             </p>
           </div>
 
@@ -91,31 +95,84 @@ export default function LoginPage() {
 
           {mode === 'verify' ? (
             <div className="space-y-4">
-              <p className="text-sm text-gray-600 text-center">קוד נשלח אל <strong>{email}</strong></p>
-              <Input label="קוד אימות" placeholder="123456" value={code} onChange={e => setCode(e.target.value)} maxLength={6} className="text-center text-lg tracking-wider" />
-              <Button className="w-full" onClick={handleVerify} loading={loading}>אימות</Button>
-              <button onClick={() => setMode('login')} className="text-sm text-brand-700 hover:underline w-full text-center">
+              <p className="text-sm text-gray-600 text-center">
+                קוד נשלח אל <strong>{email}</strong>
+              </p>
+              <Input
+                label="קוד אימות"
+                placeholder="123456"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                maxLength={6}
+                className="text-center text-lg tracking-wider"
+              />
+              <Button className="w-full" onClick={handleVerify} loading={loading}>
+                אימות
+              </Button>
+              <button
+                onClick={() => setMode('login')}
+                className="text-sm text-brand-700 hover:underline w-full text-center"
+              >
                 חזרה
               </button>
             </div>
           ) : mode === 'register' ? (
             <div className="space-y-4">
-              <Input label="שם מלא" placeholder="ישראל ישראלי" value={name} onChange={e => setName(e.target.value)} />
-              <Input label="אימייל" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} dir="ltr" />
-              <Button className="w-full" onClick={handleRegister} loading={loading}>הרשמה</Button>
+              <Input
+                label="שם מלא"
+                placeholder="ישראל ישראלי"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                label="אימייל"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                dir="ltr"
+              />
+              <Button className="w-full" onClick={handleRegister} loading={loading}>
+                הרשמה
+              </Button>
               <p className="text-sm text-center text-gray-500">
                 כבר רשום?{' '}
-                <button onClick={() => setMode('login')} className="text-brand-500 hover:underline">התחבר</button>
+                <button onClick={() => setMode('login')} className="text-brand-500 hover:underline">
+                  התחבר
+                </button>
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              <Input label="אימייל" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} dir="ltr" />
-              <Button className="w-full" onClick={handleLogin} loading={loading}>שלח קוד אימות</Button>
-              <Button className="w-full" variant="ghost" onClick={handleDevLogin} loading={loading}>כניסה מהירה (פיתוח)</Button>
+              <Input
+                label="אימייל"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                dir="ltr"
+              />
+              <Button className="w-full" onClick={handleLogin} loading={loading}>
+                שלח קוד אימות
+              </Button>
+              {process.env.NODE_ENV !== 'production' && (
+                <Button
+                  className="w-full"
+                  variant="ghost"
+                  onClick={handleDevLogin}
+                  loading={loading}
+                >
+                  כניסה מהירה (פיתוח)
+                </Button>
+              )}
               <p className="text-sm text-center text-gray-500">
                 אין חשבון?{' '}
-                <button onClick={() => setMode('register')} className="text-brand-500 hover:underline">הרשם עכשיו</button>
+                <button
+                  onClick={() => setMode('register')}
+                  className="text-brand-500 hover:underline"
+                >
+                  הרשם עכשיו
+                </button>
               </p>
             </div>
           )}

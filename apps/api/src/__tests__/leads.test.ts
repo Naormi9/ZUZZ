@@ -173,9 +173,7 @@ describe('GET /api/leads', () => {
 
     mockPrisma.lead.findMany.mockResolvedValueOnce(leads);
 
-    const res = await request(app)
-      .get('/api/leads')
-      .set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/leads').set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

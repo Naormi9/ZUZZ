@@ -8,7 +8,10 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { CreditCard } from 'lucide-react';
 
 const PLAN_LABELS: Record<string, string> = {
-  free: 'חינם', basic: 'בסיסי', pro: 'מקצועי', enterprise: 'ארגוני',
+  free: 'חינם',
+  basic: 'בסיסי',
+  pro: 'מקצועי',
+  enterprise: 'ארגוני',
 };
 
 export default function DealerBillingPage() {
@@ -22,7 +25,9 @@ export default function DealerBillingPage() {
       try {
         const res = await api.get<{ success: boolean; data: any }>('/api/subscriptions/my');
         setSubscription(res.data);
-      } catch { /* ignore */ } finally {
+      } catch {
+        /* ignore */
+      } finally {
         setLoading(false);
       }
     }
@@ -47,7 +52,9 @@ export default function DealerBillingPage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-500">סטטוס</p>
-                <p className="font-medium">{subscription.status === 'active' ? 'פעיל' : subscription.status}</p>
+                <p className="font-medium">
+                  {subscription.status === 'active' ? 'פעיל' : subscription.status}
+                </p>
               </div>
               <div>
                 <p className="text-gray-500">תוקף</p>
@@ -84,9 +91,24 @@ export default function DealerBillingPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">תוכניות זמינות</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           {[
-            { plan: 'basic', label: 'בסיסי', price: '₪99/חודש', features: ['עד 20 מודעות', 'ניהול לידים', 'דף סוחר'] },
-            { plan: 'pro', label: 'מקצועי', price: '₪249/חודש', features: ['עד 100 מודעות', 'CRM מתקדם', 'קידום כלול', 'צוות עד 5'] },
-            { plan: 'enterprise', label: 'ארגוני', price: 'בהתאמה אישית', features: ['מודעות ללא הגבלה', 'API גישה', 'צוות ללא הגבלה', 'תמיכה ייעודית'] },
+            {
+              plan: 'basic',
+              label: 'בסיסי',
+              price: '₪99/חודש',
+              features: ['עד 20 מודעות', 'ניהול לידים', 'דף סוחר'],
+            },
+            {
+              plan: 'pro',
+              label: 'מקצועי',
+              price: '₪249/חודש',
+              features: ['עד 100 מודעות', 'CRM מתקדם', 'קידום כלול', 'צוות עד 5'],
+            },
+            {
+              plan: 'enterprise',
+              label: 'ארגוני',
+              price: 'בהתאמה אישית',
+              features: ['מודעות ללא הגבלה', 'API גישה', 'צוות ללא הגבלה', 'תמיכה ייעודית'],
+            },
           ].map((tier) => (
             <Card key={tier.plan} className="hover:border-brand-300 transition-colors">
               <CardContent className="p-5">
@@ -104,7 +126,11 @@ export default function DealerBillingPage() {
           ))}
         </div>
         <p className="text-xs text-gray-400 mt-4 text-center">
-          לשדרוג תוכנית, פנו אלינו דרך <Link href="/contact" className="text-brand-600 hover:underline">צור קשר</Link>.
+          לשדרוג תוכנית, פנו אלינו דרך{' '}
+          <Link href="/contact" className="text-brand-600 hover:underline">
+            צור קשר
+          </Link>
+          .
         </p>
       </div>
     </div>

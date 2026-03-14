@@ -10,7 +10,15 @@ interface DialogContextValue {
 
 const DialogContext = React.createContext<DialogContextValue>({ open: false, setOpen: () => {} });
 
-function Dialog({ children, open: controlledOpen, onOpenChange }: { children: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) {
+function Dialog({
+  children,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
@@ -19,7 +27,11 @@ function Dialog({ children, open: controlledOpen, onOpenChange }: { children: Re
 
 function DialogTrigger({ children, className }: { children: React.ReactNode; className?: string }) {
   const { setOpen } = React.useContext(DialogContext);
-  return <div className={className} onClick={() => setOpen(true)}>{children}</div>;
+  return (
+    <div className={className} onClick={() => setOpen(true)}>
+      {children}
+    </div>
+  );
 }
 
 function DialogContent({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -28,7 +40,9 @@ function DialogContent({ children, className }: { children: React.ReactNode; cla
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
-      <div className={cn('relative z-50 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl', className)}>
+      <div
+        className={cn('relative z-50 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl', className)}
+      >
         {children}
       </div>
     </div>
@@ -43,7 +57,13 @@ function DialogTitle({ children, className }: { children: React.ReactNode; class
   return <h2 className={cn('text-lg font-semibold', className)}>{children}</h2>;
 }
 
-function DialogDescription({ children, className }: { children: React.ReactNode; className?: string }) {
+function DialogDescription({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <p className={cn('text-sm text-gray-500 mt-1', className)}>{children}</p>;
 }
 
@@ -51,4 +71,12 @@ function DialogFooter({ children, className }: { children: React.ReactNode; clas
   return <div className={cn('flex justify-end gap-2 mt-6', className)}>{children}</div>;
 }
 
-export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter };
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+};

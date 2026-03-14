@@ -7,8 +7,11 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { Megaphone } from 'lucide-react';
 
 const TYPE_LABELS: Record<string, string> = {
-  boost: 'הגברה', highlight: 'הדגשה', featured: 'מודעה מובחרת',
-  top_of_search: 'ראש תוצאות', gallery: 'גלריה',
+  boost: 'הגברה',
+  highlight: 'הדגשה',
+  featured: 'מודעה מובחרת',
+  top_of_search: 'ראש תוצאות',
+  gallery: 'גלריה',
 };
 
 export default function DealerPromotionsPage() {
@@ -22,7 +25,9 @@ export default function DealerPromotionsPage() {
       try {
         const res = await api.get<{ success: boolean; data: any[] }>('/api/promotions/my');
         setPromotions(res.data);
-      } catch { /* ignore */ } finally {
+      } catch {
+        /* ignore */
+      } finally {
         setLoading(false);
       }
     }
@@ -33,7 +38,9 @@ export default function DealerPromotionsPage() {
     try {
       await api.patch(`/api/promotions/${id}/cancel`);
       setPromotions((prev) => prev.map((p) => (p.id === id ? { ...p, isActive: false } : p)));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   return (
@@ -42,7 +49,9 @@ export default function DealerPromotionsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
         </div>
       ) : promotions.length > 0 ? (
         <div className="space-y-3">
@@ -51,8 +60,12 @@ export default function DealerPromotionsPage() {
               <CardContent className="p-4 flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">{promo.listing?.title || 'מודעה'}</span>
-                    <Badge className="text-xs bg-amber-100 text-amber-700">{TYPE_LABELS[promo.type] || promo.type}</Badge>
+                    <span className="font-medium text-gray-900">
+                      {promo.listing?.title || 'מודעה'}
+                    </span>
+                    <Badge className="text-xs bg-amber-100 text-amber-700">
+                      {TYPE_LABELS[promo.type] || promo.type}
+                    </Badge>
                     {promo.isActive ? (
                       <Badge className="text-xs bg-green-100 text-green-700">פעיל</Badge>
                     ) : (
@@ -60,12 +73,15 @@ export default function DealerPromotionsPage() {
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {new Date(promo.startAt).toLocaleDateString('he-IL')} — {new Date(promo.endAt).toLocaleDateString('he-IL')}
+                    {new Date(promo.startAt).toLocaleDateString('he-IL')} —{' '}
+                    {new Date(promo.endAt).toLocaleDateString('he-IL')}
                     {' · '}₪{(promo.amount / 100).toFixed(0)}
                   </p>
                 </div>
                 {promo.isActive && (
-                  <Button size="sm" variant="outline" onClick={() => cancelPromo(promo.id)}>ביטול</Button>
+                  <Button size="sm" variant="outline" onClick={() => cancelPromo(promo.id)}>
+                    ביטול
+                  </Button>
                 )}
               </CardContent>
             </Card>

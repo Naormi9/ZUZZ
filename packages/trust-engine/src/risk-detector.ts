@@ -166,7 +166,7 @@ const priceConditionMismatch: RiskHeuristic = (ctx) => {
         'price_condition_mismatch',
         'medium',
         'Price seems high given the reported condition issues (accidents, damage, high mileage).',
-        'המחיר נראה גבוה בהתחשב בבעיות המצב המדווחות (תאונות, נזקים, קילומטראז\' גבוה).',
+        "המחיר נראה גבוה בהתחשב בבעיות המצב המדווחות (תאונות, נזקים, קילומטראז' גבוה).",
       );
     }
   }

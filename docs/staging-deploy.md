@@ -3,6 +3,7 @@
 ## What "Staging Ready" Means
 
 The staging environment runs the same Docker images and configuration as production, but with:
+
 - A separate database (non-production data)
 - `NODE_ENV=production` (to test production code paths)
 - Rate limiting enabled
@@ -76,6 +77,7 @@ PAYMENT_PROVIDER="sandbox"
 ```
 
 **Note:** The config validator will reject `MAPS_PROVIDER=mock` and `PAYMENT_PROVIDER=sandbox` in `NODE_ENV=production`. For staging, you have two options:
+
 1. Use `NODE_ENV=production` and set real provider values (recommended for production-parity testing)
 2. Temporarily relax the validation for staging (not recommended)
 

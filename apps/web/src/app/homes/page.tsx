@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button, ListingCard, Skeleton, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@zuzz/ui';
+import {
+  Button,
+  ListingCard,
+  Skeleton,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@zuzz/ui';
 import { api } from '@/lib/api';
 
 interface PropertyResult {
@@ -59,7 +68,9 @@ export default function HomesPage() {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const res = await api.get<{ data: PropertyResult[] }>('/api/homes?featured=true&pageSize=6');
+        const res = await api.get<{ data: PropertyResult[] }>(
+          '/api/homes?featured=true&pageSize=6',
+        );
         setFeatured(res.data);
       } catch {
         // empty state
@@ -109,7 +120,9 @@ export default function HomesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {PROPERTY_TYPES.map((t) => (
-                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -123,7 +136,9 @@ export default function HomesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {ROOM_OPTIONS.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                      <SelectItem key={r.value} value={r.value}>
+                        {r.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -137,7 +152,9 @@ export default function HomesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {PRICE_RANGES.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      <SelectItem key={p.value} value={p.value}>
+                        {p.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -155,7 +172,10 @@ export default function HomesPage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">נכסים מומלצים</h2>
-          <Link href="/homes/search" className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+          <Link
+            href="/homes/search"
+            className="text-teal-600 hover:text-teal-700 text-sm font-medium"
+          >
             הצג הכל
           </Link>
         </div>
@@ -191,7 +211,9 @@ export default function HomesPage() {
                 details={[
                   { label: 'חדרים', value: String(home.property.rooms) },
                   { label: 'מ"ר', value: String(home.property.sizeSqm) },
-                  ...(home.property.floor != null ? [{ label: 'קומה', value: String(home.property.floor) }] : []),
+                  ...(home.property.floor != null
+                    ? [{ label: 'קומה', value: String(home.property.floor) }]
+                    : []),
                 ]}
                 href={`/homes/${home.id}`}
               />
@@ -211,7 +233,20 @@ export default function HomesPage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">ערים פופולריות</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 'נתניה', 'ראשון לציון', 'פתח תקווה', 'אשדוד', 'רעננה', 'כפר סבא'].map((city) => (
+          {[
+            'תל אביב',
+            'ירושלים',
+            'חיפה',
+            'באר שבע',
+            'רמת גן',
+            'הרצליה',
+            'נתניה',
+            'ראשון לציון',
+            'פתח תקווה',
+            'אשדוד',
+            'רעננה',
+            'כפר סבא',
+          ].map((city) => (
             <Link
               key={city}
               href={`/homes/search?city=${encodeURIComponent(city)}`}
@@ -227,7 +262,9 @@ export default function HomesPage() {
       <section className="bg-teal-50 border-t border-teal-100">
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">רוצה למכור או להשכיר נכס?</h2>
-          <p className="text-gray-600 mb-6">פרסם מודעה ב-ZUZZ Homes עם אימות בעלות וחשיפה מקסימלית.</p>
+          <p className="text-gray-600 mb-6">
+            פרסם מודעה ב-ZUZZ Homes עם אימות בעלות וחשיפה מקסימלית.
+          </p>
           <Button onClick={() => (window.location.href = '/homes/create')} className="px-8">
             פרסם מודעת נכס
           </Button>

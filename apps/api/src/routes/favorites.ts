@@ -8,7 +8,7 @@ export const favoritesRouter = Router();
 favoritesRouter.get('/', authenticate, async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
     const vertical = req.query.vertical as string;
 
     const where: any = { userId: req.user!.id };

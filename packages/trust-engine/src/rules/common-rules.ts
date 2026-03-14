@@ -168,8 +168,7 @@ export const listingAgeRule: TrustRuleDefinition = {
       };
     }
 
-    const ageDays =
-      (Date.now() - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24);
+    const ageDays = (Date.now() - new Date(publishedAt).getTime()) / (1000 * 60 * 60 * 24);
 
     let score: number;
     if (ageDays <= 30) {
@@ -193,14 +192,8 @@ export const listingAgeRule: TrustRuleDefinition = {
       weight: this.weight,
       score,
       status,
-      label:
-        ageDays < 1
-          ? 'Listed today'
-          : `Listed ${Math.floor(ageDays)} days ago`,
-      labelHe:
-        ageDays < 1
-          ? 'פורסם היום'
-          : `פורסם לפני ${Math.floor(ageDays)} ימים`,
+      label: ageDays < 1 ? 'Listed today' : `Listed ${Math.floor(ageDays)} days ago`,
+      labelHe: ageDays < 1 ? 'פורסם היום' : `פורסם לפני ${Math.floor(ageDays)} ימים`,
     };
   },
 };

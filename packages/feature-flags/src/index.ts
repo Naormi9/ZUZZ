@@ -32,25 +32,21 @@ export interface FeatureFlagProvider {
   refresh(): Promise<void>;
 }
 
-export function createFeatureFlagProvider(
-  type: 'local',
-  flags: FeatureFlag[]
-): FeatureFlagProvider;
-export function createFeatureFlagProvider(
-  type: 'database',
-  prisma: unknown
-): FeatureFlagProvider;
+export function createFeatureFlagProvider(type: 'local', flags: FeatureFlag[]): FeatureFlagProvider;
+export function createFeatureFlagProvider(type: 'database', prisma: unknown): FeatureFlagProvider;
 export function createFeatureFlagProvider(
   type: 'local' | 'database',
-  arg: FeatureFlag[] | unknown
+  arg: FeatureFlag[] | unknown,
 ): FeatureFlagProvider {
   switch (type) {
     case 'local': {
-      const { LocalFeatureFlagProvider } = require('./providers/local') as typeof import('./providers/local');
+      const { LocalFeatureFlagProvider } =
+        require('./providers/local') as typeof import('./providers/local');
       return new LocalFeatureFlagProvider(arg as FeatureFlag[]);
     }
     case 'database': {
-      const { DatabaseFeatureFlagProvider } = require('./providers/database') as typeof import('./providers/database');
+      const { DatabaseFeatureFlagProvider } =
+        require('./providers/database') as typeof import('./providers/database');
       return new DatabaseFeatureFlagProvider(arg);
     }
     default:

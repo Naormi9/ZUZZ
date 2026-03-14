@@ -10,7 +10,13 @@ interface TabsContextValue {
 
 const TabsContext = React.createContext<TabsContextValue>({ value: '', setValue: () => {} });
 
-function Tabs({ children, defaultValue, value: controlledValue, onValueChange, className }: {
+function Tabs({
+  children,
+  defaultValue,
+  value: controlledValue,
+  onValueChange,
+  className,
+}: {
   children: React.ReactNode;
   defaultValue?: string;
   value?: string;
@@ -29,13 +35,23 @@ function Tabs({ children, defaultValue, value: controlledValue, onValueChange, c
 
 function TabsList({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('inline-flex h-10 items-center gap-1 rounded-lg bg-gray-100 p-1', className)}>
+    <div
+      className={cn('inline-flex h-10 items-center gap-1 rounded-lg bg-gray-100 p-1', className)}
+    >
       {children}
     </div>
   );
 }
 
-function TabsTrigger({ children, value, className }: { children: React.ReactNode; value: string; className?: string }) {
+function TabsTrigger({
+  children,
+  value,
+  className,
+}: {
+  children: React.ReactNode;
+  value: string;
+  className?: string;
+}) {
   const { value: selectedValue, setValue } = React.useContext(TabsContext);
   const isActive = selectedValue === value;
   return (
@@ -52,7 +68,15 @@ function TabsTrigger({ children, value, className }: { children: React.ReactNode
   );
 }
 
-function TabsContent({ children, value, className }: { children: React.ReactNode; value: string; className?: string }) {
+function TabsContent({
+  children,
+  value,
+  className,
+}: {
+  children: React.ReactNode;
+  value: string;
+  className?: string;
+}) {
   const { value: selectedValue } = React.useContext(TabsContext);
   if (selectedValue !== value) return null;
   return <div className={cn('mt-4', className)}>{children}</div>;

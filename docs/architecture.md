@@ -62,7 +62,9 @@
 ## Key Design Decisions
 
 ### 1. Trust-First Architecture
+
 Every listing has a computed trust score based on weighted factors:
+
 - Seller verification status
 - Documentation completeness
 - Price reasonableness
@@ -70,7 +72,9 @@ Every listing has a computed trust score based on weighted factors:
 - Historical behavior
 
 ### 2. Provider Abstraction Pattern
+
 All external services are behind interfaces:
+
 - Maps: mock → Google/Mapbox
 - Payments: sandbox → Stripe/Tranzilla
 - Email: SMTP → SendGrid/etc
@@ -79,17 +83,21 @@ All external services are behind interfaces:
 - Search: PostgreSQL → Typesense/OpenSearch
 
 ### 3. Vertical Architecture
+
 Each vertical (Cars, Homes, Market) extends a shared listing base:
+
 - Common: listing lifecycle, media, favorites, messaging
 - Cars: vehicle details, trust factors, EV support
 - Homes: property details, map integration
 - Market: categories, condition, attributes
 
 ### 4. Hebrew-First / RTL-Native
+
 - All UI text defaults to Hebrew
 - CSS uses logical properties (start/end vs left/right)
 - Tailwind configured for RTL
 - Date/number formatting uses he-IL locale
+
 ```
 
 ## Data Flow
@@ -108,3 +116,4 @@ Each vertical (Cars, Homes, Market) extends a shared listing base:
 3. Results include facets (make, fuel, gearbox counts)
 4. Promoted/featured listings sorted first
 5. Trust scores and badges displayed on cards
+```

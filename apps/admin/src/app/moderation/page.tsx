@@ -63,7 +63,7 @@ export default function ModerationPage() {
   const handleAction = async (
     itemId: string,
     action: 'approve' | 'reject' | 'request_changes',
-    reason?: string
+    reason?: string,
   ) => {
     setActioningId(itemId);
     try {
@@ -138,9 +138,7 @@ export default function ModerationPage() {
                       <div className="flex items-start justify-between">
                         <div className="space-y-2">
                           <div className="flex items-center gap-3">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {item.title}
-                            </h3>
+                            <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
                             <span className={`admin-badge ${statusColors[item.status]}`}>
                               {statusLabels[item.status]}
                             </span>
@@ -166,9 +164,7 @@ export default function ModerationPage() {
                               size="sm"
                               disabled={actioningId === item.id}
                               onClick={() =>
-                                setRejectReasonId(
-                                  rejectReasonId === item.id ? null : item.id
-                                )
+                                setRejectReasonId(rejectReasonId === item.id ? null : item.id)
                               }
                             >
                               דחה

@@ -1,7 +1,20 @@
 import { z } from 'zod';
 
 export const marketListingSchema = z.object({
-  category: z.enum(['electronics', 'furniture', 'fashion', 'sports', 'garden', 'kids', 'pets', 'books', 'music', 'collectibles', 'tools', 'other']),
+  category: z.enum([
+    'electronics',
+    'furniture',
+    'fashion',
+    'sports',
+    'garden',
+    'kids',
+    'pets',
+    'books',
+    'music',
+    'collectibles',
+    'tools',
+    'other',
+  ]),
   condition: z.enum(['new', 'like_new', 'good', 'fair', 'for_parts']),
   brand: z.string().optional(),
   attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),

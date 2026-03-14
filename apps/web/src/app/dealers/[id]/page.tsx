@@ -57,7 +57,9 @@ export default function DealerProfilePage() {
       try {
         const [orgRes, listingsRes] = await Promise.all([
           api.get<{ success: boolean; data: DealerOrg }>(`/api/organizations/${id}`),
-          api.get<{ success: boolean; data: { data: ListingItem[]; total: number } }>(`/api/organizations/${id}/public-listings?pageSize=12`),
+          api.get<{ success: boolean; data: { data: ListingItem[]; total: number } }>(
+            `/api/organizations/${id}/public-listings?pageSize=12`,
+          ),
         ]);
         setOrg(orgRes.data);
         setListings(listingsRes.data.data);
@@ -76,7 +78,9 @@ export default function DealerProfilePage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Skeleton className="h-48 w-full mb-6" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full" />
+          ))}
         </div>
       </div>
     );
@@ -87,14 +91,19 @@ export default function DealerProfilePage() {
       <div className="min-h-[60vh] flex items-center justify-center text-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">סוחר לא נמצא</h1>
-          <Link href="/cars/search"><Button>חזרה לחיפוש</Button></Link>
+          <Link href="/cars/search">
+            <Button>חזרה לחיפוש</Button>
+          </Link>
         </div>
       </div>
     );
   }
 
   const TYPE_LABELS: Record<string, string> = {
-    dealer: 'סוחר רכב', agency: 'סוכנות נדל"ן', developer: 'יזם', business: 'עסק',
+    dealer: 'סוחר רכב',
+    agency: 'סוכנות נדל"ן',
+    developer: 'יזם',
+    business: 'עסק',
   };
 
   return (
@@ -105,10 +114,22 @@ export default function DealerProfilePage() {
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-4">
             <ol className="flex flex-wrap items-center gap-1">
-              <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
-              <li><span className="mx-1 text-gray-300">/</span></li>
-              <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
-              <li><span className="mx-1 text-gray-300">/</span></li>
+              <li>
+                <Link href="/" className="hover:text-gray-700">
+                  ראשי
+                </Link>
+              </li>
+              <li>
+                <span className="mx-1 text-gray-300">/</span>
+              </li>
+              <li>
+                <Link href="/cars" className="hover:text-gray-700">
+                  רכב
+                </Link>
+              </li>
+              <li>
+                <span className="mx-1 text-gray-300">/</span>
+              </li>
               <li className="text-gray-700 font-medium">{org.name}</li>
             </ol>
           </nav>
@@ -126,22 +147,50 @@ export default function DealerProfilePage() {
                 <h1 className="text-2xl font-bold text-gray-900">{org.name}</h1>
                 {org.verificationStatus === 'verified' && (
                   <Badge className="text-xs bg-green-100 text-green-700 gap-1">
-                    <Shield className="h-3 w-3" />מאומת
+                    <Shield className="h-3 w-3" />
+                    מאומת
                   </Badge>
                 )}
-                <Badge className="text-xs bg-gray-100 text-gray-700">{TYPE_LABELS[org.type] || org.type}</Badge>
+                <Badge className="text-xs bg-gray-100 text-gray-700">
+                  {TYPE_LABELS[org.type] || org.type}
+                </Badge>
               </div>
               {org.description && <p className="text-gray-600 mt-2 max-w-2xl">{org.description}</p>}
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
-                {org.city && <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{org.city}{org.region ? `, ${org.region}` : ''}</span>}
-                {org.phone && <span className="flex items-center gap-1"><Phone className="h-4 w-4" />{org.phone}</span>}
-                {org.email && <span className="flex items-center gap-1"><Mail className="h-4 w-4" />{org.email}</span>}
+                {org.city && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {org.city}
+                    {org.region ? `, ${org.region}` : ''}
+                  </span>
+                )}
+                {org.phone && (
+                  <span className="flex items-center gap-1">
+                    <Phone className="h-4 w-4" />
+                    {org.phone}
+                  </span>
+                )}
+                {org.email && (
+                  <span className="flex items-center gap-1">
+                    <Mail className="h-4 w-4" />
+                    {org.email}
+                  </span>
+                )}
                 {org.website && (
-                  <a href={org.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-brand-600 hover:underline">
-                    <Globe className="h-4 w-4" />אתר
+                  <a
+                    href={org.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-brand-600 hover:underline"
+                  >
+                    <Globe className="h-4 w-4" />
+                    אתר
                   </a>
                 )}
-                <span className="flex items-center gap-1"><Package className="h-4 w-4" />{org._count.listings} מודעות</span>
+                <span className="flex items-center gap-1">
+                  <Package className="h-4 w-4" />
+                  {org._count.listings} מודעות
+                </span>
               </div>
             </div>
           </div>
@@ -169,10 +218,17 @@ export default function DealerProfilePage() {
                 trustScore={listing.trustScore}
                 isFeatured={listing.isFeatured}
                 isPromoted={listing.isPromoted}
-                details={listing.carDetails ? [
-                  { label: 'שנה', value: String(listing.carDetails.year) },
-                  { label: 'ק"מ', value: listing.carDetails.mileage?.toLocaleString('he-IL') || '-' },
-                ] : []}
+                details={
+                  listing.carDetails
+                    ? [
+                        { label: 'שנה', value: String(listing.carDetails.year) },
+                        {
+                          label: 'ק"מ',
+                          value: listing.carDetails.mileage?.toLocaleString('he-IL') || '-',
+                        },
+                      ]
+                    : []
+                }
                 href={`/cars/${listing.id}`}
               />
             ))}

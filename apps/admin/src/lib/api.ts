@@ -25,11 +25,16 @@ class AdminApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'שגיאה לא צפויה' })) as { message?: string };
+      const error = (await response.json().catch(() => ({ message: 'שגיאה לא צפויה' }))) as {
+        message?: string;
+      };
       throw new ApiError(response.status, error.message || 'שגיאה בבקשה לשרת');
     }
 
-    const json = await response.json() as { success?: boolean; data?: T } & Record<string, unknown>;
+    const json = (await response.json()) as { success?: boolean; data?: T } & Record<
+      string,
+      unknown
+    >;
     // Unwrap the { success, data } envelope
     return (json.data !== undefined ? json.data : json) as T;
   }
@@ -81,7 +86,11 @@ class AdminApiClient {
     return this.get<PaginatedResponse<any>>(`/api/admin/moderation?${query.toString()}`);
   }
 
-  moderateItem(listingId: string, action: 'approve' | 'reject' | 'request_changes' | 'flag', reason?: string) {
+  moderateItem(
+    listingId: string,
+    action: 'approve' | 'reject' | 'request_changes' | 'flag',
+    reason?: string,
+  ) {
     return this.post(`/api/admin/moderation/${listingId}/action`, { action, reason });
   }
 
@@ -111,7 +120,11 @@ class AdminApiClient {
     return this.get<any>(`/api/admin/organizations/${id}`);
   }
 
-  orgAction(orgId: string, action: 'approve' | 'reject' | 'suspend' | 'reactivate', reason?: string) {
+  orgAction(
+    orgId: string,
+    action: 'approve' | 'reject' | 'suspend' | 'reactivate',
+    reason?: string,
+  ) {
     return this.post(`/api/admin/organizations/${orgId}/action`, { action, reason });
   }
 
@@ -121,7 +134,9 @@ class AdminApiClient {
   }
 
   toggleFeatureFlag(flagId: string, currentEnabled: boolean) {
-    return this.patch<FeatureFlag>(`/api/admin/feature-flags/${flagId}`, { isEnabled: !currentEnabled });
+    return this.patch<FeatureFlag>(`/api/admin/feature-flags/${flagId}`, {
+      isEnabled: !currentEnabled,
+    });
   }
 
   // Audit Logs

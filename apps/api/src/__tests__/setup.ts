@@ -182,7 +182,9 @@ vi.mock('@zuzz/trust-engine', () => ({
 // ---------------------------------------------------------------------------
 vi.mock('@zuzz/storage', () => ({
   createStorageProvider: vi.fn(() => ({
-    upload: vi.fn().mockResolvedValue({ url: 'http://localhost/uploads/test.jpg', key: 'test.jpg', size: 100 }),
+    upload: vi
+      .fn()
+      .mockResolvedValue({ url: 'http://localhost/uploads/test.jpg', key: 'test.jpg', size: 100 }),
     delete: vi.fn().mockResolvedValue(undefined),
     getUrl: vi.fn().mockReturnValue('http://localhost/uploads/test.jpg'),
     healthCheck: vi.fn().mockResolvedValue(true),

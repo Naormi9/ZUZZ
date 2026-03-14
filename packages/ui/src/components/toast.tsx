@@ -64,7 +64,9 @@ function Toast({ toast, onDismiss }: { toast: ToastData; onDismiss: () => void }
       )}
     >
       <span className="flex-1">{toast.message}</span>
-      <button onClick={onDismiss} className="text-white/70 hover:text-white">✕</button>
+      <button onClick={onDismiss} className="text-white/70 hover:text-white">
+        ✕
+      </button>
     </div>
   );
 }

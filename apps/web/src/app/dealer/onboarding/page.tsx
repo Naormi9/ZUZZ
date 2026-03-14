@@ -55,7 +55,9 @@ export default function DealerOnboardingPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר כדי לפתוח חשבון עסקי</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
@@ -89,9 +91,7 @@ export default function DealerOnboardingPage() {
         <p className="text-gray-600">הצטרף כסוחר ב-ZUZZ ונהל את המלאי, הלידים והמודעות שלך.</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">{error}</div>
-      )}
+      {error && <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">{error}</div>}
 
       {step === 1 && (
         <Card>
@@ -99,7 +99,11 @@ export default function DealerOnboardingPage() {
             <h2 className="text-lg font-semibold">פרטי העסק</h2>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">שם העסק *</label>
-              <Input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="שם החברה או העסק" />
+              <Input
+                value={form.name}
+                onChange={(e) => update('name', e.target.value)}
+                placeholder="שם החברה או העסק"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">סוג עסק *</label>
@@ -127,14 +131,28 @@ export default function DealerOnboardingPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">טלפון</label>
-                <Input value={form.phone} onChange={(e) => update('phone', e.target.value)} type="tel" />
+                <Input
+                  value={form.phone}
+                  onChange={(e) => update('phone', e.target.value)}
+                  type="tel"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">דוא&quot;ל עסקי</label>
-                <Input value={form.email} onChange={(e) => update('email', e.target.value)} type="email" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  דוא&quot;ל עסקי
+                </label>
+                <Input
+                  value={form.email}
+                  onChange={(e) => update('email', e.target.value)}
+                  type="email"
+                />
               </div>
             </div>
-            <Button onClick={() => setStep(2)} className="w-full" disabled={!form.name || !form.type}>
+            <Button
+              onClick={() => setStep(2)}
+              className="w-full"
+              disabled={!form.name || !form.type}
+            >
               המשך
             </Button>
           </CardContent>
@@ -144,7 +162,10 @@ export default function DealerOnboardingPage() {
       {step === 2 && (
         <Card>
           <CardContent className="p-6 space-y-4">
-            <button onClick={() => setStep(1)} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+            <button
+              onClick={() => setStep(1)}
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+            >
               <ArrowLeft className="h-4 w-4" /> חזרה
             </button>
             <h2 className="text-lg font-semibold">מיקום ופרטים נוספים</h2>
@@ -167,8 +188,13 @@ export default function DealerOnboardingPage() {
               <Input value={form.website} onChange={(e) => update('website', e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">מספר רישיון עסק (אופציונלי)</label>
-              <Input value={form.licenseNumber} onChange={(e) => update('licenseNumber', e.target.value)} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                מספר רישיון עסק (אופציונלי)
+              </label>
+              <Input
+                value={form.licenseNumber}
+                onChange={(e) => update('licenseNumber', e.target.value)}
+              />
             </div>
             <Button onClick={handleSubmit} className="w-full" disabled={loading}>
               {loading ? 'שולח...' : 'שלח בקשה'}

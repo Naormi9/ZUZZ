@@ -27,10 +27,14 @@ export default function DealerTeamPage() {
         if (org) {
           setOrgId(org.id);
           setMyRole(org.myRole);
-          const membersRes = await api.get<{ success: boolean; data: any[] }>(`/api/organizations/${org.id}/members`);
+          const membersRes = await api.get<{ success: boolean; data: any[] }>(
+            `/api/organizations/${org.id}/members`,
+          );
           setMembers(membersRes.data);
         }
-      } catch { /* ignore */ } finally {
+      } catch {
+        /* ignore */
+      } finally {
         setLoading(false);
       }
     }
@@ -41,7 +45,10 @@ export default function DealerTeamPage() {
     if (!inviteEmail) return;
     setInviteError('');
     try {
-      const res = await api.post<{ success: boolean; data: any }>(`/api/organizations/${orgId}/members`, { email: inviteEmail, role: inviteRole });
+      const res = await api.post<{ success: boolean; data: any }>(
+        `/api/organizations/${orgId}/members`,
+        { email: inviteEmail, role: inviteRole },
+      );
       setMembers((prev) => [...prev, res.data]);
       setInviteEmail('');
     } catch (err: any) {
@@ -53,7 +60,9 @@ export default function DealerTeamPage() {
     try {
       await api.delete(`/api/organizations/${orgId}/members/${userId}`);
       setMembers((prev) => prev.filter((m) => m.userId !== userId));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   const canManage = ['owner', 'admin'].includes(myRole);
@@ -83,7 +92,10 @@ export default function DealerTeamPage() {
                 <option value="member">חבר</option>
                 <option value="admin">מנהל</option>
               </select>
-              <Button onClick={invite} className="gap-1"><UserPlus className="h-4 w-4" />הזמן</Button>
+              <Button onClick={invite} className="gap-1">
+                <UserPlus className="h-4 w-4" />
+                הזמן
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -92,7 +104,9 @@ export default function DealerTeamPage() {
       {/* Members list */}
       {loading ? (
         <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
         </div>
       ) : members.length > 0 ? (
         <div className="space-y-2">
@@ -101,16 +115,23 @@ export default function DealerTeamPage() {
               <CardContent className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-gray-500">{m.user?.name?.charAt(0) || '?'}</span>
+                    <span className="text-sm font-semibold text-gray-500">
+                      {m.user?.name?.charAt(0) || '?'}
+                    </span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{m.user?.name}</p>
                     <p className="text-xs text-gray-500">{m.user?.email}</p>
                   </div>
-                  <Badge className="text-xs bg-gray-100 text-gray-700">{ROLE_LABELS[m.role] || m.role}</Badge>
+                  <Badge className="text-xs bg-gray-100 text-gray-700">
+                    {ROLE_LABELS[m.role] || m.role}
+                  </Badge>
                 </div>
                 {canManage && m.role !== 'owner' && m.userId !== user?.id && (
-                  <button onClick={() => removeMember(m.userId)} className="p-2 text-gray-400 hover:text-red-600">
+                  <button
+                    onClick={() => removeMember(m.userId)}
+                    className="p-2 text-gray-400 hover:text-red-600"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}

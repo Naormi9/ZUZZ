@@ -27,10 +27,22 @@ export default function BuyingCarGuidePage() {
         {/* Breadcrumbs */}
         <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-6">
           <ol className="flex flex-wrap items-center gap-1">
-            <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
-            <li><span className="mx-1 text-gray-300">/</span></li>
-            <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
-            <li><span className="mx-1 text-gray-300">/</span></li>
+            <li>
+              <Link href="/" className="hover:text-gray-700">
+                ראשי
+              </Link>
+            </li>
+            <li>
+              <span className="mx-1 text-gray-300">/</span>
+            </li>
+            <li>
+              <Link href="/cars" className="hover:text-gray-700">
+                רכב
+              </Link>
+            </li>
+            <li>
+              <span className="mx-1 text-gray-300">/</span>
+            </li>
             <li className="text-gray-700 font-medium">מדריך קניית רכב</li>
           </ol>
         </nav>
@@ -40,51 +52,48 @@ export default function BuyingCarGuidePage() {
         </h1>
 
         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-          קניית רכב היא אחת ההחלטות הכלכליות הגדולות שנעשות. המדריך הזה יעזור
-          לכם לנווט את התהליך בביטחון — מהחיפוש ועד העברת הבעלות.
+          קניית רכב היא אחת ההחלטות הכלכליות הגדולות שנעשות. המדריך הזה יעזור לכם לנווט את התהליך
+          בביטחון — מהחיפוש ועד העברת הבעלות.
         </p>
 
         <div className="prose prose-gray max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">1. הגדירו תקציב ריאלי</h2>
             <p className="text-gray-700 leading-relaxed">
-              מעבר למחיר הרכב עצמו, קחו בחשבון עלויות נוספות: ביטוח, טסט שנתי,
-              אגרת רישוי, תחזוקה שוטפת ודלק. מומלץ לשמור מרווח של 10-15% מעל
-              מחיר הרכב לכיסוי הוצאות נלוות.
+              מעבר למחיר הרכב עצמו, קחו בחשבון עלויות נוספות: ביטוח, טסט שנתי, אגרת רישוי, תחזוקה
+              שוטפת ודלק. מומלץ לשמור מרווח של 10-15% מעל מחיר הרכב לכיסוי הוצאות נלוות.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">2. חקרו את הרכב לפני הפגישה</h2>
             <p className="text-gray-700 leading-relaxed">
-              בדקו את מחיר השוק של הרכב, קראו ביקורות, ובדקו היסטוריית תקלות
-              נפוצות לדגם. ב-ZUZZ תוכלו לראות ציון אמון לכל מודעה שמבוסס על
-              מסמכים אמיתיים ואימות מוכר.
+              בדקו את מחיר השוק של הרכב, קראו ביקורות, ובדקו היסטוריית תקלות נפוצות לדגם. ב-ZUZZ
+              תוכלו לראות ציון אמון לכל מודעה שמבוסס על מסמכים אמיתיים ואימות מוכר.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">3. בדקו את המסמכים</h2>
             <p className="text-gray-700 leading-relaxed">
-              וודאו שיש רישיון רכב תקף, טסט עדכני, וביטוח בתוקף. בדקו שאין
-              עיקולים או שעבודים על הרכב. ב-ZUZZ מוכרים יכולים להעלות מסמכים
-              מאומתים ישירות למודעה.
+              וודאו שיש רישיון רכב תקף, טסט עדכני, וביטוח בתוקף. בדקו שאין עיקולים או שעבודים על
+              הרכב. ב-ZUZZ מוכרים יכולים להעלות מסמכים מאומתים ישירות למודעה.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">4. בדיקת רכב מקצועית</h2>
             <p className="text-gray-700 leading-relaxed">
-              תמיד קחו את הרכב לבדיקה מקצועית במכון בדיקה מוסמך. הבדיקה כוללת
-              מצב המנוע, השלדה, מערכת ההיגוי, הבלמים, מצב הצמיגים ועוד.
+              תמיד קחו את הרכב לבדיקה מקצועית במכון בדיקה מוסמך. הבדיקה כוללת מצב המנוע, השלדה,
+              מערכת ההיגוי, הבלמים, מצב הצמיגים ועוד.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">5. משא ומתן ועסקה</h2>
             <p className="text-gray-700 leading-relaxed">
-              אל תתביישו לנהל משא ומתן על המחיר. השתמשו במידע שאספתם כדי
-              לתמוך בעמדתכם. ודאו שההעברה נעשית כחוק ברשות הרישוי.
+              אל תתביישו לנהל משא ומתן על המחיר. השתמשו במידע שאספתם כדי לתמוך בעמדתכם. ודאו שההעברה
+              נעשית כחוק ברשות הרישוי.
             </p>
           </section>
         </div>

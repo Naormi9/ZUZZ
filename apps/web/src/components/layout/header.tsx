@@ -77,9 +77,7 @@ export function Header() {
                   }}
                 >
                   <User className="h-5 w-5" />
-                  <span className="hidden sm:inline">
-                    {user?.name ?? 'החשבון שלי'}
-                  </span>
+                  <span className="hidden sm:inline">{user?.name ?? 'החשבון שלי'}</span>
                 </button>
               </div>
             ) : (
@@ -96,11 +94,7 @@ export function Header() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden"
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               <span className="sr-only">תפריט</span>
             </button>
           </div>

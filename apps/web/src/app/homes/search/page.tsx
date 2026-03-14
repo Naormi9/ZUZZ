@@ -74,7 +74,13 @@ const SORT_OPTIONS = [
 
 export default function HomesSearchPageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center text-gray-500">טוען...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center text-gray-500">טוען...</div>
+        </div>
+      }
+    >
       <HomesSearchPage />
     </Suspense>
   );
@@ -146,12 +152,22 @@ function HomesSearchPage() {
     <div className="space-y-5">
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">סוג נכס</label>
-        <Select value={propertyType} onValueChange={(v) => { setPropertyType(v); setPage(1); }}>
-          <SelectTrigger><SelectValue placeholder="כל הסוגים" /></SelectTrigger>
+        <Select
+          value={propertyType}
+          onValueChange={(v) => {
+            setPropertyType(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="כל הסוגים" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="">כל הסוגים</SelectItem>
             {PROPERTY_TYPES.map((t) => (
-              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+              <SelectItem key={t.value} value={t.value}>
+                {t.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -159,22 +175,61 @@ function HomesSearchPage() {
 
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">עיר</label>
-        <Input value={city} onChange={(e) => { setCity(e.target.value); setPage(1); }} placeholder="הקלד עיר..." />
+        <Input
+          value={city}
+          onChange={(e) => {
+            setCity(e.target.value);
+            setPage(1);
+          }}
+          placeholder="הקלד עיר..."
+        />
       </div>
 
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">חדרים</label>
         <div className="flex gap-2">
-          <Input type="number" value={roomsFrom} onChange={(e) => { setRoomsFrom(e.target.value); setPage(1); }} placeholder="מ-" />
-          <Input type="number" value={roomsTo} onChange={(e) => { setRoomsTo(e.target.value); setPage(1); }} placeholder="עד" />
+          <Input
+            type="number"
+            value={roomsFrom}
+            onChange={(e) => {
+              setRoomsFrom(e.target.value);
+              setPage(1);
+            }}
+            placeholder="מ-"
+          />
+          <Input
+            type="number"
+            value={roomsTo}
+            onChange={(e) => {
+              setRoomsTo(e.target.value);
+              setPage(1);
+            }}
+            placeholder="עד"
+          />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">טווח מחירים</label>
         <div className="flex gap-2">
-          <Input type="number" value={priceFrom} onChange={(e) => { setPriceFrom(e.target.value); setPage(1); }} placeholder="ממחיר" />
-          <Input type="number" value={priceTo} onChange={(e) => { setPriceTo(e.target.value); setPage(1); }} placeholder="עד מחיר" />
+          <Input
+            type="number"
+            value={priceFrom}
+            onChange={(e) => {
+              setPriceFrom(e.target.value);
+              setPage(1);
+            }}
+            placeholder="ממחיר"
+          />
+          <Input
+            type="number"
+            value={priceTo}
+            onChange={(e) => {
+              setPriceTo(e.target.value);
+              setPage(1);
+            }}
+            placeholder="עד מחיר"
+          />
         </div>
       </div>
 
@@ -202,11 +257,21 @@ function HomesSearchPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="hidden sm:block">
-                <Select value={sort} onValueChange={(v) => { setSort(v); setPage(1); }}>
-                  <SelectTrigger className="w-48"><SelectValue placeholder="מיון" /></SelectTrigger>
+                <Select
+                  value={sort}
+                  onValueChange={(v) => {
+                    setSort(v);
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="מיון" />
+                  </SelectTrigger>
                   <SelectContent>
                     {SORT_OPTIONS.map((s) => (
-                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -220,7 +285,9 @@ function HomesSearchPage() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-80 overflow-y-auto">
-                  <SheetHeader><SheetTitle>סינון נכסים</SheetTitle></SheetHeader>
+                  <SheetHeader>
+                    <SheetTitle>סינון נכסים</SheetTitle>
+                  </SheetHeader>
                   <div className="mt-6">{filterContent}</div>
                 </SheetContent>
               </Sheet>
@@ -246,9 +313,24 @@ function HomesSearchPage() {
             {/* Map placeholder */}
             <div className="bg-gray-200 rounded-xl h-64 flex items-center justify-center border border-gray-300">
               <div className="text-center text-gray-500">
-                <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="w-12 h-12 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
                 <p className="text-sm font-medium">מפה תוצג כאן</p>
                 <p className="text-xs text-gray-400">תצוגת מפה עם סימון נכסים</p>
@@ -288,7 +370,9 @@ function HomesSearchPage() {
                       details={[
                         { label: 'חדרים', value: String(home.property.rooms) },
                         { label: 'מ"ר', value: String(home.property.sizeSqm) },
-                        ...(home.property.floor != null ? [{ label: 'קומה', value: String(home.property.floor) }] : []),
+                        ...(home.property.floor != null
+                          ? [{ label: 'קומה', value: String(home.property.floor) }]
+                          : []),
                       ]}
                       href={`/homes/${home.id}`}
                     />
@@ -298,13 +382,23 @@ function HomesSearchPage() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-8">
-                    <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => p - 1)}
+                    >
                       הקודם
                     </Button>
                     <span className="text-sm text-gray-600">
                       עמוד {page} מתוך {totalPages}
                     </span>
-                    <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((p) => p + 1)}
+                    >
                       הבא
                     </Button>
                   </div>
@@ -314,7 +408,11 @@ function HomesSearchPage() {
               <EmptyState
                 title="לא נמצאו נכסים"
                 description="נסה לשנות את הסינון או להרחיב את החיפוש"
-                action={<Button variant="outline" onClick={clearFilters}>נקה מסננים</Button>}
+                action={
+                  <Button variant="outline" onClick={clearFilters}>
+                    נקה מסננים
+                  </Button>
+                }
               />
             )}
           </div>

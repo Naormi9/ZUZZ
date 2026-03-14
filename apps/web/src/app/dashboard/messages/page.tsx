@@ -35,7 +35,9 @@ export default function MessagesPage() {
   async function loadMessages(convId: string) {
     setSelectedConv(convId);
     try {
-      const res = await api.get<{ success: boolean; data: any[] }>(`/api/messages/conversations/${convId}`);
+      const res = await api.get<{ success: boolean; data: any[] }>(
+        `/api/messages/conversations/${convId}`,
+      );
       setMessages(res.data);
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch {
@@ -62,7 +64,9 @@ export default function MessagesPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
@@ -78,18 +82,22 @@ export default function MessagesPage() {
           <CardContent className="p-0">
             {loading ? (
               <div className="p-4 space-y-3">
-                {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
               </div>
             ) : conversations.length > 0 ? (
               <div className="divide-y">
-                {conversations.map(conv => (
+                {conversations.map((conv) => (
                   <button
                     key={conv.id}
                     onClick={() => loadMessages(conv.id)}
                     className={`w-full text-right p-4 hover:bg-gray-50 transition-colors ${selectedConv === conv.id ? 'bg-brand-50' : ''}`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm text-gray-900">{conv.otherUser?.name}</span>
+                      <span className="font-medium text-sm text-gray-900">
+                        {conv.otherUser?.name}
+                      </span>
                       {conv.unreadCount > 0 && (
                         <span className="bg-brand-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                           {conv.unreadCount}
@@ -98,7 +106,9 @@ export default function MessagesPage() {
                     </div>
                     <p className="text-xs text-gray-500 mt-1 truncate">{conv.listing?.title}</p>
                     {conv.lastMessagePreview && (
-                      <p className="text-xs text-gray-400 mt-0.5 truncate">{conv.lastMessagePreview}</p>
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">
+                        {conv.lastMessagePreview}
+                      </p>
                     )}
                   </button>
                 ))}
@@ -118,16 +128,26 @@ export default function MessagesPage() {
             {selectedConv ? (
               <>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {messages.map(msg => (
-                    <div key={msg.id} className={`flex ${msg.senderId === user?.id ? 'justify-start' : 'justify-end'}`}>
-                      <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
-                        msg.senderId === user?.id
-                          ? 'bg-brand-500 text-white rounded-br-sm'
-                          : 'bg-gray-100 text-gray-900 rounded-bl-sm'
-                      }`}>
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.senderId === user?.id ? 'justify-start' : 'justify-end'}`}
+                    >
+                      <div
+                        className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
+                          msg.senderId === user?.id
+                            ? 'bg-brand-500 text-white rounded-br-sm'
+                            : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                        }`}
+                      >
                         <p>{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${msg.senderId === user?.id ? 'text-brand-200' : 'text-gray-400'}`}>
-                          {new Date(msg.createdAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                        <p
+                          className={`text-[10px] mt-1 ${msg.senderId === user?.id ? 'text-brand-200' : 'text-gray-400'}`}
+                        >
+                          {new Date(msg.createdAt).toLocaleTimeString('he-IL', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </p>
                       </div>
                     </div>
@@ -137,10 +157,10 @@ export default function MessagesPage() {
                 <div className="border-t p-3 flex gap-2">
                   <Input
                     value={newMessage}
-                    onChange={e => setNewMessage(e.target.value)}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="הקלד הודעה..."
                     className="flex-1"
-                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                   />
                   <Button onClick={sendMessage} loading={sending} disabled={!newMessage.trim()}>
                     <Send className="h-4 w-4" />

@@ -10,10 +10,7 @@ messagesRouter.get('/conversations', authenticate, async (req, res, next) => {
   try {
     const conversations = await prisma.conversation.findMany({
       where: {
-        OR: [
-          { buyerId: req.user!.id },
-          { sellerId: req.user!.id },
-        ],
+        OR: [{ buyerId: req.user!.id }, { sellerId: req.user!.id }],
         status: 'active',
       },
       include: {
@@ -152,7 +149,9 @@ messagesRouter.post('/send', authenticate, async (req, res, next) => {
       data: {
         lastMessageAt: new Date(),
         lastMessagePreview: content.trim().slice(0, 100),
-        ...(isBuyer ? { sellerUnreadCount: { increment: 1 } } : { buyerUnreadCount: { increment: 1 } }),
+        ...(isBuyer
+          ? { sellerUnreadCount: { increment: 1 } }
+          : { buyerUnreadCount: { increment: 1 } }),
       },
     });
 

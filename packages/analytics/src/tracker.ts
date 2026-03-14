@@ -19,7 +19,7 @@ export class AnalyticsTracker {
       bufferSize?: number;
       /** Flush interval in ms (default: 5000) */
       flushIntervalMs?: number;
-    }
+    },
   ) {
     this.prisma = prisma;
     this.bufferSize = options?.bufferSize ?? 50;
