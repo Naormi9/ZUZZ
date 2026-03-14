@@ -35,8 +35,16 @@ export function SellerCard({
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-gray-900 truncate">{name}</h4>
             {isVerified && (
-              <svg className="w-4 h-4 text-brand-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                className="w-4 h-4 text-brand-500 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
             )}
           </div>
@@ -53,7 +61,12 @@ export function SellerCard({
           {responseTime && (
             <div className="flex items-center gap-1">
               <span>⚡</span>
-              <span>זמן תגובה: {responseTime < 60 ? `${responseTime} דק׳` : `${Math.round(responseTime / 60)} שעות`}</span>
+              <span>
+                זמן תגובה:{' '}
+                {responseTime < 60
+                  ? `${responseTime} דק׳`
+                  : `${Math.round(responseTime / 60)} שעות`}
+              </span>
             </div>
           )}
           {responseRate && (
@@ -68,7 +81,9 @@ export function SellerCard({
       {badges.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-3">
           {badges.map((badge, i) => (
-            <Badge key={i} variant="trust" className="text-[10px]">{badge.label}</Badge>
+            <Badge key={i} variant="trust" className="text-[10px]">
+              {badge.label}
+            </Badge>
           ))}
         </div>
       )}

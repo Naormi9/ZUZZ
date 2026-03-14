@@ -84,18 +84,53 @@ export const REGION_HE: Record<string, string> = {
 // ── Popular makes (Hebrew) ──────────────────────────────────────────
 
 export const POPULAR_MAKES = [
-  'טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה',
-  'פולקסווגן', 'BMW', 'מרצדס', 'אאודי', 'ניסאן',
-  'סוזוקי', 'שברולט', 'סובארו', 'הונדה', 'רנו',
-  'פיג\'ו', 'סיטרואן', 'פורד', 'אופל', 'מיצובישי',
-  'טסלה', 'וולוו', 'לקסוס', 'מיני',
+  'טויוטה',
+  'יונדאי',
+  'קיה',
+  'מאזדה',
+  'סקודה',
+  'פולקסווגן',
+  'BMW',
+  'מרצדס',
+  'אאודי',
+  'ניסאן',
+  'סוזוקי',
+  'שברולט',
+  'סובארו',
+  'הונדה',
+  'רנו',
+  "פיג'ו",
+  'סיטרואן',
+  'פורד',
+  'אופל',
+  'מיצובישי',
+  'טסלה',
+  'וולוו',
+  'לקסוס',
+  'מיני',
 ] as const;
 
 export const POPULAR_CITIES = [
-  'תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן',
-  'הרצליה', 'נתניה', 'ראשון לציון', 'פתח תקווה', 'אשדוד',
-  'רעננה', 'כפר סבא', 'חולון', 'בת ים', 'אשקלון',
-  'מודיעין', 'רחובות', 'לוד', 'נצרת', 'עכו',
+  'תל אביב',
+  'ירושלים',
+  'חיפה',
+  'באר שבע',
+  'רמת גן',
+  'הרצליה',
+  'נתניה',
+  'ראשון לציון',
+  'פתח תקווה',
+  'אשדוד',
+  'רעננה',
+  'כפר סבא',
+  'חולון',
+  'בת ים',
+  'אשקלון',
+  'מודיעין',
+  'רחובות',
+  'לוד',
+  'נצרת',
+  'עכו',
 ] as const;
 
 // ── Utility: build canonical URL ────────────────────────────────────
@@ -132,7 +167,9 @@ interface MetaOpts {
  */
 export function buildMetadata(opts: MetaOpts): Metadata {
   const imageUrl = opts.image
-    ? opts.image.startsWith('http') ? opts.image : `${SITE_URL}${opts.image}`
+    ? opts.image.startsWith('http')
+      ? opts.image
+      : `${SITE_URL}${opts.image}`
     : `${SITE_URL}${DEFAULT_OG_IMAGE}`;
 
   const url = canonicalUrl(opts.path);
@@ -165,9 +202,7 @@ export function buildMetadata(opts: MetaOpts): Metadata {
       description: opts.description,
       images: [imageUrl],
     },
-    ...(opts.noIndex
-      ? { robots: { index: false, follow: false } }
-      : {}),
+    ...(opts.noIndex ? { robots: { index: false, follow: false } } : {}),
   };
 }
 

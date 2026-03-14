@@ -14,12 +14,20 @@ export const metadata: Metadata = {
     default: 'ZUZZ — המקום שבו עסקאות זזות באמת',
     template: '%s | ZUZZ',
   },
-  description:
-    'פלטפורמת המסחר המובילה בישראל. רכב, נדל"ן ושוק — עם תשתית אמון מובנית.',
+  description: 'פלטפורמת המסחר המובילה בישראל. רכב, נדל"ן ושוק — עם תשתית אמון מובנית.',
   keywords: [
-    'לוח מודעות', 'רכב למכירה', 'דירות למכירה', 'יד שנייה',
-    'רכב', 'נדלן', 'שוק', 'ישראל', 'ZUZZ',
-    'מכוניות למכירה', 'רכב יד שנייה', 'לוח רכב',
+    'לוח מודעות',
+    'רכב למכירה',
+    'דירות למכירה',
+    'יד שנייה',
+    'רכב',
+    'נדלן',
+    'שוק',
+    'ישראל',
+    'ZUZZ',
+    'מכוניות למכירה',
+    'רכב יד שנייה',
+    'לוח רכב',
   ],
   icons: {
     icon: '/brand/favicon.svg',
@@ -49,11 +57,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="he" dir="rtl">
       <body className="flex min-h-screen flex-col font-sans">

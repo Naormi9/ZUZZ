@@ -54,7 +54,7 @@ export default function ReportsPage() {
     try {
       await adminApi.resolveReport(reportId);
       setReports((prev) =>
-        prev.map((r) => (r.id === reportId ? { ...r, status: 'resolved' as const } : r))
+        prev.map((r) => (r.id === reportId ? { ...r, status: 'resolved' as const } : r)),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטיפול בדיווח');
@@ -68,7 +68,7 @@ export default function ReportsPage() {
     try {
       await adminApi.dismissReport(reportId);
       setReports((prev) =>
-        prev.map((r) => (r.id === reportId ? { ...r, status: 'dismissed' as const } : r))
+        prev.map((r) => (r.id === reportId ? { ...r, status: 'dismissed' as const } : r)),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בדחיית דיווח');

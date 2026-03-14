@@ -8,11 +8,17 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { Users, Phone, Mail, MessageCircle } from 'lucide-react';
 
 const STATUS_LABELS: Record<string, string> = {
-  new: 'חדש', contacted: 'פנו', qualified: 'מתאים', converted: 'הומר', lost: 'אבד',
+  new: 'חדש',
+  contacted: 'פנו',
+  qualified: 'מתאים',
+  converted: 'הומר',
+  lost: 'אבד',
 };
 const STATUS_COLORS: Record<string, string> = {
-  new: 'bg-brand-100 text-brand-700', contacted: 'bg-yellow-100 text-yellow-700',
-  qualified: 'bg-green-100 text-green-700', converted: 'bg-emerald-100 text-emerald-700',
+  new: 'bg-brand-100 text-brand-700',
+  contacted: 'bg-yellow-100 text-yellow-700',
+  qualified: 'bg-green-100 text-green-700',
+  converted: 'bg-emerald-100 text-emerald-700',
   lost: 'bg-gray-100 text-gray-700',
 };
 
@@ -39,7 +45,7 @@ export default function LeadsPage() {
   async function updateStatus(leadId: string, status: string) {
     try {
       await api.patch(`/api/leads/${leadId}/status`, { status });
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l));
+      setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status } : l)));
     } catch {
       // ignore
     }
@@ -50,7 +56,9 @@ export default function LeadsPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">יש להתחבר</h1>
-          <Link href="/auth/login"><Button>התחברות</Button></Link>
+          <Link href="/auth/login">
+            <Button>התחברות</Button>
+          </Link>
         </div>
       </div>
     );
@@ -62,11 +70,13 @@ export default function LeadsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-24 w-full" />)}
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
         </div>
       ) : leads.length > 0 ? (
         <div className="space-y-3">
-          {leads.map(lead => (
+          {leads.map((lead) => (
             <Card key={lead.id}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -77,19 +87,31 @@ export default function LeadsPage() {
                         {STATUS_LABELS[lead.status] || lead.status}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      עבור: {lead.listing?.title}
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">עבור: {lead.listing?.title}</p>
                     {lead.message && <p className="text-sm text-gray-700 mt-2">{lead.message}</p>}
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                      {lead.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{lead.phone}</span>}
-                      {lead.buyer?.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{lead.buyer.email}</span>}
+                      {lead.phone && (
+                        <span className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {lead.phone}
+                        </span>
+                      )}
+                      {lead.buyer?.email && (
+                        <span className="flex items-center gap-1">
+                          <Mail className="h-3 w-3" />
+                          {lead.buyer.email}
+                        </span>
+                      )}
                       <span>{new Date(lead.createdAt).toLocaleDateString('he-IL')}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
                     {lead.status === 'new' && (
-                      <Button size="sm" variant="outline" onClick={() => updateStatus(lead.id, 'contacted')}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updateStatus(lead.id, 'contacted')}
+                      >
                         סמן כטופל
                       </Button>
                     )}

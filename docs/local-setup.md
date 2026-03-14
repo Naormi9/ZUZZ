@@ -37,27 +37,28 @@ pnpm dev
 
 ## Services
 
-| Service   | URL                     | Purpose          |
-|-----------|-------------------------|------------------|
-| Web App   | http://localhost:3000    | Public marketplace |
-| Admin     | http://localhost:3001    | Backoffice       |
-| API       | http://localhost:4000    | Backend API      |
-| PostgreSQL| localhost:5432          | Database         |
-| Redis     | localhost:6379          | Cache/Queue      |
-| MinIO     | http://localhost:9001    | Storage Console  |
-| MailHog   | http://localhost:8025    | Email UI         |
+| Service    | URL                   | Purpose            |
+| ---------- | --------------------- | ------------------ |
+| Web App    | http://localhost:3000 | Public marketplace |
+| Admin      | http://localhost:3001 | Backoffice         |
+| API        | http://localhost:4000 | Backend API        |
+| PostgreSQL | localhost:5432        | Database           |
+| Redis      | localhost:6379        | Cache/Queue        |
+| MinIO      | http://localhost:9001 | Storage Console    |
+| MailHog    | http://localhost:8025 | Email UI           |
 
 ## Demo Accounts
 
-| Email                | Role       | Description       |
-|----------------------|------------|-------------------|
-| admin@zuzz.co.il     | admin      | Admin user        |
-| yossi@example.com    | seller     | Private seller    |
-| dana@example.com     | seller     | Private seller    |
-| buyer@example.com    | buyer      | Buyer             |
-| dealer@carzone.co.il | dealer     | Dealer user       |
+| Email                | Role   | Description    |
+| -------------------- | ------ | -------------- |
+| admin@zuzz.co.il     | admin  | Admin user     |
+| yossi@example.com    | seller | Private seller |
+| dana@example.com     | seller | Private seller |
+| buyer@example.com    | buyer  | Buyer          |
+| dealer@carzone.co.il | dealer | Dealer user    |
 
 In development, use the `/api/auth/dev-login` endpoint to bypass OTP:
+
 ```bash
 curl -X POST http://localhost:4000/api/auth/dev-login \
   -H "Content-Type: application/json" \
@@ -115,15 +116,15 @@ pnpm docker:down   # Stop Docker services
 
 See `.env.example` for the complete list with comments. Key variables:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | `postgresql://zuzz:zuzz_dev@localhost:5432/zuzz_dev` | PostgreSQL connection |
-| `REDIS_URL` | `redis://localhost:6379` | Redis connection |
-| `AUTH_SECRET` | (placeholder) | JWT signing secret (min 32 chars) |
-| `STORAGE_ENDPOINT` | `http://localhost:9000` | MinIO/S3 endpoint |
-| `RATE_LIMIT_ENABLED` | `false` | Enable Redis-backed rate limiting |
-| `LOG_LEVEL` | `debug` | Pino log level |
-| `NODE_ENV` | `development` | Environment mode |
+| Variable             | Default                                              | Description                       |
+| -------------------- | ---------------------------------------------------- | --------------------------------- |
+| `DATABASE_URL`       | `postgresql://zuzz:zuzz_dev@localhost:5432/zuzz_dev` | PostgreSQL connection             |
+| `REDIS_URL`          | `redis://localhost:6379`                             | Redis connection                  |
+| `AUTH_SECRET`        | (placeholder)                                        | JWT signing secret (min 32 chars) |
+| `STORAGE_ENDPOINT`   | `http://localhost:9000`                              | MinIO/S3 endpoint                 |
+| `RATE_LIMIT_ENABLED` | `false`                                              | Enable Redis-backed rate limiting |
+| `LOG_LEVEL`          | `debug`                                              | Pino log level                    |
+| `NODE_ENV`           | `development`                                        | Environment mode                  |
 
 ## How Uploads Work in Dev
 
@@ -143,16 +144,21 @@ In production, uploads go to S3/MinIO via the same abstraction — no code chang
 ## Troubleshooting
 
 ### Database connection fails
+
 Make sure Docker containers are running: `docker compose ps`
 
 ### Prisma client not found
+
 Run `pnpm db:generate` to generate the client.
 
 ### Port already in use
+
 Check for conflicting processes: `lsof -i :3000` / `lsof -i :4000`
 
 ### Tests fail with import errors
+
 Ensure Prisma client is generated: `pnpm db:generate`
 
 ### Upload directory missing
+
 The API creates `uploads/` automatically on startup. If permissions are wrong, create it manually: `mkdir -p apps/api/uploads`

@@ -56,22 +56,15 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-brand-black to-brand-charcoal text-white">
         <div className="container-app py-16 sm:py-24 lg:py-32">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              ZUZZ
-            </h1>
-            <p className="mt-4 text-xl text-brand-cream sm:text-2xl">
-              המקום שבו עסקאות זזות באמת
-            </p>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">ZUZZ</h1>
+            <p className="mt-4 text-xl text-brand-cream sm:text-2xl">המקום שבו עסקאות זזות באמת</p>
             <p className="mt-2 text-base text-gray-400">
               פלטפורמת המסחר המובילה בישראל — עם תשתית אמון מובנית
             </p>
 
             {/* Search Bar */}
             <div className="mt-10">
-              <form
-                action="/cars/search"
-                className="relative mx-auto max-w-2xl"
-              >
+              <form action="/cars/search" className="relative mx-auto max-w-2xl">
                 <div className="flex items-center overflow-hidden rounded-xl bg-white shadow-lg">
                   <input
                     type="text"
@@ -102,17 +95,11 @@ export default function HomePage() {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {verticals.map((vertical) => (
               <Link key={vertical.href} href={vertical.href}>
-                <Card
-                  className={`cursor-pointer border-2 transition-all ${vertical.color}`}
-                >
+                <Card className={`cursor-pointer border-2 transition-all ${vertical.color}`}>
                   <CardContent className="p-8 text-center">
                     <span className="text-5xl">{vertical.icon}</span>
-                    <h3 className="mt-4 text-xl font-bold text-gray-900">
-                      {vertical.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {vertical.description}
-                    </p>
+                    <h3 className="mt-4 text-xl font-bold text-gray-900">{vertical.title}</h3>
+                    <p className="mt-2 text-sm text-gray-600">{vertical.description}</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -146,9 +133,7 @@ export default function HomePage() {
               </Card>
             ))}
           </div>
-          <p className="mt-6 text-center text-sm text-gray-500">
-            מודעות מובחרות יופיעו כאן בקרוב
-          </p>
+          <p className="mt-6 text-center text-sm text-gray-500">מודעות מובחרות יופיעו כאן בקרוב</p>
         </div>
       </section>
 
@@ -156,24 +141,17 @@ export default function HomePage() {
       <section className="section-spacing">
         <div className="container-app">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-              למה ZUZZ?
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">למה ZUZZ?</h2>
             <p className="mt-3 text-gray-600">
-              אנחנו לא רק לוח מודעות. אנחנו פלטפורמת עסקאות עם תשתית אמון
-              אמיתית.
+              אנחנו לא רק לוח מודעות. אנחנו פלטפורמת עסקאות עם תשתית אמון אמיתית.
             </p>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {trustFeatures.map((feature) => (
               <div key={feature.title} className="text-center">
                 <span className="text-4xl">{feature.icon}</span>
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm text-gray-600">
-                  {feature.description}
-                </p>
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">{feature.title}</h3>
+                <p className="mt-2 text-sm text-gray-600">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -183,12 +161,8 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="bg-brand-500 py-16 text-white">
         <div className="container-app text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            מוכנים להתחיל?
-          </h2>
-          <p className="mt-3 text-brand-100">
-            פרסמו מודעה תוך דקות וקבלו חשיפה לקהל הנכון
-          </p>
+          <h2 className="text-2xl font-bold sm:text-3xl">מוכנים להתחיל?</h2>
+          <p className="mt-3 text-brand-100">פרסמו מודעה תוך דקות וקבלו חשיפה לקהל הנכון</p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/cars/create">
               <Button
@@ -199,10 +173,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/cars/search">
-              <Button
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10"
-              >
+              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
                 עיין במודעות
               </Button>
             </Link>

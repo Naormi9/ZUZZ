@@ -24,7 +24,9 @@ promotionsRouter.post('/', authenticate, async (req, res, next) => {
     let isOrgMember = false;
     if (listing.organizationId) {
       const member = await prisma.organizationMember.findUnique({
-        where: { organizationId_userId: { organizationId: listing.organizationId, userId: req.user!.id } },
+        where: {
+          organizationId_userId: { organizationId: listing.organizationId, userId: req.user!.id },
+        },
       });
       isOrgMember = !!member;
     }
@@ -38,11 +40,11 @@ promotionsRouter.post('/', authenticate, async (req, res, next) => {
 
     // Price calculation (simple tier pricing in agorot)
     const priceMap: Record<string, number> = {
-      boost: 2900,      // ₪29
-      highlight: 4900,   // ₪49
-      featured: 9900,    // ₪99
+      boost: 2900, // ₪29
+      highlight: 4900, // ₪49
+      featured: 9900, // ₪99
       top_of_search: 14900, // ₪149
-      gallery: 6900,     // ₪69
+      gallery: 6900, // ₪69
     };
     const amount = (priceMap[type] || 4900) * Math.ceil(days / 7);
 
@@ -127,33 +129,38 @@ promotionsRouter.patch('/:id/cancel', authenticate, async (req, res, next) => {
 
 // ── Admin: list all promotions ──────────────────────────────────────
 
-promotionsRouter.get('/admin/all', authenticate, requireRole('admin', 'moderator'), async (req, res, next) => {
-  try {
-    const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
-    const activeOnly = req.query.active === 'true';
+promotionsRouter.get(
+  '/admin/all',
+  authenticate,
+  requireRole('admin', 'moderator'),
+  async (req, res, next) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
+      const activeOnly = req.query.active === 'true';
 
-    const where: Record<string, unknown> = {};
-    if (activeOnly) where.isActive = true;
+      const where: Record<string, unknown> = {};
+      if (activeOnly) where.isActive = true;
 
-    const [promotions, total] = await Promise.all([
-      prisma.promotion.findMany({
-        where,
-        include: {
-          listing: { select: { id: true, title: true, userId: true, organizationId: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }),
-      prisma.promotion.count({ where }),
-    ]);
+      const [promotions, total] = await Promise.all([
+        prisma.promotion.findMany({
+          where,
+          include: {
+            listing: { select: { id: true, title: true, userId: true, organizationId: true } },
+          },
+          orderBy: { createdAt: 'desc' },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+        prisma.promotion.count({ where }),
+      ]);
 
-    res.json({
-      success: true,
-      data: { data: promotions, total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+      res.json({
+        success: true,
+        data: { data: promotions, total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);

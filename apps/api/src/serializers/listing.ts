@@ -1,4 +1,13 @@
-import type { Listing, ListingMedia, ListingDocument, TrustFactor, CarListing, PropertyListing, MarketListing, User } from '@zuzz/database';
+import type {
+  Listing,
+  ListingMedia,
+  ListingDocument,
+  TrustFactor,
+  CarListing,
+  PropertyListing,
+  MarketListing,
+  User,
+} from '@zuzz/database';
 
 type ListingWithRelations = Listing & {
   media?: ListingMedia[];
@@ -7,7 +16,12 @@ type ListingWithRelations = Listing & {
   carDetails?: CarListing | null;
   propertyDetails?: PropertyListing | null;
   marketDetails?: MarketListing | null;
-  user?: Pick<User, 'id' | 'name'> & { createdAt?: Date; profile?: any; _count?: any; organizationMembers?: any[] };
+  user?: Pick<User, 'id' | 'name'> & {
+    createdAt?: Date;
+    profile?: any;
+    _count?: any;
+    organizationMembers?: any[];
+  };
   isFavorited?: boolean;
 };
 
@@ -48,18 +62,22 @@ export function serializeListingCard(listing: ListingWithRelations) {
       score: f.score,
     })),
     car: listing.carDetails ? serializeCarBrief(listing.carDetails) : undefined,
-    property: listing.propertyDetails ? {
-      propertyType: listing.propertyDetails.propertyType,
-      listingType: listing.propertyDetails.listingType,
-      rooms: listing.propertyDetails.rooms,
-      sizeSqm: listing.propertyDetails.sizeSqm,
-      floor: listing.propertyDetails.floor,
-    } : undefined,
-    market: listing.marketDetails ? {
-      category: listing.marketDetails.category,
-      condition: listing.marketDetails.condition,
-      brand: listing.marketDetails.brand,
-    } : undefined,
+    property: listing.propertyDetails
+      ? {
+          propertyType: listing.propertyDetails.propertyType,
+          listingType: listing.propertyDetails.listingType,
+          rooms: listing.propertyDetails.rooms,
+          sizeSqm: listing.propertyDetails.sizeSqm,
+          floor: listing.propertyDetails.floor,
+        }
+      : undefined,
+    market: listing.marketDetails
+      ? {
+          category: listing.marketDetails.category,
+          condition: listing.marketDetails.condition,
+          brand: listing.marketDetails.brand,
+        }
+      : undefined,
   };
 }
 
@@ -89,34 +107,60 @@ export function serializeListingDetail(listing: ListingWithRelations) {
 
   return {
     ...card,
-    car: car ? {
-      ...serializeCarBrief(car),
-      trim: car.trim ?? '',
-      licensePlate: car.licensePlate,
-      vin: car.vin,
-      firstRegistrationDate: car.firstRegistrationDate?.toISOString() ?? null,
-      interiorColor: car.interiorColor ?? '',
-      testUntil: car.testUntil?.toISOString() ?? null,
-      ownershipType: car.ownershipType,
-      evRange: car.rangeKm,
-      batteryCapacity: car.batteryCapacity,
-      batteryHealth: car.batteryHealth,
-      batteryWarrantyUntil: car.batteryWarrantyUntil?.toISOString() ?? null,
-      acChargeKw: car.acChargeKw,
-      dcChargeKw: car.dcChargeKw,
-      chargeConnectorType: car.chargeConnectorType,
-      features: car.features,
-    } : undefined,
-    sellerStatements: car ? [
-      { key: 'accidentDeclared', label: 'האם היו תאונות?', value: !car.accidentDeclared, note: car.accidentDetails ?? undefined },
-      { key: 'engineReplaced', label: 'מנוע מקורי', value: !car.engineReplaced },
-      { key: 'gearboxReplaced', label: 'תיבת הילוכים מקורית', value: !car.gearboxReplaced },
-      { key: 'frameDamage', label: 'ללא נזק לשלדה', value: !car.frameDamage },
-      { key: 'warrantyExists', label: 'אחריות בתוקף', value: car.warrantyExists, note: car.warrantyDetails ?? undefined },
-      { key: 'personalImport', label: 'יבוא אישי', value: car.personalImport },
-      ...(car.maintenanceHistory ? [{ key: 'maintenanceHistory', label: `טיפולים: ${getMaintenanceLabel(car.maintenanceHistory)}`, value: car.maintenanceHistory === 'full_agency' || car.maintenanceHistory === 'partial_agency' }] : []),
-      ...(car.numKeys ? [{ key: 'numKeys', label: `${car.numKeys} מפתחות`, value: (car.numKeys ?? 0) >= 2 }] : []),
-    ] : [],
+    car: car
+      ? {
+          ...serializeCarBrief(car),
+          trim: car.trim ?? '',
+          licensePlate: car.licensePlate,
+          vin: car.vin,
+          firstRegistrationDate: car.firstRegistrationDate?.toISOString() ?? null,
+          interiorColor: car.interiorColor ?? '',
+          testUntil: car.testUntil?.toISOString() ?? null,
+          ownershipType: car.ownershipType,
+          evRange: car.rangeKm,
+          batteryCapacity: car.batteryCapacity,
+          batteryHealth: car.batteryHealth,
+          batteryWarrantyUntil: car.batteryWarrantyUntil?.toISOString() ?? null,
+          acChargeKw: car.acChargeKw,
+          dcChargeKw: car.dcChargeKw,
+          chargeConnectorType: car.chargeConnectorType,
+          features: car.features,
+        }
+      : undefined,
+    sellerStatements: car
+      ? [
+          {
+            key: 'accidentDeclared',
+            label: 'האם היו תאונות?',
+            value: !car.accidentDeclared,
+            note: car.accidentDetails ?? undefined,
+          },
+          { key: 'engineReplaced', label: 'מנוע מקורי', value: !car.engineReplaced },
+          { key: 'gearboxReplaced', label: 'תיבת הילוכים מקורית', value: !car.gearboxReplaced },
+          { key: 'frameDamage', label: 'ללא נזק לשלדה', value: !car.frameDamage },
+          {
+            key: 'warrantyExists',
+            label: 'אחריות בתוקף',
+            value: car.warrantyExists,
+            note: car.warrantyDetails ?? undefined,
+          },
+          { key: 'personalImport', label: 'יבוא אישי', value: car.personalImport },
+          ...(car.maintenanceHistory
+            ? [
+                {
+                  key: 'maintenanceHistory',
+                  label: `טיפולים: ${getMaintenanceLabel(car.maintenanceHistory)}`,
+                  value:
+                    car.maintenanceHistory === 'full_agency' ||
+                    car.maintenanceHistory === 'partial_agency',
+                },
+              ]
+            : []),
+          ...(car.numKeys
+            ? [{ key: 'numKeys', label: `${car.numKeys} מפתחות`, value: (car.numKeys ?? 0) >= 2 }]
+            : []),
+        ]
+      : [],
     documents: (listing.documents ?? []).map((d: ListingDocument) => ({
       id: d.id,
       type: d.type,

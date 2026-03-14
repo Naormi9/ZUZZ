@@ -12,7 +12,12 @@ export type ListingStatus =
 
 export type ListingVertical = 'cars' | 'homes' | 'market';
 
-export type ModerationStatus = 'pending' | 'approved' | 'rejected' | 'changes_requested' | 'flagged';
+export type ModerationStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'changes_requested'
+  | 'flagged';
 
 export interface ListingBase {
   id: string;

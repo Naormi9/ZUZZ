@@ -1,12 +1,7 @@
 /**
  * Re-export search types from @zuzz/types and add provider-specific types.
  */
-export type {
-  SearchQuery,
-  SearchResult,
-  SearchFacet,
-  SearchFacetValue,
-} from '@zuzz/types';
+export type { SearchQuery, SearchResult, SearchFacet, SearchFacetValue } from '@zuzz/types';
 
 export interface SearchProviderQuery {
   /** Free-text search query */

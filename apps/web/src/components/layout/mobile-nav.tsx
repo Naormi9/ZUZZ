@@ -21,10 +21,7 @@ export function MobileNav() {
       <div className="flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive =
-            item.href === '/'
-              ? pathname === '/'
-              : pathname.startsWith(item.href);
+          const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           const isHighlight = 'highlight' in item && item.highlight;
 
           return (
@@ -47,9 +44,7 @@ export function MobileNav() {
               ) : (
                 <Icon className="h-5 w-5" />
               )}
-              <span className={cn(isHighlight && '-mt-0.5 font-medium')}>
-                {item.label}
-              </span>
+              <span className={cn(isHighlight && '-mt-0.5 font-medium')}>{item.label}</span>
             </Link>
           );
         })}

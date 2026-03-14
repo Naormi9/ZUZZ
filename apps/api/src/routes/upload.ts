@@ -25,7 +25,10 @@ const ALLOWED_DOCUMENT_TYPES: Record<string, string[]> = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_MEDIA_FILES = 20;
 
-function validateFileExtension(file: Express.Multer.File, allowedTypes: Record<string, string[]>): boolean {
+function validateFileExtension(
+  file: Express.Multer.File,
+  allowedTypes: Record<string, string[]>,
+): boolean {
   const ext = path.extname(file.originalname).toLowerCase();
   const mimeExtensions = allowedTypes[file.mimetype];
   if (!mimeExtensions) return false;
@@ -77,106 +80,135 @@ const documentUpload = multer({
 export const uploadRouter = Router();
 
 // Upload media for listing
-uploadRouter.post('/listing/:listingId/media', authenticate, mediaUpload.array('files', MAX_MEDIA_FILES), async (req, res, next) => {
-  try {
-    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
-    if (!listing || listing.userId !== req.user!.id) {
-      throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+uploadRouter.post(
+  '/listing/:listingId/media',
+  authenticate,
+  mediaUpload.array('files', MAX_MEDIA_FILES),
+  async (req, res, next) => {
+    try {
+      const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
+      if (!listing || listing.userId !== req.user!.id) {
+        throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+      }
+
+      const files = req.files as Express.Multer.File[];
+      if (!files?.length) {
+        throw new AppError(400, 'NO_FILES', 'לא נבחרו קבצים');
+      }
+
+      const existingCount = await prisma.listingMedia.count({
+        where: { listingId: req.params.listingId! },
+      });
+
+      if (existingCount + files.length > MAX_MEDIA_FILES) {
+        throw new AppError(400, 'TOO_MANY_FILES', `ניתן להעלות עד ${MAX_MEDIA_FILES} קבצים`);
+      }
+
+      const storage = getStorage();
+
+      const media = await Promise.all(
+        files.map(async (file, index) => {
+          const key = generateStorageKey(
+            `listings/${req.params.listingId}/media`,
+            file.originalname,
+          );
+
+          const result = await storage.upload({
+            key,
+            body: file.buffer,
+            contentType: file.mimetype,
+            isPublic: true,
+            maxSize: MAX_FILE_SIZE,
+          });
+
+          return prisma.listingMedia.create({
+            data: {
+              listingId: req.params.listingId!,
+              url: result.url,
+              thumbnailUrl: result.url, // TODO: generate actual thumbnails
+              type: 'image',
+              mimeType: file.mimetype,
+              size: result.size,
+              order: existingCount + index,
+            },
+          });
+        }),
+      );
+
+      logger.info(
+        { listingId: req.params.listingId, count: files.length },
+        'Media uploaded via storage provider',
+      );
+      res.json({ success: true, data: media });
+    } catch (err) {
+      next(err);
     }
-
-    const files = req.files as Express.Multer.File[];
-    if (!files?.length) {
-      throw new AppError(400, 'NO_FILES', 'לא נבחרו קבצים');
-    }
-
-    const existingCount = await prisma.listingMedia.count({
-      where: { listingId: req.params.listingId! },
-    });
-
-    if (existingCount + files.length > MAX_MEDIA_FILES) {
-      throw new AppError(400, 'TOO_MANY_FILES', `ניתן להעלות עד ${MAX_MEDIA_FILES} קבצים`);
-    }
-
-    const storage = getStorage();
-
-    const media = await Promise.all(
-      files.map(async (file, index) => {
-        const key = generateStorageKey(`listings/${req.params.listingId}/media`, file.originalname);
-
-        const result = await storage.upload({
-          key,
-          body: file.buffer,
-          contentType: file.mimetype,
-          isPublic: true,
-          maxSize: MAX_FILE_SIZE,
-        });
-
-        return prisma.listingMedia.create({
-          data: {
-            listingId: req.params.listingId!,
-            url: result.url,
-            thumbnailUrl: result.url, // TODO: generate actual thumbnails
-            type: 'image',
-            mimeType: file.mimetype,
-            size: result.size,
-            order: existingCount + index,
-          },
-        });
-      }),
-    );
-
-    logger.info({ listingId: req.params.listingId, count: files.length }, 'Media uploaded via storage provider');
-    res.json({ success: true, data: media });
-  } catch (err) {
-    next(err);
-  }
-});
+  },
+);
 
 // Upload document for listing
-uploadRouter.post('/listing/:listingId/document', authenticate, documentUpload.single('file'), async (req, res, next) => {
-  try {
-    const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
-    if (!listing || listing.userId !== req.user!.id) {
-      throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+uploadRouter.post(
+  '/listing/:listingId/document',
+  authenticate,
+  documentUpload.single('file'),
+  async (req, res, next) => {
+    try {
+      const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId! } });
+      if (!listing || listing.userId !== req.user!.id) {
+        throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+      }
+
+      const file = req.file;
+      if (!file) {
+        throw new AppError(400, 'NO_FILE', 'לא נבחר קובץ');
+      }
+
+      const validDocTypes = [
+        'vehicle_license',
+        'test_certificate',
+        'insurance',
+        'inspection_report',
+        'ownership_proof',
+        'other',
+      ];
+      const docType = req.body.type || 'other';
+      if (!validDocTypes.includes(docType)) {
+        throw new AppError(400, 'INVALID_DOC_TYPE', 'סוג מסמך לא תקין');
+      }
+
+      const storage = getStorage();
+      const key = generateStorageKey(
+        `listings/${req.params.listingId}/documents`,
+        file.originalname,
+      );
+
+      const result = await storage.upload({
+        key,
+        body: file.buffer,
+        contentType: file.mimetype,
+        isPublic: false, // Documents are not publicly accessible by default
+        maxSize: MAX_FILE_SIZE,
+      });
+
+      const doc = await prisma.listingDocument.create({
+        data: {
+          listingId: req.params.listingId!,
+          type: docType,
+          url: result.url,
+          name: file.originalname.slice(0, 255),
+        },
+      });
+
+      logger.info(
+        { listingId: req.params.listingId, type: docType },
+        'Document uploaded via storage provider',
+      );
+      res.json({ success: true, data: doc });
+    } catch (err) {
+      next(err);
     }
-
-    const file = req.file;
-    if (!file) {
-      throw new AppError(400, 'NO_FILE', 'לא נבחר קובץ');
-    }
-
-    const validDocTypes = ['vehicle_license', 'test_certificate', 'insurance', 'inspection_report', 'ownership_proof', 'other'];
-    const docType = req.body.type || 'other';
-    if (!validDocTypes.includes(docType)) {
-      throw new AppError(400, 'INVALID_DOC_TYPE', 'סוג מסמך לא תקין');
-    }
-
-    const storage = getStorage();
-    const key = generateStorageKey(`listings/${req.params.listingId}/documents`, file.originalname);
-
-    const result = await storage.upload({
-      key,
-      body: file.buffer,
-      contentType: file.mimetype,
-      isPublic: false, // Documents are not publicly accessible by default
-      maxSize: MAX_FILE_SIZE,
-    });
-
-    const doc = await prisma.listingDocument.create({
-      data: {
-        listingId: req.params.listingId!,
-        type: docType,
-        url: result.url,
-        name: file.originalname.slice(0, 255),
-      },
-    });
-
-    logger.info({ listingId: req.params.listingId, type: docType }, 'Document uploaded via storage provider');
-    res.json({ success: true, data: doc });
-  } catch (err) {
-    next(err);
-  }
-});
+  },
+);
 
 // Delete media
 uploadRouter.delete('/media/:id', authenticate, async (req, res, next) => {
@@ -203,7 +235,10 @@ uploadRouter.delete('/media/:id', authenticate, async (req, res, next) => {
         await storage.delete(key);
       }
     } catch (err) {
-      logger.warn({ mediaId: req.params.id, err }, 'Failed to delete file from storage, DB record will still be removed');
+      logger.warn(
+        { mediaId: req.params.id, err },
+        'Failed to delete file from storage, DB record will still be removed',
+      );
     }
 
     await prisma.listingMedia.delete({ where: { id: req.params.id } });

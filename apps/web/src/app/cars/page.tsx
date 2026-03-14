@@ -2,13 +2,31 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button, ListingCard, Skeleton, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@zuzz/ui';
+import {
+  Button,
+  ListingCard,
+  Skeleton,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@zuzz/ui';
 import { api } from '../../lib/api';
 
 const POPULAR_MAKES = [
-  'טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה',
-  'פולקסווגן', 'BMW', 'מרצדס', 'אאודי', 'ניסאן',
-  'סוזוקי', 'שברולט',
+  'טויוטה',
+  'יונדאי',
+  'קיה',
+  'מאזדה',
+  'סקודה',
+  'פולקסווגן',
+  'BMW',
+  'מרצדס',
+  'אאודי',
+  'ניסאן',
+  'סוזוקי',
+  'שברולט',
 ];
 
 const PRICE_RANGES = [
@@ -39,9 +57,7 @@ export default function CarsHomePage() {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const res = await api.get<{ success: boolean; data: any[] }>(
-          '/api/cars/featured',
-        );
+        const res = await api.get<{ success: boolean; data: any[] }>('/api/cars/featured');
         setFeaturedCars(res.data);
       } catch {
         // fail silently - show empty state
@@ -74,12 +90,9 @@ export default function CarsHomePage() {
       <section className="bg-gradient-to-bl from-brand-black via-brand-charcoal to-brand-black text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              מצא את הרכב הבא שלך
-            </h1>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">מצא את הרכב הבא שלך</h1>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              אלפי רכבים עם ציון אמון, מסמכים מאומתים ומוכרים מזוהים.
-              עסקאות שזזות באמת.
+              אלפי רכבים עם ציון אמון, מסמכים מאומתים ומוכרים מזוהים. עסקאות שזזות באמת.
             </p>
           </div>
 
@@ -95,7 +108,9 @@ export default function CarsHomePage() {
                   </SelectTrigger>
                   <SelectContent>
                     {POPULAR_MAKES.map((make) => (
-                      <SelectItem key={make} value={make}>{make}</SelectItem>
+                      <SelectItem key={make} value={make}>
+                        {make}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -110,7 +125,9 @@ export default function CarsHomePage() {
                   </SelectTrigger>
                   <SelectContent>
                     {PRICE_RANGES.map((range) => (
-                      <SelectItem key={range.value} value={range.value}>{range.label}</SelectItem>
+                      <SelectItem key={range.value} value={range.value}>
+                        {range.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -125,7 +142,9 @@ export default function CarsHomePage() {
                   </SelectTrigger>
                   <SelectContent>
                     {YEAR_RANGES.map((range) => (
-                      <SelectItem key={range.value} value={range.value}>{range.label}</SelectItem>
+                      <SelectItem key={range.value} value={range.value}>
+                        {range.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -143,7 +162,10 @@ export default function CarsHomePage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">רכבים מומלצים</h2>
-          <Link href="/cars/search" className="text-brand-700 hover:text-brand-800 text-sm font-medium">
+          <Link
+            href="/cars/search"
+            className="text-brand-700 hover:text-brand-800 text-sm font-medium"
+          >
             הצג הכל ←
           </Link>
         </div>
@@ -179,12 +201,18 @@ export default function CarsHomePage() {
                 details={[
                   { label: 'שנה', value: String(car.car.year) },
                   { label: 'ק"מ', value: car.car.mileage.toLocaleString('he-IL') },
-                  { label: 'תיבת הילוכים', value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני' },
+                  {
+                    label: 'תיבת הילוכים',
+                    value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני',
+                  },
                 ]}
                 badges={car.trustFactors
                   .filter((f: { status: string; label: string }) => f.status === 'positive')
                   .slice(0, 2)
-                  .map((f: { status: string; label: string }) => ({ label: f.label, variant: 'verified' as const }))}
+                  .map((f: { status: string; label: string }) => ({
+                    label: f.label,
+                    variant: 'verified' as const,
+                  }))}
                 href={`/cars/${car.id}`}
               />
             ))}
@@ -218,14 +246,17 @@ export default function CarsHomePage() {
       {/* Why ZUZZ Cars - Trust Section */}
       <section className="bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">
-            למה ZUZZ Cars?
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">למה ZUZZ Cars?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">ציון אמון לכל מודעה</h3>
@@ -237,7 +268,12 @@ export default function CarsHomePage() {
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                  />
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">מוכרים מזוהים</h3>
@@ -249,7 +285,12 @@ export default function CarsHomePage() {
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">מסמכים ברורים</h3>
@@ -261,7 +302,12 @@ export default function CarsHomePage() {
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                  />
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">תקשורת ישירה</h3>
@@ -277,7 +323,20 @@ export default function CarsHomePage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי עיר</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-          {['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 'נתניה', 'ראשון לציון', 'פתח תקווה', 'אשדוד', 'רעננה', 'כפר סבא'].map((city) => (
+          {[
+            'תל אביב',
+            'ירושלים',
+            'חיפה',
+            'באר שבע',
+            'רמת גן',
+            'הרצליה',
+            'נתניה',
+            'ראשון לציון',
+            'פתח תקווה',
+            'אשדוד',
+            'רעננה',
+            'כפר סבא',
+          ].map((city) => (
             <a
               key={city}
               href={`/cars/search?city=${encodeURIComponent(city)}`}

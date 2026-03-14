@@ -55,9 +55,7 @@ export default function UsersPage() {
     setTogglingId(userId);
     try {
       const updatedUser = await adminApi.toggleUserStatus(userId);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? updatedUser : u))
-      );
+      setUsers((prev) => prev.map((u) => (u.id === userId ? updatedUser : u)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בעדכון סטטוס');
     } finally {
@@ -145,7 +143,9 @@ export default function UsersPage() {
                       {new Intl.NumberFormat('he-IL').format(user._count?.listings ?? 0)}
                     </td>
                     <td>
-                      <span className={`admin-badge ${user.isActive ? 'admin-badge-success' : 'admin-badge-neutral'}`}>
+                      <span
+                        className={`admin-badge ${user.isActive ? 'admin-badge-success' : 'admin-badge-neutral'}`}
+                      >
                         {user.isActive ? 'פעיל' : 'לא פעיל'}
                       </span>
                     </td>
@@ -157,11 +157,7 @@ export default function UsersPage() {
                         disabled={togglingId === user.id}
                         onClick={() => handleToggleStatus(user.id)}
                       >
-                        {togglingId === user.id
-                          ? 'מעדכן...'
-                          : user.isActive
-                            ? 'השבת'
-                            : 'הפעל'}
+                        {togglingId === user.id ? 'מעדכן...' : user.isActive ? 'השבת' : 'הפעל'}
                       </Button>
                     </td>
                   </tr>
@@ -170,9 +166,7 @@ export default function UsersPage() {
         </table>
 
         {!loading && users.length === 0 && (
-          <div className="py-12 text-center text-gray-500">
-            לא נמצאו משתמשים
-          </div>
+          <div className="py-12 text-center text-gray-500">לא נמצאו משתמשים</div>
         )}
       </div>
 

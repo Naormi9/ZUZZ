@@ -35,15 +35,9 @@ export {
 } from './rules/car-rules';
 
 // Completeness
-export {
-  computeCompleteness,
-  getFieldDefinitions,
-} from './completeness';
+export { computeCompleteness, getFieldDefinitions } from './completeness';
 export type { FieldDefinition } from './completeness';
 
 // Risk detection
-export {
-  detectRisks,
-  generateContentHash,
-} from './risk-detector';
+export { detectRisks, generateContentHash } from './risk-detector';
 export type { RiskDetectionContext } from './risk-detector';

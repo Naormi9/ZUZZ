@@ -1,7 +1,20 @@
 import { z } from 'zod';
 
 export const propertyDetailsSchema = z.object({
-  propertyType: z.enum(['apartment', 'house', 'penthouse', 'garden_apartment', 'duplex', 'studio', 'villa', 'cottage', 'lot', 'commercial', 'office', 'other']),
+  propertyType: z.enum([
+    'apartment',
+    'house',
+    'penthouse',
+    'garden_apartment',
+    'duplex',
+    'studio',
+    'villa',
+    'cottage',
+    'lot',
+    'commercial',
+    'office',
+    'other',
+  ]),
   listingType: z.enum(['sale', 'rent', 'roommates']),
   rooms: z.number().min(1).max(20),
   bathrooms: z.number().min(0).max(10),
@@ -12,7 +25,11 @@ export const propertyDetailsSchema = z.object({
   gardenSqm: z.number().optional(),
   parkingSpots: z.number().min(0).optional(),
   condition: z.enum(['new', 'renovated', 'good', 'needs_renovation', 'shell']),
-  yearBuilt: z.number().min(1900).max(new Date().getFullYear() + 5).optional(),
+  yearBuilt: z
+    .number()
+    .min(1900)
+    .max(new Date().getFullYear() + 5)
+    .optional(),
   isAccessible: z.boolean().optional(),
   hasElevator: z.boolean().optional(),
   hasSafeRoom: z.boolean().optional(),

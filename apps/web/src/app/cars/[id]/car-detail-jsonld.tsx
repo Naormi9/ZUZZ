@@ -33,9 +33,8 @@ export function CarDetailJsonLd({ data }: { data: CarJsonLdData | null }) {
 
   if (!mounted || !data) return null;
 
-  const SITE_URL = typeof window !== 'undefined'
-    ? window.location.origin
-    : 'https://www.zuzz.co.il';
+  const SITE_URL =
+    typeof window !== 'undefined' ? window.location.origin : 'https://www.zuzz.co.il';
 
   const GEARBOX_HE: Record<string, string> = {
     automatic: 'אוטומט',
@@ -80,12 +79,8 @@ export function CarDetailJsonLd({ data }: { data: CarJsonLdData | null }) {
       priceCurrency: data.currency ?? 'ILS',
       availability: 'https://schema.org/InStock',
       url: `${SITE_URL}/cars/${data.id}`,
-      ...(data.sellerName
-        ? { seller: { '@type': 'Person', name: data.sellerName } }
-        : {}),
-      ...(data.city
-        ? { areaServed: { '@type': 'Place', name: data.city } }
-        : {}),
+      ...(data.sellerName ? { seller: { '@type': 'Person', name: data.sellerName } } : {}),
+      ...(data.city ? { areaServed: { '@type': 'Place', name: data.city } } : {}),
     },
   };
 

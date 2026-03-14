@@ -19,10 +19,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
             <li key={item.href} className="flex items-center gap-1">
               {i > 0 && <span className="mx-1 text-gray-300">/</span>}
               {i < items.length - 1 ? (
-                <Link
-                  href={item.href}
-                  className="hover:text-gray-700 transition-colors"
-                >
+                <Link href={item.href} className="hover:text-gray-700 transition-colors">
                   {item.name}
                 </Link>
               ) : (

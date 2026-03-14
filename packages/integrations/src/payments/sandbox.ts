@@ -30,7 +30,9 @@ export class SandboxPaymentProvider implements PaymentProvider {
 
     this.payments.set(id, intent);
 
-    console.log(`[SandboxPayment] Created payment ${id}: ${input.amount.amount} ${input.amount.currency}`);
+    console.log(
+      `[SandboxPayment] Created payment ${id}: ${input.amount.amount} ${input.amount.currency}`,
+    );
 
     return {
       intent,
@@ -82,7 +84,9 @@ export class SandboxPaymentProvider implements PaymentProvider {
     payment.updatedAt = new Date();
 
     const refundId = `ref_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    console.log(`[SandboxPayment] Refunded payment ${input.paymentId}: ${refundAmount.amount} ${refundAmount.currency}`);
+    console.log(
+      `[SandboxPayment] Refunded payment ${input.paymentId}: ${refundAmount.amount} ${refundAmount.currency}`,
+    );
 
     return {
       id: refundId,

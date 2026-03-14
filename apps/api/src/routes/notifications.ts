@@ -8,7 +8,7 @@ export const notificationsRouter = Router();
 notificationsRouter.get('/', authenticate, async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
     const [notifications, total, unreadCount] = await Promise.all([
       prisma.notification.findMany({

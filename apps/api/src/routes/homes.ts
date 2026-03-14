@@ -152,7 +152,14 @@ homesRouter.get('/search', optionalAuth, async (req, res, next) => {
 
     res.json({
       success: true,
-      data: { items: listings, total, page, pageSize, totalPages: Math.ceil(total / pageSize), hasMore: page * pageSize < total },
+      data: {
+        items: listings,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: page * pageSize < total,
+      },
     });
   } catch (err) {
     next(err);

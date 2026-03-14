@@ -96,7 +96,11 @@ listingsRouter.patch('/:id/status', authenticate, async (req, res, next) => {
     };
 
     if (!validTransitions[listing.status]?.includes(status)) {
-      throw new AppError(400, 'INVALID_TRANSITION', `לא ניתן לשנות סטטוס מ-${listing.status} ל-${status}`);
+      throw new AppError(
+        400,
+        'INVALID_TRANSITION',
+        `לא ניתן לשנות סטטוס מ-${listing.status} ל-${status}`,
+      );
     }
 
     const updated = await prisma.listing.update({
@@ -175,7 +179,7 @@ listingsRouter.post('/:id/report', authenticate, reportRateLimiter, async (req, 
 listingsRouter.get('/my/all', authenticate, async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
     const status = req.query.status as string;
 
     const where: any = { userId: req.user!.id };
@@ -199,7 +203,14 @@ listingsRouter.get('/my/all', authenticate, async (req, res, next) => {
 
     res.json({
       success: true,
-      data: { data: listings, total, page, pageSize, totalPages: Math.ceil(total / pageSize), hasMore: page * pageSize < total },
+      data: {
+        data: listings,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: page * pageSize < total,
+      },
     });
   } catch (err) {
     next(err);

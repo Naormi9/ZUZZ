@@ -15,15 +15,8 @@ import type {
 } from './rules/common-rules';
 import { commonRules } from './rules/common-rules';
 import { carRules } from './rules/car-rules';
-import {
-  computeCompleteness,
-  getFieldDefinitions,
-  type FieldDefinition,
-} from './completeness';
-import {
-  detectRisks as detectRisksInternal,
-  type RiskDetectionContext,
-} from './risk-detector';
+import { computeCompleteness, getFieldDefinitions, type FieldDefinition } from './completeness';
+import { detectRisks as detectRisksInternal, type RiskDetectionContext } from './risk-detector';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -132,12 +125,8 @@ export class TrustEngine {
    * @param listing - The listing to check.
    * @param overrideFields - Optional custom field list (overrides vertical defaults).
    */
-  computeCompleteness(
-    listing: ListingBase,
-    overrideFields?: FieldDefinition[],
-  ): CompletenessScore {
-    const fields =
-      overrideFields ?? this.fieldOverrides[listing.vertical] ?? undefined;
+  computeCompleteness(listing: ListingBase, overrideFields?: FieldDefinition[]): CompletenessScore {
+    const fields = overrideFields ?? this.fieldOverrides[listing.vertical] ?? undefined;
     return computeCompleteness(listing, fields);
   }
 
@@ -212,19 +201,14 @@ export class TrustEngine {
    * rules + rules marked as 'all').
    */
   private getApplicableRules(vertical: ListingVertical): TrustRuleDefinition[] {
-    return this.rules.filter(
-      (rule) => rule.vertical === 'all' || rule.vertical === vertical,
-    );
+    return this.rules.filter((rule) => rule.vertical === 'all' || rule.vertical === vertical);
   }
 
   /**
    * Evaluates a set of rules and collects their results. Rules that return
    * `null` (e.g. an EV rule for a non-EV car) are silently skipped.
    */
-  private evaluateRules(
-    rules: TrustRuleDefinition[],
-    ctx: RuleEvaluationContext,
-  ): EvaluatedRule[] {
+  private evaluateRules(rules: TrustRuleDefinition[], ctx: RuleEvaluationContext): EvaluatedRule[] {
     const results: EvaluatedRule[] = [];
     for (const rule of rules) {
       const result = rule.evaluate(ctx);

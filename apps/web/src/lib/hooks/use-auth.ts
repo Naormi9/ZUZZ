@@ -59,7 +59,10 @@ export const useAuth = create<AuthState>()(
       verifyOtp: async (email: string, code: string) => {
         set({ isLoading: true });
         try {
-          const res = await api.post<{ success: boolean; data: { token: string; user: User } }>('/api/auth/verify', { email, code });
+          const res = await api.post<{ success: boolean; data: { token: string; user: User } }>(
+            '/api/auth/verify',
+            { email, code },
+          );
           const { token, user } = res.data;
           set({ user, token, isAuthenticated: true, isLoading: false });
         } catch (error) {
@@ -71,7 +74,10 @@ export const useAuth = create<AuthState>()(
       devLogin: async (email: string) => {
         set({ isLoading: true });
         try {
-          const res = await api.post<{ success: boolean; data: { token: string; user: any } }>('/api/auth/dev-login', { email });
+          const res = await api.post<{ success: boolean; data: { token: string; user: any } }>(
+            '/api/auth/dev-login',
+            { email },
+          );
           const { token, user } = res.data;
           set({ user, token, isAuthenticated: true, isLoading: false });
         } catch (error) {

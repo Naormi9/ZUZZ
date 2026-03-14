@@ -22,7 +22,8 @@ async function requireOrgMember(userId: string, orgId: string, roles?: string[])
 
 organizationsRouter.post('/', authenticate, async (req, res, next) => {
   try {
-    const { name, type, description, phone, email, website, city, region, address, licenseNumber } = req.body;
+    const { name, type, description, phone, email, website, city, region, address, licenseNumber } =
+      req.body;
     if (!name || !type) throw new AppError(400, 'INVALID', 'שם וסוג ארגון נדרשים');
 
     const validTypes = ['dealer', 'agency', 'developer', 'business'];
@@ -239,7 +240,9 @@ organizationsRouter.delete('/:id/members/:userId', authenticate, async (req, res
 
     // Non-owners cannot remove owners
     const target = await prisma.organizationMember.findUnique({
-      where: { organizationId_userId: { organizationId: req.params.id!, userId: req.params.userId! } },
+      where: {
+        organizationId_userId: { organizationId: req.params.id!, userId: req.params.userId! },
+      },
     });
     if (!target) throw new AppError(404, 'NOT_FOUND', 'חבר לא נמצא');
     if (target.role === 'owner' && membership.role !== 'owner') {
@@ -247,7 +250,9 @@ organizationsRouter.delete('/:id/members/:userId', authenticate, async (req, res
     }
 
     await prisma.organizationMember.delete({
-      where: { organizationId_userId: { organizationId: req.params.id!, userId: req.params.userId! } },
+      where: {
+        organizationId_userId: { organizationId: req.params.id!, userId: req.params.userId! },
+      },
     });
 
     res.json({ success: true });
@@ -263,7 +268,7 @@ organizationsRouter.get('/:id/listings', authenticate, async (req, res, next) =>
     await requireOrgMember(req.user!.id, req.params.id!);
 
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
     const status = req.query.status as string;
 
     const where: Record<string, unknown> = { organizationId: req.params.id! };
@@ -300,7 +305,7 @@ organizationsRouter.get('/:id/leads', authenticate, async (req, res, next) => {
 
     const status = req.query.status as string;
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
     // Get all org listing IDs
     const orgListings = await prisma.listing.findMany({
@@ -393,7 +398,7 @@ organizationsRouter.get('/:id/analytics', authenticate, async (req, res, next) =
 organizationsRouter.get('/:id/public-listings', async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
     const org = await prisma.organization.findUnique({
       where: { id: req.params.id!, isActive: true },
@@ -405,7 +410,9 @@ organizationsRouter.get('/:id/public-listings', async (req, res, next) => {
         where: { organizationId: req.params.id!, status: 'active' },
         include: {
           media: { take: 1, orderBy: { order: 'asc' } },
-          carDetails: { select: { make: true, model: true, year: true, mileage: true, gearbox: true } },
+          carDetails: {
+            select: { make: true, model: true, year: true, mileage: true, gearbox: true },
+          },
         },
         orderBy: { publishedAt: 'desc' },
         skip: (page - 1) * pageSize,

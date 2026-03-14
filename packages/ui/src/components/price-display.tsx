@@ -8,7 +8,13 @@ interface PriceDisplayProps {
   className?: string;
 }
 
-export function PriceDisplay({ amount, currency = 'ILS', isNegotiable, size = 'md', className }: PriceDisplayProps) {
+export function PriceDisplay({
+  amount,
+  currency = 'ILS',
+  isNegotiable,
+  size = 'md',
+  className,
+}: PriceDisplayProps) {
   const formatted = new Intl.NumberFormat('he-IL', {
     style: 'currency',
     currency,

@@ -2,11 +2,21 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  transpilePackages: ['@zuzz/ui', '@zuzz/types', '@zuzz/validation', '@zuzz/shared-utils', '@zuzz/config'],
+  transpilePackages: [
+    '@zuzz/ui',
+    '@zuzz/types',
+    '@zuzz/validation',
+    '@zuzz/shared-utils',
+    '@zuzz/config',
+  ],
   images: {
     remotePatterns: [
-      { protocol: 'http', hostname: 'localhost' },
+      ...(process.env.NODE_ENV !== 'production'
+        ? [{ protocol: 'http' as const, hostname: 'localhost' }]
+        : []),
       { protocol: 'https', hostname: '*.zuzz.co.il' },
+      { protocol: 'https', hostname: '*.amazonaws.com' },
+      { protocol: 'https', hostname: '*.cloudfront.net' },
     ],
   },
   experimental: {

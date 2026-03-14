@@ -40,10 +40,26 @@ interface SearchApiResponse {
 }
 
 const MAKES = [
-  'טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה',
-  'פולקסווגן', 'BMW', 'מרצדס', 'אאודי', 'ניסאן',
-  'סוזוקי', 'שברולט', 'סובארו', 'הונדה', 'רנו',
-  'פיג\'ו', 'סיטרואן', 'פורד', 'אופל', 'מיצובישי',
+  'טויוטה',
+  'יונדאי',
+  'קיה',
+  'מאזדה',
+  'סקודה',
+  'פולקסווגן',
+  'BMW',
+  'מרצדס',
+  'אאודי',
+  'ניסאן',
+  'סוזוקי',
+  'שברולט',
+  'סובארו',
+  'הונדה',
+  'רנו',
+  "פיג'ו",
+  'סיטרואן',
+  'פורד',
+  'אופל',
+  'מיצובישי',
 ];
 
 const FUEL_TYPES = [
@@ -80,11 +96,13 @@ const currentYear = new Date().getFullYear();
 
 export default function CarsSearchPageWrapper() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-500">טוען...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center text-gray-500">טוען...</div>
+        </div>
+      }
+    >
       <CarsSearchPage />
     </Suspense>
   );
@@ -112,7 +130,9 @@ function CarsSearchPage() {
   const [maxMileage, setMaxMileage] = useState(searchParams.get('maxMileage') ?? '');
   const [maxHand, setMaxHand] = useState(searchParams.get('maxHand') ?? '');
   const [evOnly, setEvOnly] = useState(searchParams.get('evOnly') === 'true');
-  const [verifiedSeller, setVerifiedSeller] = useState(searchParams.get('verifiedSeller') === 'true');
+  const [verifiedSeller, setVerifiedSeller] = useState(
+    searchParams.get('verifiedSeller') === 'true',
+  );
   const [noAccidents, setNoAccidents] = useState(searchParams.get('noAccidents') === 'true');
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'newest');
   const [page, setPage] = useState(Number(searchParams.get('page') ?? '1'));
@@ -136,7 +156,23 @@ function CarsSearchPage() {
     params.set('page', String(page));
     params.set('pageSize', '20');
     return params.toString();
-  }, [make, model, yearFrom, yearTo, priceFrom, priceTo, fuelType, gearbox, maxMileage, maxHand, evOnly, verifiedSeller, noAccidents, sort, page]);
+  }, [
+    make,
+    model,
+    yearFrom,
+    yearTo,
+    priceFrom,
+    priceTo,
+    fuelType,
+    gearbox,
+    maxMileage,
+    maxHand,
+    evOnly,
+    verifiedSeller,
+    noAccidents,
+    sort,
+    page,
+  ]);
 
   useEffect(() => {
     async function fetchResults() {
@@ -182,7 +218,19 @@ function CarsSearchPage() {
     setPage(1);
   }
 
-  const activeFilterCount = [make, model, yearFrom, priceTo, fuelType, gearbox, maxMileage, maxHand, evOnly, verifiedSeller, noAccidents].filter(Boolean).length;
+  const activeFilterCount = [
+    make,
+    model,
+    yearFrom,
+    priceTo,
+    fuelType,
+    gearbox,
+    maxMileage,
+    maxHand,
+    evOnly,
+    verifiedSeller,
+    noAccidents,
+  ].filter(Boolean).length;
 
   // Dynamic title and noindex for search pages
   useEffect(() => {
@@ -190,7 +238,13 @@ function CarsSearchPage() {
     if (make) parts.push(make);
     if (model) parts.push(model);
     if (fuelType) {
-      const fuelLabels: Record<string, string> = { petrol: 'בנזין', diesel: 'דיזל', hybrid: 'היברידי', electric: 'חשמלי', lpg: 'גז' };
+      const fuelLabels: Record<string, string> = {
+        petrol: 'בנזין',
+        diesel: 'דיזל',
+        hybrid: 'היברידי',
+        electric: 'חשמלי',
+        lpg: 'גז',
+      };
       parts.push(fuelLabels[fuelType] ?? fuelType);
     }
     const suffix = parts.length > 0 ? ` — ${parts.join(' ')}` : '';
@@ -222,7 +276,9 @@ function CarsSearchPage() {
           <SelectContent>
             <SelectItem value="">כל היצרנים</SelectItem>
             {MAKES.map((m) => (
-              <SelectItem key={m} value={m}>{m}</SelectItem>
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -231,11 +287,7 @@ function CarsSearchPage() {
       {/* Model */}
       <div>
         <label className="block text-sm font-semibold text-gray-900 mb-2">דגם</label>
-        <Input
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-          placeholder="הקלד דגם..."
-        />
+        <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="הקלד דגם..." />
       </div>
 
       {/* Year Range */}
@@ -290,7 +342,9 @@ function CarsSearchPage() {
           <SelectContent>
             <SelectItem value="">כל הסוגים</SelectItem>
             {FUEL_TYPES.map((f) => (
-              <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+              <SelectItem key={f.value} value={f.value}>
+                {f.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -306,7 +360,9 @@ function CarsSearchPage() {
           <SelectContent>
             <SelectItem value="">הכל</SelectItem>
             {GEARBOX_OPTIONS.map((g) => (
-              <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
+              <SelectItem key={g.value} value={g.value}>
+                {g.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -333,7 +389,9 @@ function CarsSearchPage() {
           <SelectContent>
             <SelectItem value="">כל הידות</SelectItem>
             {HAND_OPTIONS.map((h) => (
-              <SelectItem key={h.value} value={h.value}>{h.label}</SelectItem>
+              <SelectItem key={h.value} value={h.value}>
+                {h.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -392,10 +450,22 @@ function CarsSearchPage() {
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-2">
             <ol className="flex flex-wrap items-center gap-1">
-              <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
-              <li><span className="mx-1 text-gray-300">/</span></li>
-              <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
-              <li><span className="mx-1 text-gray-300">/</span></li>
+              <li>
+                <Link href="/" className="hover:text-gray-700">
+                  ראשי
+                </Link>
+              </li>
+              <li>
+                <span className="mx-1 text-gray-300">/</span>
+              </li>
+              <li>
+                <Link href="/cars" className="hover:text-gray-700">
+                  רכב
+                </Link>
+              </li>
+              <li>
+                <span className="mx-1 text-gray-300">/</span>
+              </li>
               <li className="text-gray-700 font-medium">
                 {make ? `${make}${model ? ` ${model}` : ''}` : 'חיפוש'}
               </li>
@@ -417,13 +487,21 @@ function CarsSearchPage() {
             <div className="flex items-center gap-3">
               {/* Sort */}
               <div className="hidden sm:block">
-                <Select value={sort} onValueChange={(v) => { setSort(v); setPage(1); }}>
+                <Select
+                  value={sort}
+                  onValueChange={(v) => {
+                    setSort(v);
+                    setPage(1);
+                  }}
+                >
                   <SelectTrigger className="w-48">
                     <SelectValue placeholder="מיון" />
                   </SelectTrigger>
                   <SelectContent>
                     {SORT_OPTIONS.map((s) => (
-                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -435,18 +513,14 @@ function CarsSearchPage() {
                   <Button variant="outline" className="lg:hidden gap-2">
                     <SlidersHorizontal className="h-4 w-4" />
                     <span>סינון</span>
-                    {activeFilterCount > 0 && (
-                      <Badge className="mr-1">{activeFilterCount}</Badge>
-                    )}
+                    {activeFilterCount > 0 && <Badge className="mr-1">{activeFilterCount}</Badge>}
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-80 overflow-y-auto">
                   <SheetHeader>
                     <SheetTitle>סינון רכבים</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-6">
-                    {filterContent}
-                  </div>
+                  <div className="mt-6">{filterContent}</div>
                 </SheetContent>
               </Sheet>
             </div>
@@ -454,13 +528,21 @@ function CarsSearchPage() {
 
           {/* Mobile sort */}
           <div className="mt-3 sm:hidden">
-            <Select value={sort} onValueChange={(v) => { setSort(v); setPage(1); }}>
+            <Select
+              value={sort}
+              onValueChange={(v) => {
+                setSort(v);
+                setPage(1);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="מיון" />
               </SelectTrigger>
               <SelectContent>
                 {SORT_OPTIONS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -520,12 +602,18 @@ function CarsSearchPage() {
                       details={[
                         { label: 'שנה', value: String(car.car.year) },
                         { label: 'ק"מ', value: car.car.mileage.toLocaleString('he-IL') },
-                        { label: 'תיבת הילוכים', value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני' },
+                        {
+                          label: 'תיבת הילוכים',
+                          value: car.car.gearbox === 'automatic' ? 'אוטומט' : 'ידני',
+                        },
                       ]}
                       badges={car.trustFactors
                         .filter((f: { status: string; label: string }) => f.status === 'positive')
                         .slice(0, 2)
-                        .map((f: { status: string; label: string }) => ({ label: f.label, variant: 'verified' as const }))}
+                        .map((f: { status: string; label: string }) => ({
+                          label: f.label,
+                          variant: 'verified' as const,
+                        }))}
                       href={`/cars/${car.id}`}
                     />
                   ))}

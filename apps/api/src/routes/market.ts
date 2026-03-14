@@ -48,7 +48,12 @@ marketRouter.get('/', optionalAuth, async (req, res, next) => {
 
     const where: any = { vertical: 'market', status: 'active' };
 
-    const orderBy: any = sort === 'price_asc' ? { priceAmount: 'asc' } : sort === 'price_desc' ? { priceAmount: 'desc' } : { createdAt: 'desc' };
+    const orderBy: any =
+      sort === 'price_asc'
+        ? { priceAmount: 'asc' }
+        : sort === 'price_desc'
+          ? { priceAmount: 'desc' }
+          : { createdAt: 'desc' };
 
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({
@@ -120,7 +125,14 @@ marketRouter.get('/search', optionalAuth, async (req, res, next) => {
 
     res.json({
       success: true,
-      data: { items: listings, total, page, pageSize, totalPages: Math.ceil(total / pageSize), hasMore: page * pageSize < total },
+      data: {
+        items: listings,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: page * pageSize < total,
+      },
     });
   } catch (err) {
     next(err);

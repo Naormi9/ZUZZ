@@ -20,7 +20,13 @@ export function createStorageProvider(config: StorageConfig): StorageProvider {
       return new S3StorageProvider(config);
     }
     case 'local': {
-      const { LocalStorageProvider } = require('./providers/local') as typeof import('./providers/local');
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(
+          'Local storage provider is not allowed in production. Use S3-compatible storage.',
+        );
+      }
+      const { LocalStorageProvider } =
+        require('./providers/local') as typeof import('./providers/local');
       return new LocalStorageProvider(config.bucket, config.publicUrl);
     }
     default:

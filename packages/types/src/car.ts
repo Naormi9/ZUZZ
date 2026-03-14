@@ -4,7 +4,19 @@ export type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'phev' | 'electric' | 'l
 export type GearboxType = 'automatic' | 'manual' | 'robotic' | 'cvt';
 export type OwnershipType = 'private' | 'company' | 'leasing' | 'rental' | 'government' | 'taxi';
 export type SellerType = 'private' | 'dealer' | 'leasing_company';
-export type BodyType = 'sedan' | 'hatchback' | 'suv' | 'crossover' | 'coupe' | 'convertible' | 'wagon' | 'van' | 'pickup' | 'minivan' | 'commercial' | 'other';
+export type BodyType =
+  | 'sedan'
+  | 'hatchback'
+  | 'suv'
+  | 'crossover'
+  | 'coupe'
+  | 'convertible'
+  | 'wagon'
+  | 'van'
+  | 'pickup'
+  | 'minivan'
+  | 'commercial'
+  | 'other';
 export type ChargeConnectorType = 'type1' | 'type2' | 'ccs' | 'chademo' | 'tesla';
 
 export interface CarListing extends ListingBase {

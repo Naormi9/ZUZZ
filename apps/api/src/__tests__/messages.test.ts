@@ -58,7 +58,13 @@ describe('GET /api/messages/conversations', () => {
         buyerUnreadCount: 2,
         sellerUnreadCount: 0,
         lastMessageAt: new Date(),
-        listing: { id: 'listing-1', title: 'Toyota Corolla', priceAmount: 100000, priceCurrency: 'ILS', vertical: 'cars' },
+        listing: {
+          id: 'listing-1',
+          title: 'Toyota Corolla',
+          priceAmount: 100000,
+          priceCurrency: 'ILS',
+          vertical: 'cars',
+        },
         buyer: { id: testUser.id, name: testUser.name },
         seller: { id: 'seller-1', name: 'Seller' },
       },
@@ -294,8 +300,20 @@ describe('GET /api/messages/unread-count', () => {
     mockAuthUser();
 
     const conversations = [
-      { id: 'conv-1', buyerId: testUser.id, sellerId: 'seller-1', buyerUnreadCount: 3, sellerUnreadCount: 0 },
-      { id: 'conv-2', buyerId: 'buyer-2', sellerId: testUser.id, buyerUnreadCount: 0, sellerUnreadCount: 5 },
+      {
+        id: 'conv-1',
+        buyerId: testUser.id,
+        sellerId: 'seller-1',
+        buyerUnreadCount: 3,
+        sellerUnreadCount: 0,
+      },
+      {
+        id: 'conv-2',
+        buyerId: 'buyer-2',
+        sellerId: testUser.id,
+        buyerUnreadCount: 0,
+        sellerUnreadCount: 5,
+      },
     ];
 
     mockPrisma.conversation.findMany.mockResolvedValueOnce(conversations);

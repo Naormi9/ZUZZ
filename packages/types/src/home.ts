@@ -1,6 +1,18 @@
 import type { ListingBase, ListingDocument } from './listing';
 
-export type PropertyType = 'apartment' | 'house' | 'penthouse' | 'garden_apartment' | 'duplex' | 'studio' | 'villa' | 'cottage' | 'lot' | 'commercial' | 'office' | 'other';
+export type PropertyType =
+  | 'apartment'
+  | 'house'
+  | 'penthouse'
+  | 'garden_apartment'
+  | 'duplex'
+  | 'studio'
+  | 'villa'
+  | 'cottage'
+  | 'lot'
+  | 'commercial'
+  | 'office'
+  | 'other';
 export type PropertyCondition = 'new' | 'renovated' | 'good' | 'needs_renovation' | 'shell';
 export type PropertyListingType = 'sale' | 'rent' | 'roommates';
 export type HomeSeller = 'owner' | 'agent' | 'developer';
@@ -28,7 +40,7 @@ export interface PropertyDetails {
   yearBuilt?: number;
   isAccessible?: boolean;
   hasElevator?: boolean;
-  hasSafeRoom?: boolean;    // ממ"ד
+  hasSafeRoom?: boolean; // ממ"ד
   hasStorage?: boolean;
   hasAirConditioning?: boolean;
   hasCentralHeating?: boolean;

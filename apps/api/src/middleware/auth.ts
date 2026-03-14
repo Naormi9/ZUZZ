@@ -44,9 +44,7 @@ export function verifyToken(token: string): AuthUser {
 
 export async function authenticate(req: Request, _res: Response, next: NextFunction) {
   try {
-    const token =
-      req.cookies?.token ||
-      req.headers.authorization?.replace('Bearer ', '');
+    const token = req.cookies?.token || req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
       throw new AppError(401, 'UNAUTHORIZED', 'לא מחובר');
@@ -72,9 +70,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
 
 export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   try {
-    const token =
-      req.cookies?.token ||
-      req.headers.authorization?.replace('Bearer ', '');
+    const token = req.cookies?.token || req.headers.authorization?.replace('Bearer ', '');
 
     if (token) {
       const payload = verifyToken(token);

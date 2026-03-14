@@ -7,14 +7,62 @@ import { Skeleton } from '@zuzz/ui';
 import { adminApi, type DashboardMetrics } from '@/lib/api';
 
 const metricCards = [
-  { key: 'totalUsers' as const, label: 'סה"כ משתמשים', icon: '👥', color: 'text-brand-500', bg: 'bg-brand-50' },
-  { key: 'activeListings' as const, label: 'מודעות פעילות', icon: '📋', color: 'text-green-600', bg: 'bg-green-50' },
-  { key: 'pendingModeration' as const, label: 'ממתין למודרציה', icon: '⏳', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  { key: 'openReports' as const, label: 'דיווחים פתוחים', icon: '🚩', color: 'text-red-600', bg: 'bg-red-50' },
-  { key: 'newUsersToday' as const, label: 'משתמשים חדשים היום', icon: '🆕', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-  { key: 'newListingsToday' as const, label: 'מודעות חדשות היום', icon: '📝', color: 'text-teal-600', bg: 'bg-teal-50' },
-  { key: 'messagesExchangedToday' as const, label: 'הודעות היום', icon: '💬', color: 'text-purple-600', bg: 'bg-purple-50' },
-  { key: 'revenueThisMonth' as const, label: 'הכנסות החודש', icon: '💰', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  {
+    key: 'totalUsers' as const,
+    label: 'סה"כ משתמשים',
+    icon: '👥',
+    color: 'text-brand-500',
+    bg: 'bg-brand-50',
+  },
+  {
+    key: 'activeListings' as const,
+    label: 'מודעות פעילות',
+    icon: '📋',
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+  },
+  {
+    key: 'pendingModeration' as const,
+    label: 'ממתין למודרציה',
+    icon: '⏳',
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+  },
+  {
+    key: 'openReports' as const,
+    label: 'דיווחים פתוחים',
+    icon: '🚩',
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+  },
+  {
+    key: 'newUsersToday' as const,
+    label: 'משתמשים חדשים היום',
+    icon: '🆕',
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50',
+  },
+  {
+    key: 'newListingsToday' as const,
+    label: 'מודעות חדשות היום',
+    icon: '📝',
+    color: 'text-teal-600',
+    bg: 'bg-teal-50',
+  },
+  {
+    key: 'messagesExchangedToday' as const,
+    label: 'הודעות היום',
+    icon: '💬',
+    color: 'text-purple-600',
+    bg: 'bg-purple-50',
+  },
+  {
+    key: 'revenueThisMonth' as const,
+    label: 'הכנסות החודש',
+    icon: '💰',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+  },
 ] as const;
 
 const quickActions = [
@@ -22,7 +70,7 @@ const quickActions = [
   { label: 'תור מודרציה', href: '/admin/moderation', description: 'אישור ודחיית מודעות' },
   { label: 'דיווחים', href: '/admin/reports', description: 'טיפול בדיווחי משתמשים' },
   { label: 'ארגונים', href: '/admin/organizations', description: 'ניהול ארגונים וסוכנויות' },
-  { label: 'Feature Flags', href: '/admin/feature-flags', description: 'ניהול דגלי פיצ\'רים' },
+  { label: 'Feature Flags', href: '/admin/feature-flags', description: "ניהול דגלי פיצ'רים" },
   { label: 'יומן פעולות', href: '/admin/audit-logs', description: 'צפייה בלוג פעולות' },
 ];
 
@@ -84,9 +132,7 @@ export default function AdminDashboardPage() {
                         : '—'}
                     </p>
                   </div>
-                  <div className={`rounded-lg ${card.bg} p-3 text-2xl`}>
-                    {card.icon}
-                  </div>
+                  <div className={`rounded-lg ${card.bg} p-3 text-2xl`}>{card.icon}</div>
                 </div>
               )}
             </CardContent>

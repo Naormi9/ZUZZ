@@ -36,29 +36,34 @@ analyticsRouter.post('/event', optionalAuth, async (req, res, next) => {
 });
 
 // Get analytics summary (admin only — was previously unauthenticated)
-analyticsRouter.get('/summary', authenticate, requireRole('admin', 'moderator'), async (req, res, next) => {
-  try {
-    const period = (req.query.period as string) || 'week';
-    const now = new Date();
-    let since: Date;
+analyticsRouter.get(
+  '/summary',
+  authenticate,
+  requireRole('admin', 'moderator'),
+  async (req, res, next) => {
+    try {
+      const period = (req.query.period as string) || 'week';
+      const now = new Date();
+      let since: Date;
 
-    if (period === 'day') since = new Date(now.getTime() - 86400000);
-    else if (period === 'month') since = new Date(now.getTime() - 30 * 86400000);
-    else since = new Date(now.getTime() - 7 * 86400000);
+      if (period === 'day') since = new Date(now.getTime() - 86400000);
+      else if (period === 'month') since = new Date(now.getTime() - 30 * 86400000);
+      else since = new Date(now.getTime() - 7 * 86400000);
 
-    const events = await prisma.analyticsEvent.groupBy({
-      by: ['type'],
-      where: { createdAt: { gte: since } },
-      _count: { type: true },
-    });
+      const events = await prisma.analyticsEvent.groupBy({
+        by: ['type'],
+        where: { createdAt: { gte: since } },
+        _count: { type: true },
+      });
 
-    const metrics: Record<string, number> = {};
-    for (const e of events) {
-      metrics[e.type] = e._count.type;
+      const metrics: Record<string, number> = {};
+      for (const e of events) {
+        metrics[e.type] = e._count.type;
+      }
+
+      res.json({ success: true, data: { period, metrics } });
+    } catch (err) {
+      next(err);
     }
-
-    res.json({ success: true, data: { period, metrics } });
-  } catch (err) {
-    next(err);
-  }
-});
+  },
+);

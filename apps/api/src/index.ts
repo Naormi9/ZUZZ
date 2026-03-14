@@ -55,7 +55,13 @@ import { organizationsRouter } from './routes/organizations';
 import { promotionsRouter } from './routes/promotions';
 import { subscriptionsRouter } from './routes/subscriptions';
 import { errorHandler } from './middleware/error-handler';
-import { globalRateLimiter, authRateLimiter, uploadRateLimiter, messageRateLimiter, leadRateLimiter } from './middleware/rate-limiter';
+import {
+  globalRateLimiter,
+  authRateLimiter,
+  uploadRateLimiter,
+  messageRateLimiter,
+  leadRateLimiter,
+} from './middleware/rate-limiter';
 import { requestId } from './middleware/request-id';
 import { setupWebSocket } from './websocket';
 
@@ -76,24 +82,28 @@ const io = new SocketServer(httpServer, {
 // Middleware
 app.use(requestId);
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({
-  origin: [
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
-  ],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(pinoHttp({
-  logger: logger as any,
-  autoLogging: { ignore: (req) => (req as any).url === '/api/health/live' },
-  genReqId: (req) => (req as any).requestId,
-  serializers: {
-    req: (req) => ({ method: req.method, url: req.url, requestId: req.id }),
-    res: (res) => ({ statusCode: res.statusCode }),
-  },
-}));
+app.use(
+  pinoHttp({
+    logger: logger as any,
+    autoLogging: { ignore: (req) => (req as any).url === '/api/health/live' },
+    genReqId: (req) => (req as any).requestId,
+    serializers: {
+      req: (req) => ({ method: req.method, url: req.url, requestId: req.id }),
+      res: (res) => ({ statusCode: res.statusCode }),
+    },
+  }),
+);
 app.use(globalRateLimiter);
 
 // Serve uploaded files

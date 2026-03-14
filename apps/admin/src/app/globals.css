@@ -11,21 +11,21 @@
     /* Background */
     --color-bg-default: #ffffff;
     --color-bg-subtle: #f9fafb;
-    --color-bg-inverse: #1B1B1B;
-    --color-bg-cream: #FFE7D0;
+    --color-bg-inverse: #1b1b1b;
+    --color-bg-cream: #ffe7d0;
 
     /* Text */
-    --color-text-primary: #1B1B1B;
+    --color-text-primary: #1b1b1b;
     --color-text-secondary: #323232;
     --color-text-tertiary: #6b7280;
     --color-text-inverse: #ffffff;
 
     /* Action */
-    --color-action-primary: #FC6E20;
-    --color-action-primary-hover: #E55A0D;
+    --color-action-primary: #fc6e20;
+    --color-action-primary-hover: #e55a0d;
 
     /* Focus */
-    --color-focus-ring: #FC6E20;
+    --color-focus-ring: #fc6e20;
   }
 
   html {

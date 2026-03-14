@@ -26,10 +26,22 @@ export default function SellingCarGuidePage() {
       <article className="max-w-3xl mx-auto px-4 py-12">
         <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-6">
           <ol className="flex flex-wrap items-center gap-1">
-            <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
-            <li><span className="mx-1 text-gray-300">/</span></li>
-            <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
-            <li><span className="mx-1 text-gray-300">/</span></li>
+            <li>
+              <Link href="/" className="hover:text-gray-700">
+                ראשי
+              </Link>
+            </li>
+            <li>
+              <span className="mx-1 text-gray-300">/</span>
+            </li>
+            <li>
+              <Link href="/cars" className="hover:text-gray-700">
+                רכב
+              </Link>
+            </li>
+            <li>
+              <span className="mx-1 text-gray-300">/</span>
+            </li>
             <li className="text-gray-700 font-medium">מדריך מכירת רכב</li>
           </ol>
         </nav>
@@ -39,49 +51,48 @@ export default function SellingCarGuidePage() {
         </h1>
 
         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-          רוצים למכור את הרכב בצורה מהירה ובמחיר הוגן? המדריך הזה יעזור לכם
-          להכין מודעה מנצחת ולסגור עסקה טובה.
+          רוצים למכור את הרכב בצורה מהירה ובמחיר הוגן? המדריך הזה יעזור לכם להכין מודעה מנצחת ולסגור
+          עסקה טובה.
         </p>
 
         <div className="prose prose-gray max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">1. הכינו את הרכב למכירה</h2>
             <p className="text-gray-700 leading-relaxed">
-              שטיפה חיצונית ופנימית, טיפול במצב הרכב, תיקון ליקויים קלים — כל
-              אלה משפיעים על הרושם הראשון ועל המחיר שתקבלו.
+              שטיפה חיצונית ופנימית, טיפול במצב הרכב, תיקון ליקויים קלים — כל אלה משפיעים על הרושם
+              הראשון ועל המחיר שתקבלו.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">2. תמחרו נכון</h2>
             <p className="text-gray-700 leading-relaxed">
-              בדקו מחירי שוק לרכבים דומים. תמחור גבוה מדי ירחיק קונים, תמחור
-              נמוך מדי יפגע ברווח. חפשו רכבים דומים ב-ZUZZ לקבלת התמונה.
+              בדקו מחירי שוק לרכבים דומים. תמחור גבוה מדי ירחיק קונים, תמחור נמוך מדי יפגע ברווח.
+              חפשו רכבים דומים ב-ZUZZ לקבלת התמונה.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">3. צלמו תמונות איכותיות</h2>
             <p className="text-gray-700 leading-relaxed">
-              תמונות טובות הן המפתח למודעה מצליחה. צלמו באור טבעי, מכל זווית,
-              כולל פנים הרכב, תא המטען, ולוח השעונים.
+              תמונות טובות הן המפתח למודעה מצליחה. צלמו באור טבעי, מכל זווית, כולל פנים הרכב, תא
+              המטען, ולוח השעונים.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">4. פרסמו מודעה מלאה ב-ZUZZ</h2>
             <p className="text-gray-700 leading-relaxed">
-              מלאו את כל הפרטים, העלו מסמכים (רישיון רכב, טסט), ותנו תיאור
-              כנה. מודעות מלאות מקבלות ציון אמון גבוה יותר ומושכות יותר קונים
-              רציניים.
+              מלאו את כל הפרטים, העלו מסמכים (רישיון רכב, טסט), ותנו תיאור כנה. מודעות מלאות מקבלות
+              ציון אמון גבוה יותר ומושכות יותר קונים רציניים.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">5. סגרו עסקה בבטחון</h2>
             <p className="text-gray-700 leading-relaxed">
-              היפגשו עם קונים במקומות ציבוריים, דרשו תשלום בנקאי, ובצעו העברת
-              בעלות כחוק ברשות הרישוי.
+              היפגשו עם קונים במקומות ציבוריים, דרשו תשלום בנקאי, ובצעו העברת בעלות כחוק ברשות
+              הרישוי.
             </p>
           </section>
         </div>

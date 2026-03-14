@@ -2,12 +2,12 @@
 
 ## Commands
 
-| Command | Environment | Description |
-|---------|-------------|-------------|
-| `pnpm db:migrate:dev` | Development | Create and apply new migrations |
-| `pnpm db:migrate:deploy` | Production/CI | Apply pending migrations (non-interactive) |
-| `pnpm db:migrate:status` | Any | Check migration status |
-| `pnpm db:push` | Development only | Push schema without migration (prototyping) |
+| Command                  | Environment      | Description                                 |
+| ------------------------ | ---------------- | ------------------------------------------- |
+| `pnpm db:migrate:dev`    | Development      | Create and apply new migrations             |
+| `pnpm db:migrate:deploy` | Production/CI    | Apply pending migrations (non-interactive)  |
+| `pnpm db:migrate:status` | Any              | Check migration status                      |
+| `pnpm db:push`           | Development only | Push schema without migration (prototyping) |
 
 ## Creating a new migration
 

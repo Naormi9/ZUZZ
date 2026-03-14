@@ -28,10 +28,7 @@ function getStoredToken(): string | null {
   }
 }
 
-async function request<T>(
-  endpoint: string,
-  options: RequestOptions = {},
-): Promise<T> {
+async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { body, token, headers: customHeaders, ...rest } = options;
 
   const authToken = token ?? getStoredToken();

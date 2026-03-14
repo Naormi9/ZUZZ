@@ -1,24 +1,43 @@
 import { z } from 'zod';
 
-export const carIdentifySchema = z.object({
-  licensePlate: z.string().optional(),
-  vin: z.string().optional(),
-  make: z.string().optional(),
-  model: z.string().optional(),
-  year: z.number().optional(),
-}).refine(
-  (data) => data.licensePlate || data.vin || (data.make && data.model && data.year),
-  { message: 'יש לספק מספר רישוי, VIN, או מותג+דגם+שנה' },
-);
+export const carIdentifySchema = z
+  .object({
+    licensePlate: z.string().optional(),
+    vin: z.string().optional(),
+    make: z.string().optional(),
+    model: z.string().optional(),
+    year: z.number().optional(),
+  })
+  .refine((data) => data.licensePlate || data.vin || (data.make && data.model && data.year), {
+    message: 'יש לספק מספר רישוי, VIN, או מותג+דגם+שנה',
+  });
 
 export const carDetailsSchema = z.object({
   make: z.string().min(1, 'יש לבחור יצרן'),
   model: z.string().min(1, 'יש לבחור דגם'),
   trim: z.string().optional(),
-  year: z.number().min(1990).max(new Date().getFullYear() + 1),
+  year: z
+    .number()
+    .min(1990)
+    .max(new Date().getFullYear() + 1),
   firstRegistrationDate: z.string().optional(),
-  bodyType: z.enum(['sedan', 'hatchback', 'suv', 'crossover', 'coupe', 'convertible', 'wagon', 'van', 'pickup', 'minivan', 'commercial', 'other']).optional(),
-  mileage: z.number().min(0, 'קילומטראז\' חייב להיות חיובי'),
+  bodyType: z
+    .enum([
+      'sedan',
+      'hatchback',
+      'suv',
+      'crossover',
+      'coupe',
+      'convertible',
+      'wagon',
+      'van',
+      'pickup',
+      'minivan',
+      'commercial',
+      'other',
+    ])
+    .optional(),
+  mileage: z.number().min(0, "קילומטראז' חייב להיות חיובי"),
   handCount: z.number().min(0).max(20),
   ownershipType: z.enum(['private', 'company', 'leasing', 'rental', 'government', 'taxi']),
   gearbox: z.enum(['automatic', 'manual', 'robotic', 'cvt']),
@@ -73,7 +92,9 @@ export const carSearchFiltersSchema = z.object({
   priceTo: z.coerce.number().optional(),
   mileageFrom: z.coerce.number().optional(),
   mileageTo: z.coerce.number().optional(),
-  fuelType: z.array(z.enum(['petrol', 'diesel', 'hybrid', 'phev', 'electric', 'lpg', 'cng'])).optional(),
+  fuelType: z
+    .array(z.enum(['petrol', 'diesel', 'hybrid', 'phev', 'electric', 'lpg', 'cng']))
+    .optional(),
   gearbox: z.array(z.enum(['automatic', 'manual', 'robotic', 'cvt'])).optional(),
   handCountMax: z.coerce.number().optional(),
   bodyType: z.array(z.string()).optional(),

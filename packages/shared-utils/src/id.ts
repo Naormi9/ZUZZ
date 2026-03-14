@@ -17,6 +17,8 @@ export function generateOtp(length = 6): string {
 export function generateInvoiceNumber(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0');
   return `INV-${year}-${random}`;
 }

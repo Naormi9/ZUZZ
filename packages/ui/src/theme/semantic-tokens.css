@@ -22,8 +22,8 @@
   /* ── Background ── */
   --color-bg-default: #ffffff;
   --color-bg-subtle: #f9fafb;
-  --color-bg-inverse: #1B1B1B;
-  --color-bg-cream: #FFE7D0;
+  --color-bg-inverse: #1b1b1b;
+  --color-bg-cream: #ffe7d0;
 
   /* ── Surface ── */
   --color-surface-default: #ffffff;
@@ -31,7 +31,7 @@
   --color-surface-elevated: #ffffff;
 
   /* ── Text ── */
-  --color-text-primary: #1B1B1B;
+  --color-text-primary: #1b1b1b;
   --color-text-secondary: #323232;
   --color-text-tertiary: #6b7280;
   --color-text-inverse: #ffffff;
@@ -43,15 +43,15 @@
   --color-border-strong: #323232;
 
   /* ── Action (primary = brand-orange) ── */
-  --color-action-primary: #FC6E20;
-  --color-action-primary-hover: #E55A0D;
-  --color-action-primary-active: #C04A0A;
-  --color-action-secondary: #1B1B1B;
+  --color-action-primary: #fc6e20;
+  --color-action-primary-hover: #e55a0d;
+  --color-action-primary-active: #c04a0a;
+  --color-action-secondary: #1b1b1b;
   --color-action-secondary-hover: #323232;
 
   /* ── Accent ── */
-  --color-accent: #FC6E20;
-  --color-accent-subtle: #FFF4EB;
+  --color-accent: #fc6e20;
+  --color-accent-subtle: #fff4eb;
 
   /* ── Status ── */
   --color-success: #16a34a;
@@ -62,5 +62,5 @@
   --color-error-subtle: #fef2f2;
 
   /* ── Focus ── */
-  --color-focus-ring: #FC6E20;
+  --color-focus-ring: #fc6e20;
 }

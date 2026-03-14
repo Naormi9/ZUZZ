@@ -17,22 +17,23 @@ ZUZZ implements a comprehensive SEO foundation optimized for the Israeli market 
 
 ### Dynamic Metadata
 
-| Page | Metadata Source | Strategy |
-|------|----------------|----------|
-| Homepage | Static export | Root layout defaults |
-| Cars landing `/cars` | Static in layout.tsx | Hebrew-optimized title/description |
-| Car detail `/cars/[id]` | `generateMetadata()` in layout.tsx | Fetches listing from API, builds make/model/year/price title |
-| Cars search `/cars/search` | Static layout + client-side title update | Layout provides base, client updates title per filters |
-| Homes landing `/homes` | Static in layout.tsx | Hebrew-optimized |
-| Homes search `/homes/search` | Static in layout.tsx | Hebrew-optimized |
-| Market `/market` | Static in layout.tsx | Hebrew-optimized |
-| Guides | Static `buildMetadata()` per page | Article-type OG |
-| Static pages | Static `buildMetadata()` per page | Standard |
-| Dashboard / Auth / Create | Static with `noindex` | Excluded from indexing |
+| Page                         | Metadata Source                          | Strategy                                                     |
+| ---------------------------- | ---------------------------------------- | ------------------------------------------------------------ |
+| Homepage                     | Static export                            | Root layout defaults                                         |
+| Cars landing `/cars`         | Static in layout.tsx                     | Hebrew-optimized title/description                           |
+| Car detail `/cars/[id]`      | `generateMetadata()` in layout.tsx       | Fetches listing from API, builds make/model/year/price title |
+| Cars search `/cars/search`   | Static layout + client-side title update | Layout provides base, client updates title per filters       |
+| Homes landing `/homes`       | Static in layout.tsx                     | Hebrew-optimized                                             |
+| Homes search `/homes/search` | Static in layout.tsx                     | Hebrew-optimized                                             |
+| Market `/market`             | Static in layout.tsx                     | Hebrew-optimized                                             |
+| Guides                       | Static `buildMetadata()` per page        | Article-type OG                                              |
+| Static pages                 | Static `buildMetadata()` per page        | Standard                                                     |
+| Dashboard / Auth / Create    | Static with `noindex`                    | Excluded from indexing                                       |
 
 ### SEO Utility Library (`apps/web/src/lib/seo.ts`)
 
 Core helper: `buildMetadata(opts)` — generates complete `Metadata` object with:
+
 - Title, description
 - Canonical URL
 - Open Graph (title, description, url, image, locale, siteName)
@@ -40,6 +41,7 @@ Core helper: `buildMetadata(opts)` — generates complete `Metadata` object with
 - Optional noindex
 
 Additional helpers:
+
 - `carListingTitle()` — builds Hebrew car title from make/model/year
 - `carListingDescription()` — builds description with specs and price
 - `carsSearchTitle()` / `carsSearchDescription()` — search page metadata
@@ -83,25 +85,27 @@ Total: ~75 URLs. Listing detail pages should be added when listing volume justif
 
 ## noindex / index Policy
 
-| Page Type | Indexed? | Reason |
-|-----------|----------|--------|
-| Homepage | Yes | Core page |
-| Vertical landing pages | Yes | High-value category pages |
-| Listing detail pages | Yes | Individual content pages |
-| Search pages (0-2 filters) | Yes | High-value landing pages |
-| Search pages (3+ filters) | No | Prevent index bloat from filter combos |
-| Dashboard pages | No | User-private content |
-| Auth pages | No | No SEO value |
-| Create/edit pages | No | No SEO value |
-| Paginated results (page > 1) | Follow default | Crawlable but not primary |
+| Page Type                    | Indexed?       | Reason                                 |
+| ---------------------------- | -------------- | -------------------------------------- |
+| Homepage                     | Yes            | Core page                              |
+| Vertical landing pages       | Yes            | High-value category pages              |
+| Listing detail pages         | Yes            | Individual content pages               |
+| Search pages (0-2 filters)   | Yes            | High-value landing pages               |
+| Search pages (3+ filters)    | No             | Prevent index bloat from filter combos |
+| Dashboard pages              | No             | User-private content                   |
+| Auth pages                   | No             | No SEO value                           |
+| Create/edit pages            | No             | No SEO value                           |
+| Paginated results (page > 1) | Follow default | Crawlable but not primary              |
 
 ## Structured Data (JSON-LD)
 
 ### Global (root layout)
+
 - **Organization** — ZUZZ brand, logo, description
 - **WebSite** — with `SearchAction` pointing to `/cars/search?q={search_term_string}`
 
 ### Car Detail Pages
+
 - **Vehicle** schema with:
   - Brand, model, modelDate
   - mileageFromOdometer
@@ -110,31 +114,38 @@ Total: ~75 URLs. Listing detail pages should be added when listing volume justif
 - Injected client-side after data loads via `CarDetailJsonLd` component
 
 ### Breadcrumbs
+
 - **BreadcrumbList** on guide pages
 - Visible breadcrumb navigation on car detail pages and search pages
 
 ### Content Pages
+
 - **BreadcrumbList** on guide pages via `JsonLd` component
 
 ## Internal Linking Strategy
 
 ### Footer
+
 Restructured with SEO-focused links:
+
 - **Cars section**: landing, search, top 3 makes, electric vehicles
 - **Real estate & market**: landing pages
 - **ZUZZ section**: about, contact, trust, buying guide, selling guide
 - **Support**: terms, privacy, accessibility, publish CTA
 
 ### Car Detail Pages
+
 - Breadcrumb: Home → Cars → Make → Current listing
 - Related links: all cars by same make, make+model search, cars in same city
 - Similar cars section (existing)
 
 ### Cars Search Page
+
 - Breadcrumb: Home → Cars → Current search
 - Popular searches section at bottom: top makes + top cities
 
 ### Cars Landing Page
+
 - Search by make grid (12 popular makes)
 - Search by city grid (12 popular cities)
 - Search by type (electric, hybrid, SUV, first-hand, verified sellers)
@@ -143,11 +154,14 @@ Restructured with SEO-focused links:
 ## Editorial / Content Foundation
 
 ### API
+
 - `GET /api/articles` — list published articles
 - `GET /api/articles/:slug` — get article by slug
 
 ### Database Model
+
 The `Article` model supports:
+
 - `slug` (unique), `type` (page, guide, article, landing)
 - `title` / `titleHe`, `content` / `contentHe`
 - `seoTitle`, `seoDescription`
@@ -155,6 +169,7 @@ The `Article` model supports:
 - `isPublished`, `publishedAt`
 
 ### Content Pages Created
+
 - `/guides/buying-car` — Car buying guide (Hebrew, real content)
 - `/guides/selling-car` — Car selling guide (Hebrew, real content)
 - `/about` — About ZUZZ
@@ -165,6 +180,7 @@ The `Article` model supports:
 - `/accessibility` — Accessibility statement
 
 ### Content Expansion Rules
+
 1. Only create content that provides real value to users
 2. No auto-generated spam or thin content
 3. Each guide should link to relevant product pages

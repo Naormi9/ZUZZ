@@ -15,7 +15,7 @@ export default function FeatureFlagsPage() {
     adminApi
       .getFeatureFlags()
       .then(setFlags)
-      .catch((err) => setError(err instanceof Error ? err.message : 'שגיאה בטעינת דגלי פיצ\'רים'))
+      .catch((err) => setError(err instanceof Error ? err.message : "שגיאה בטעינת דגלי פיצ'רים"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -84,9 +84,7 @@ export default function FeatureFlagsPage() {
                           {flag.isEnabled ? 'פעיל' : 'כבוי'}
                         </span>
                       </div>
-                      {flag.key && (
-                        <p className="font-mono text-xs text-gray-400">{flag.key}</p>
-                      )}
+                      {flag.key && <p className="font-mono text-xs text-gray-400">{flag.key}</p>}
                       <p className="text-sm text-gray-500">{flag.description}</p>
                       <p className="text-xs text-gray-400">
                         עודכן לאחרונה: {formatDate(flag.updatedAt)}

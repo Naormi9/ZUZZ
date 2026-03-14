@@ -28,8 +28,12 @@ export default function ContactPage() {
           </p>
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link href="/about" className="text-sm text-brand-600 hover:underline">אודות ZUZZ</Link>
-          <Link href="/trust" className="text-sm text-brand-600 hover:underline">בטיחות ואמון</Link>
+          <Link href="/about" className="text-sm text-brand-600 hover:underline">
+            אודות ZUZZ
+          </Link>
+          <Link href="/trust" className="text-sm text-brand-600 hover:underline">
+            בטיחות ואמון
+          </Link>
         </div>
       </article>
     </div>

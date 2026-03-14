@@ -16,15 +16,24 @@ export interface EmailProvider {
 export function createEmailProvider(config: import('./types').EmailConfig): EmailProvider {
   switch (config.provider) {
     case 'smtp': {
-      const { SmtpEmailProvider } = require('./providers/smtp') as typeof import('./providers/smtp');
+      const { SmtpEmailProvider } =
+        require('./providers/smtp') as typeof import('./providers/smtp');
       return new SmtpEmailProvider(config);
     }
     case 'mock': {
-      const { MockEmailProvider } = require('./providers/mock') as typeof import('./providers/mock');
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(
+          'Mock email provider is not allowed in production. Configure SMTP credentials.',
+        );
+      }
+      const { MockEmailProvider } =
+        require('./providers/mock') as typeof import('./providers/mock');
       return new MockEmailProvider();
     }
     default:
-      throw new Error(`Unknown email provider: ${(config as import('./types').EmailConfig).provider}`);
+      throw new Error(
+        `Unknown email provider: ${(config as import('./types').EmailConfig).provider}`,
+      );
   }
 }
 

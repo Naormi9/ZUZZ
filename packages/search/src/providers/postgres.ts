@@ -22,10 +22,20 @@ export class PostgresSearchProvider implements SearchProvider {
   }
 
   async search<T = Record<string, unknown>>(
-    query: SearchProviderQuery
+    query: SearchProviderQuery,
   ): Promise<SearchProviderResult<T>> {
     const start = Date.now();
-    const { q, vertical, filters, page = 1, pageSize = 20, sortBy, sortOrder = 'desc', facetFields, geo } = query;
+    const {
+      q,
+      vertical,
+      filters,
+      page = 1,
+      pageSize = 20,
+      sortBy,
+      sortOrder = 'desc',
+      facetFields,
+      geo,
+    } = query;
 
     const conditions: string[] = [`"vertical" = '${vertical}'`, `"status" = 'active'`];
     const params: unknown[] = [];
@@ -38,7 +48,7 @@ export class PostgresSearchProvider implements SearchProvider {
         `(
           "searchVector" @@ plainto_tsquery('hebrew', $${paramIndex})
           OR similarity("title", $${paramIndex}) > 0.2
-        )`
+        )`,
       );
       params.push(q.trim());
       orderClause = `ts_rank("searchVector", plainto_tsquery('hebrew', $${paramIndex})) DESC`;
@@ -52,7 +62,7 @@ export class PostgresSearchProvider implements SearchProvider {
           "location"::geography,
           ST_SetSRID(ST_MakePoint($${paramIndex}, $${paramIndex + 1}), 4326)::geography,
           $${paramIndex + 2}
-        )`
+        )`,
       );
       params.push(geo.lng, geo.lat, geo.radiusKm * 1000);
       paramIndex += 3;
@@ -104,11 +114,11 @@ export class PostgresSearchProvider implements SearchProvider {
     const [countResult, items] = await Promise.all([
       this.prisma.$queryRawUnsafe(
         `SELECT COUNT(*) as count FROM "listings" WHERE ${whereClause}`,
-        ...params
+        ...params,
       ) as Promise<Array<{ count: bigint }>>,
       this.prisma.$queryRawUnsafe(
         `SELECT * FROM "listings" WHERE ${whereClause} ORDER BY ${orderClause} LIMIT ${pageSize} OFFSET ${offset}`,
-        ...params
+        ...params,
       ) as Promise<T[]>,
     ]);
 
@@ -133,7 +143,7 @@ export class PostgresSearchProvider implements SearchProvider {
   async suggest(
     query: string,
     vertical: 'cars' | 'homes' | 'market',
-    limit: number = 10
+    limit: number = 10,
   ): Promise<SearchSuggestion[]> {
     if (!query.trim()) return [];
 
@@ -146,7 +156,7 @@ export class PostgresSearchProvider implements SearchProvider {
        LIMIT $3`,
       query.trim(),
       vertical,
-      limit
+      limit,
     )) as Array<{ title: string; similarity: number }>;
 
     return results.map((r: { title: string; similarity: number }) => ({
@@ -157,7 +167,7 @@ export class PostgresSearchProvider implements SearchProvider {
 
   async facets(
     vertical: 'cars' | 'homes' | 'market',
-    fields: string[]
+    fields: string[],
   ): Promise<SearchFacetResult[]> {
     const whereClause = `"vertical" = '${vertical}' AND "status" = 'active'`;
     return this.computeFacets(fields, whereClause, []);
@@ -166,7 +176,7 @@ export class PostgresSearchProvider implements SearchProvider {
   private async computeFacets(
     fields: string[],
     whereClause: string,
-    params: unknown[]
+    params: unknown[],
   ): Promise<SearchFacetResult[]> {
     const facets: SearchFacetResult[] = [];
 
@@ -179,7 +189,7 @@ export class PostgresSearchProvider implements SearchProvider {
            GROUP BY "data"->>'${field}'
            ORDER BY count DESC
            LIMIT 50`,
-          ...params
+          ...params,
         )) as Array<{ value: string; count: bigint }>;
 
         facets.push({

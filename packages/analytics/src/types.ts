@@ -2,11 +2,7 @@
  * Re-export and extend the analytics types from @zuzz/types.
  * These types are the canonical event definitions used by the tracker.
  */
-export type {
-  AnalyticsEventType,
-  AnalyticsEvent,
-  AnalyticsSummary,
-} from '@zuzz/types';
+export type { AnalyticsEventType, AnalyticsEvent, AnalyticsSummary } from '@zuzz/types';
 
 export interface TrackEventInput {
   type: import('@zuzz/types').AnalyticsEventType;

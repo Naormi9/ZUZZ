@@ -64,9 +64,9 @@ export default function OrganizationsPage() {
     setLoading(true);
     setError(null);
     try {
-      const orgs = await adminApi.getOrganizations(
-        statusFilter ? { status: statusFilter } : undefined
-      ) as Organization[];
+      const orgs = (await adminApi.getOrganizations(
+        statusFilter ? { status: statusFilter } : undefined,
+      )) as Organization[];
       setOrganizations(orgs);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בטעינת ארגונים');
@@ -90,7 +90,7 @@ export default function OrganizationsPage() {
   async function openDetail(orgId: string) {
     setDetailLoading(true);
     try {
-      const org = await adminApi.getOrganization(orgId) as Organization;
+      const org = (await adminApi.getOrganization(orgId)) as Organization;
       setSelectedOrg(org);
     } catch {
       // stay on list
@@ -105,7 +105,7 @@ export default function OrganizationsPage() {
     try {
       await adminApi.orgAction(selectedOrg.id, action);
       // Refresh detail
-      const org = await adminApi.getOrganization(selectedOrg.id) as Organization;
+      const org = (await adminApi.getOrganization(selectedOrg.id)) as Organization;
       setSelectedOrg(org);
       // Refresh list
       fetchOrganizations();
@@ -138,13 +138,34 @@ export default function OrganizationsPage() {
           <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-3">
             <h2 className="font-semibold text-gray-900">פרטי ארגון</h2>
             <div className="text-sm space-y-2">
-              <p><span className="text-gray-500">סוג:</span> {typeLabels[org.type] || org.type}</p>
-              {org.city && <p><span className="text-gray-500">מיקום:</span> {org.city}{org.region ? `, ${org.region}` : ''}</p>}
-              {org.phone && <p><span className="text-gray-500">טלפון:</span> {org.phone}</p>}
-              {org.email && <p><span className="text-gray-500">דוא&quot;ל:</span> {org.email}</p>}
-              <p><span className="text-gray-500">הצטרף:</span> {formatDate(org.createdAt)}</p>
-              <p><span className="text-gray-500">מודעות:</span> {org._count?.listings ?? 0}</p>
-              <p><span className="text-gray-500">חברים:</span> {org._count?.members ?? 0}</p>
+              <p>
+                <span className="text-gray-500">סוג:</span> {typeLabels[org.type] || org.type}
+              </p>
+              {org.city && (
+                <p>
+                  <span className="text-gray-500">מיקום:</span> {org.city}
+                  {org.region ? `, ${org.region}` : ''}
+                </p>
+              )}
+              {org.phone && (
+                <p>
+                  <span className="text-gray-500">טלפון:</span> {org.phone}
+                </p>
+              )}
+              {org.email && (
+                <p>
+                  <span className="text-gray-500">דוא&quot;ל:</span> {org.email}
+                </p>
+              )}
+              <p>
+                <span className="text-gray-500">הצטרף:</span> {formatDate(org.createdAt)}
+              </p>
+              <p>
+                <span className="text-gray-500">מודעות:</span> {org._count?.listings ?? 0}
+              </p>
+              <p>
+                <span className="text-gray-500">חברים:</span> {org._count?.members ?? 0}
+              </p>
             </div>
           </div>
 
@@ -154,14 +175,23 @@ export default function OrganizationsPage() {
             <div className="text-sm space-y-2">
               {owner && (
                 <>
-                  <p><span className="text-gray-500">בעלים:</span> {owner.user.name}</p>
-                  <p><span className="text-gray-500">אימייל:</span> {owner.user.email}</p>
+                  <p>
+                    <span className="text-gray-500">בעלים:</span> {owner.user.name}
+                  </p>
+                  <p>
+                    <span className="text-gray-500">אימייל:</span> {owner.user.email}
+                  </p>
                 </>
               )}
               {sub ? (
                 <>
-                  <p><span className="text-gray-500">תוכנית:</span> {sub.plan}</p>
-                  <p><span className="text-gray-500">סטטוס מנוי:</span> {sub.status === 'active' ? 'פעיל' : sub.status}</p>
+                  <p>
+                    <span className="text-gray-500">תוכנית:</span> {sub.plan}
+                  </p>
+                  <p>
+                    <span className="text-gray-500">סטטוס מנוי:</span>{' '}
+                    {sub.status === 'active' ? 'פעיל' : sub.status}
+                  </p>
                 </>
               ) : (
                 <p className="text-gray-400">אין מנוי פעיל</p>
@@ -221,12 +251,17 @@ export default function OrganizationsPage() {
             <h2 className="font-semibold text-gray-900 mb-4">חברי צוות</h2>
             <div className="space-y-2">
               {org.members.map((m, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                >
                   <div>
                     <p className="text-sm font-medium text-gray-900">{m.user.name}</p>
                     <p className="text-xs text-gray-500">{m.user.email}</p>
                   </div>
-                  <Badge variant="secondary">{m.role === 'owner' ? 'בעלים' : m.role === 'admin' ? 'מנהל' : 'חבר'}</Badge>
+                  <Badge variant="secondary">
+                    {m.role === 'owner' ? 'בעלים' : m.role === 'admin' ? 'מנהל' : 'חבר'}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -297,12 +332,12 @@ export default function OrganizationsPage() {
                   <tr key={org.id}>
                     <td className="font-medium text-gray-900">{org.name}</td>
                     <td>
-                      <Badge variant="secondary">
-                        {typeLabels[org.type] || org.type}
-                      </Badge>
+                      <Badge variant="secondary">{typeLabels[org.type] || org.type}</Badge>
                     </td>
                     <td>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[org.verificationStatus] || 'bg-gray-100 text-gray-600'}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[org.verificationStatus] || 'bg-gray-100 text-gray-600'}`}
+                      >
                         {statusLabels[org.verificationStatus] || org.verificationStatus}
                       </span>
                     </td>

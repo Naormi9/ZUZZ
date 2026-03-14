@@ -13,7 +13,14 @@ export default function DealerSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
-    name: '', description: '', phone: '', email: '', website: '', city: '', region: '', address: '',
+    name: '',
+    description: '',
+    phone: '',
+    email: '',
+    website: '',
+    city: '',
+    region: '',
+    address: '',
   });
 
   useEffect(() => {
@@ -25,13 +32,19 @@ export default function DealerSettingsPage() {
         if (myOrg) {
           setOrg(myOrg);
           setForm({
-            name: myOrg.name || '', description: myOrg.description || '',
-            phone: myOrg.phone || '', email: myOrg.email || '',
-            website: myOrg.website || '', city: myOrg.city || '',
-            region: myOrg.region || '', address: myOrg.address || '',
+            name: myOrg.name || '',
+            description: myOrg.description || '',
+            phone: myOrg.phone || '',
+            email: myOrg.email || '',
+            website: myOrg.website || '',
+            city: myOrg.city || '',
+            region: myOrg.region || '',
+            address: myOrg.address || '',
           });
         }
-      } catch { /* ignore */ } finally {
+      } catch {
+        /* ignore */
+      } finally {
         setLoading(false);
       }
     }
@@ -46,12 +59,19 @@ export default function DealerSettingsPage() {
       await api.patch(`/api/organizations/${org.id}`, form);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <div className="max-w-2xl mx-auto px-4 py-8"><Skeleton className="h-96 w-full" /></div>;
+  if (loading)
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
   if (!org) return <div className="text-center py-16 text-gray-500">אין ארגון</div>;
 
   return (
@@ -76,33 +96,53 @@ export default function DealerSettingsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">טלפון</label>
-              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">דוא&quot;ל</label>
-              <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Input
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">אתר אינטרנט</label>
-            <Input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+            <Input
+              value={form.website}
+              onChange={(e) => setForm({ ...form, website: e.target.value })}
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">עיר</label>
-              <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              <Input
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">אזור</label>
-              <Input value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
+              <Input
+                value={form.region}
+                onChange={(e) => setForm({ ...form, region: e.target.value })}
+              />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">כתובת</label>
-            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Input
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <Button onClick={save} disabled={saving}>{saving ? 'שומר...' : 'שמור שינויים'}</Button>
+            <Button onClick={save} disabled={saving}>
+              {saving ? 'שומר...' : 'שמור שינויים'}
+            </Button>
             {saved && <span className="text-sm text-green-600">נשמר בהצלחה</span>}
           </div>
         </CardContent>
