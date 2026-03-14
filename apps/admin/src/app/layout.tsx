@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AdminSidebar } from '@/components/admin-sidebar';
+import { AuthGuard } from '@/components/auth-guard';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -14,10 +15,12 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   return (
     <html lang="he" dir="rtl">
       <body className="font-sans">
-        <div className="flex min-h-screen">
-          <AdminSidebar />
-          <main className="ms-[260px] flex-1 p-6">{children}</main>
-        </div>
+        <AuthGuard>
+          <div className="flex min-h-screen">
+            <AdminSidebar />
+            <main className="ms-[260px] flex-1 p-6">{children}</main>
+          </div>
+        </AuthGuard>
       </body>
     </html>
   );

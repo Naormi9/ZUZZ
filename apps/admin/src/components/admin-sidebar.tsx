@@ -203,7 +203,8 @@ export function AdminSidebar() {
           type="button"
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
           onClick={() => {
-            // TODO: implement logout
+            document.cookie = 'token=; Max-Age=0; path=/';
+            window.location.href = '/';
           }}
         >
           <svg

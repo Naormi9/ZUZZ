@@ -14,6 +14,7 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
@@ -72,13 +73,46 @@ export function Header() {
               <div className="relative">
                 <button
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
-                  onClick={() => {
-                    /* TODO: dropdown menu */
-                  }}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden sm:inline">{user?.name ?? 'החשבון שלי'}</span>
                 </button>
+                {userMenuOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      לוח בקרה
+                    </Link>
+                    <Link
+                      href="/dashboard/favorites"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      מועדפים
+                    </Link>
+                    <Link
+                      href="/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      הגדרות
+                    </Link>
+                    <div className="my-1 border-t border-gray-100" />
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        logout();
+                      }}
+                      className="block w-full px-4 py-2 text-start text-sm text-red-600 hover:bg-red-50"
+                    >
+                      התנתקות
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Link href="/auth/login">
