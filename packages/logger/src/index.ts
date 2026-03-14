@@ -6,6 +6,10 @@ export function createLogger(name: string) {
   return pino({
     name,
     level: process.env.LOG_LEVEL ?? (isDev ? 'debug' : 'info'),
+    redact: {
+      paths: ['req.headers.authorization', 'req.headers.cookie', 'password', 'token', 'secret'],
+      censor: '[REDACTED]',
+    },
     ...(isDev
       ? {
           transport: {

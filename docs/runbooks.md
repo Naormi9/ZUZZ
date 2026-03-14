@@ -68,9 +68,11 @@ Currently, the upload route uses Multer's local disk storage directly. For produ
 
 ### Reset and reseed (dev only)
 ```bash
-pnpm db:push     # Reset schema (destructive!)
-pnpm db:seed     # Seed demo data
+pnpm db:push     # Reset schema (destructive! NEVER in staging/production)
+pnpm db:seed     # Seed demo data (dev/staging first setup only)
 ```
+
+**WARNING:** `db:push` and `db:reset` are destructive. They drop and recreate tables. Never use them on staging or production databases.
 
 ### Create a new migration (dev)
 ```bash
@@ -79,17 +81,41 @@ pnpm db:migrate:dev -- --name describe_the_change
 
 ### Apply migrations (staging/production)
 ```bash
-pnpm db:migrate:deploy
+# Safe pre-deploy migration with backup
+./scripts/pre-deploy-migrate.sh
+
+# Or manually:
+pnpm db:migrate:status    # Check what's pending
+pnpm db:migrate:deploy    # Apply pending migrations
 ```
 
-### Check migration status
+### Migration order for deploys
+1. Create database backup: `pnpm db:backup`
+2. Check pending migrations: `pnpm db:migrate:status`
+3. Apply migrations: `pnpm db:migrate:deploy`
+4. Deploy new application code
+5. Verify health: `curl /api/health/ready`
+
+### Resolving migration for existing db:push databases
+If your database was created with `db:push` (no migration history):
 ```bash
-pnpm db:migrate:status
+cd packages/database
+npx prisma migrate resolve --applied 0_init
 ```
+This marks the initial migration as applied without re-running it.
+
+### Rollback guidance
+Prisma does not support automatic rollback. Options:
+1. **New undo migration:** Create a migration that reverses the changes
+2. **Restore from backup:** `pnpm db:restore` (restores from latest backup)
+3. **Manual SQL:** Connect to the database and apply reverse DDL manually
+4. For additive migrations (new columns/tables), you may not need rollback
+
+Always test migrations on staging before production.
 
 ### Backup/restore
 ```bash
-pnpm db:backup    # Creates pg_dump to infrastructure/backups/
+pnpm db:backup    # Creates pg_dump (supports S3 upload if S3_BUCKET is set)
 pnpm db:restore   # Restores from latest backup
 ```
 
@@ -135,6 +161,7 @@ Rate limited responses return `429` with Hebrew error message.
 ### Structured logging
 All API logs use Pino (structured JSON in production, pretty-printed in development).
 Log level controlled by `LOG_LEVEL` env var.
+Sensitive data (auth headers, cookies, passwords, tokens) is automatically redacted from logs.
 
 ### Request correlation
 Every request gets a unique `X-Request-ID` header (generated or forwarded from load balancer).
@@ -142,9 +169,70 @@ This ID appears in all log entries for that request.
 
 ### Error tracking
 Sentry is initialized when `SENTRY_DSN` is set. All 5xx errors and unhandled exceptions are captured.
+The error handler at `apps/api/src/middleware/error-handler.ts` sends exceptions to Sentry automatically.
+
+### OpenTelemetry (prepared, not yet active)
+The instrumentation scaffold is at `apps/api/src/instrumentation.ts`.
+To enable:
+1. Install OTEL packages (see comments in the file)
+2. Set `OTEL_EXPORTER_OTLP_ENDPOINT` in environment
+3. Uncomment the initialization code
 
 ### Key log contexts
 - `api:auth` — Login/register/OTP events
 - `api:upload` — File upload/delete events
 - `api:websocket` — WebSocket connection/room events
 - `api:error` — Error handler events
+
+## Deployment Operations
+
+### Full deploy
+```bash
+./scripts/deploy.sh staging    # or production
+```
+
+### Smoke test after deploy
+```bash
+./scripts/smoke-test.sh [API_URL] [WEB_URL] [ADMIN_URL]
+```
+
+### Rolling back a deploy
+1. If migration was the issue, restore from pre-migration backup
+2. If application code was the issue:
+   ```bash
+   git checkout <previous-tag-or-commit>
+   docker compose -f docker-compose.production.yml up -d --build
+   ```
+3. Verify with health check: `curl /api/health/ready`
+
+### Checking deployment health
+```bash
+# Quick check
+curl http://localhost:4000/api/health/ready
+
+# Full status with timings
+curl http://localhost:4000/api/health | python3 -m json.tool
+
+# View API logs
+docker compose -f docker-compose.production.yml logs -f api
+
+# View all service status
+docker compose -f docker-compose.production.yml ps
+```
+
+### Emergency: API not starting
+1. Check logs: `docker compose -f docker-compose.production.yml logs api`
+2. Common causes:
+   - Environment validation failed (check .env.production)
+   - Database not reachable
+   - Redis not reachable
+   - Port conflict
+3. If env validation fails, the error message will indicate which variable is wrong
+
+### Graceful shutdown
+The API handles `SIGTERM` and `SIGINT` with a graceful shutdown sequence:
+1. Stops accepting new connections
+2. Closes WebSocket connections
+3. Disconnects from PostgreSQL
+4. Disconnects from Redis
+5. Force-exits after 15 seconds if shutdown hangs

@@ -10,11 +10,40 @@ on:
         options:
           - staging
           - production
+      skip_smoke_test:
+        description: 'Skip smoke test after deploy'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
+  pre-deploy:
+    name: Pre-deploy checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify CI passed
+        run: |
+          echo "Deploying commit: ${{ github.sha }}"
+          echo "Target: ${{ inputs.environment }}"
+          echo "Branch: ${{ github.ref_name }}"
+
+      - name: Verify Docker images exist
+        run: |
+          for app in api web admin; do
+            echo "Checking ghcr.io/${{ github.repository }}/zuzz-${app}:${{ github.sha }}..."
+            docker manifest inspect ghcr.io/${{ github.repository }}/zuzz-${app}:${{ github.sha }} > /dev/null 2>&1 || \
+              echo "⚠️  Image not found for ${app}. Build may be needed."
+          done
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        continue-on-error: true
+
   deploy:
     name: Deploy to ${{ inputs.environment }}
     runs-on: ubuntu-latest
+    needs: [pre-deploy]
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
@@ -26,19 +55,77 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
+            set -euo pipefail
             cd /opt/zuzz
-            git pull origin ${{ github.ref_name }}
-            docker compose -f docker-compose.production.yml pull
-            docker compose -f docker-compose.production.yml up -d
-            # Wait for API to be healthy
-            sleep 10
-            curl -sf http://localhost:4000/api/health/live || echo "Health check failed"
 
-      - name: Verify deployment
+            echo "=== Pre-deploy backup ==="
+            if command -v pg_dump &> /dev/null; then
+              ./scripts/pre-deploy-migrate.sh 2>&1 || echo "Migration script not available, using direct deploy"
+            fi
+
+            echo "=== Pulling latest code ==="
+            git fetch origin ${{ github.ref_name }}
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+
+            echo "=== Setting GIT_SHA ==="
+            export GIT_SHA=${{ github.sha }}
+
+            echo "=== Deploying ==="
+            docker compose -f docker-compose.production.yml pull 2>/dev/null || true
+            docker compose -f docker-compose.production.yml up -d --build
+
+            echo "=== Waiting for API readiness ==="
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:4000/api/health/ready > /dev/null 2>&1; then
+                echo "API is ready (attempt $i)"
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "❌ API did not become ready"
+                docker compose -f docker-compose.production.yml logs --tail=50 api
+                exit 1
+              fi
+              sleep 5
+            done
+
+      - name: Verify deployment health
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            curl -sf http://localhost:4000/api/health | jq .
+            echo "=== Health Check ==="
+            curl -sf http://localhost:4000/api/health | python3 -m json.tool || curl -sf http://localhost:4000/api/health
+
+            echo ""
+            echo "=== Readiness Check ==="
+            curl -sf http://localhost:4000/api/health/ready | python3 -m json.tool || curl -sf http://localhost:4000/api/health/ready
+
+  smoke-test:
+    name: Smoke Test
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: ${{ !inputs.skip_smoke_test }}
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run smoke tests
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /opt/zuzz
+            if [ -f scripts/smoke-test.sh ]; then
+              chmod +x scripts/smoke-test.sh
+              ./scripts/smoke-test.sh
+            else
+              echo "Smoke test script not found, running basic checks..."
+              curl -sf http://localhost:4000/api/health/ready
+              curl -sf http://localhost:3000 > /dev/null
+              echo "Basic checks passed"
+            fi

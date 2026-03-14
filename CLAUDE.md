@@ -104,6 +104,7 @@ Key ideas:
 
 ## Commands
 ```bash
+# Development
 pnpm install           # Install all dependencies
 pnpm dev               # Start all apps in dev mode
 pnpm build             # Build all packages and apps
@@ -112,19 +113,28 @@ pnpm typecheck         # Type-check all packages
 pnpm test              # Run all tests (vitest)
 pnpm test:e2e          # Run Playwright E2E tests
 pnpm format            # Format code with Prettier
+
+# Database
 pnpm db:generate       # Generate Prisma client
-pnpm db:push           # Push schema to database (dev only!)
+pnpm db:push           # Push schema to database (dev only! NEVER in production)
 pnpm db:migrate:dev    # Create new migration (dev)
-pnpm db:migrate:deploy # Apply pending migrations (production)
+pnpm db:migrate:deploy # Apply pending migrations (staging/production)
 pnpm db:migrate:status # Check migration status
-pnpm db:seed           # Seed demo data
+pnpm db:seed           # Seed demo data (dev only)
 pnpm db:studio         # Open Prisma Studio GUI
 pnpm db:backup         # Backup PostgreSQL
 pnpm db:restore        # Restore PostgreSQL from backup
+
+# Infrastructure
 pnpm docker:up         # Start PostgreSQL, Redis, MinIO, MailHog
 pnpm docker:down       # Stop Docker services
 pnpm docker:prod:up    # Start production stack
 pnpm docker:prod:down  # Stop production stack
+
+# Deployment
+./scripts/deploy.sh staging         # Full deploy to staging
+./scripts/pre-deploy-migrate.sh     # Pre-deploy migration with backup
+./scripts/smoke-test.sh             # Post-deploy smoke test
 ```
 
 ## When implementing new features
@@ -156,7 +166,9 @@ Prefer focused subagents with narrow responsibilities:
 - Report endpoint prevents self-reporting and duplicate reports
 - Request correlation IDs via `X-Request-ID` header
 - Multer file size errors return proper 413 status
-- `@zuzz/config` validates environment on startup with Zod, rejects unsafe production defaults
+- `@zuzz/config` validates environment eagerly on API startup with Zod, rejects unsafe production defaults
+- Sensitive data (auth headers, cookies, passwords) redacted from Pino logs
+- Production config rejects: placeholder AUTH_SECRET, minioadmin storage creds, localhost URLs, disabled rate limiting, mock providers
 
 ## Test coverage
 - API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4)
@@ -168,7 +180,21 @@ Prefer focused subagents with narrow responsibilities:
 - docs/architecture.md — System architecture
 - docs/local-setup.md — Local dev setup
 - docs/deployment.md — Deployment guide & checklist
+- docs/staging-deploy.md — Staging deployment guide
+- docs/production-checklist.md — Production readiness checklist
 - docs/runbooks.md — Operational runbooks
+
+## Deployment readiness
+- Environment validated eagerly on API startup (fail-fast)
+- Production rejects unsafe defaults (placeholder secrets, localhost URLs, disabled rate limiting)
+- Health endpoints: /api/health/live, /api/health, /api/health/ready, /api/health/startup
+- Graceful shutdown with 15s timeout
+- Sentry error tracking when SENTRY_DSN is set
+- Sensitive data redacted from logs
+- OpenTelemetry tracing prepared (not yet active)
+- Smoke test script for post-deploy validation
+- CI/CD: lint → typecheck → test → build → e2e → docker build
+- Deploy workflow: manual dispatch with staging/production targets
 
 ## Non-goals
 - Do not turn this into a shallow clone

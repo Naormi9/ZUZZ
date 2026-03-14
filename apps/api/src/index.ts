@@ -12,6 +12,17 @@ try {
   // Sentry not installed — continue without it
 }
 
+import { validateConfig, getConfig } from '@zuzz/config';
+
+// Validate environment eagerly on startup — fail fast if misconfigured
+try {
+  validateConfig();
+} catch (err) {
+  console.error('❌ Environment validation failed. Check your .env file:');
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
