@@ -47,7 +47,16 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-bold text-brand-600">ZUZZ</span>
+              <img
+                src="/brand/logo-mark.svg"
+                alt="ZUZZ"
+                className="h-8 w-auto"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <span className="hidden text-2xl font-bold text-brand-black">ZUZZ</span>
             </Link>
             <p className="mt-3 text-sm text-gray-600">
               המקום שבו עסקאות זזות באמת

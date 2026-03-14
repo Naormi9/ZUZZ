@@ -3,9 +3,29 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── ZUZZ Semantic Design Tokens ── */
   :root {
     --font-heebo: 'Heebo', sans-serif;
     --admin-sidebar-width: 260px;
+
+    /* Background */
+    --color-bg-default: #ffffff;
+    --color-bg-subtle: #f9fafb;
+    --color-bg-inverse: #1B1B1B;
+    --color-bg-cream: #FFE7D0;
+
+    /* Text */
+    --color-text-primary: #1B1B1B;
+    --color-text-secondary: #323232;
+    --color-text-tertiary: #6b7280;
+    --color-text-inverse: #ffffff;
+
+    /* Action */
+    --color-action-primary: #FC6E20;
+    --color-action-primary-hover: #E55A0D;
+
+    /* Focus */
+    --color-focus-ring: #FC6E20;
   }
 
   html {
@@ -14,7 +34,7 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 text-brand-black antialiased;
   }
 
   /* RTL-specific overrides */
@@ -86,7 +106,7 @@
   }
 
   .admin-badge-info {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-brand-50 text-brand-800;
   }
 
   .admin-badge-neutral {

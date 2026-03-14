@@ -22,7 +22,17 @@ export function Header() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="text-2xl font-bold text-brand-600">ZUZZ</span>
+            <img
+              src="/brand/logo-mark.svg"
+              alt="ZUZZ"
+              className="h-9 w-auto"
+              onError={(e) => {
+                // Fallback to text if logo not available
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <span className="hidden text-2xl font-bold text-brand-black">ZUZZ</span>
           </Link>
 
           {/* Desktop Navigation */}

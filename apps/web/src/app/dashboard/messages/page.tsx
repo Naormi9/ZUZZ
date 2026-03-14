@@ -86,12 +86,12 @@ export default function MessagesPage() {
                   <button
                     key={conv.id}
                     onClick={() => loadMessages(conv.id)}
-                    className={`w-full text-right p-4 hover:bg-gray-50 transition-colors ${selectedConv === conv.id ? 'bg-blue-50' : ''}`}
+                    className={`w-full text-right p-4 hover:bg-gray-50 transition-colors ${selectedConv === conv.id ? 'bg-brand-50' : ''}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-sm text-gray-900">{conv.otherUser?.name}</span>
                       {conv.unreadCount > 0 && (
-                        <span className="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="bg-brand-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -122,11 +122,11 @@ export default function MessagesPage() {
                     <div key={msg.id} className={`flex ${msg.senderId === user?.id ? 'justify-start' : 'justify-end'}`}>
                       <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
                         msg.senderId === user?.id
-                          ? 'bg-blue-600 text-white rounded-br-sm'
+                          ? 'bg-brand-500 text-white rounded-br-sm'
                           : 'bg-gray-100 text-gray-900 rounded-bl-sm'
                       }`}>
                         <p>{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${msg.senderId === user?.id ? 'text-blue-200' : 'text-gray-400'}`}>
+                        <p className={`text-[10px] mt-1 ${msg.senderId === user?.id ? 'text-brand-200' : 'text-gray-400'}`}>
                           {new Date(msg.createdAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>

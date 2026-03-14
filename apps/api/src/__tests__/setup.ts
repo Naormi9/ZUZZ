@@ -142,6 +142,37 @@ vi.mock('@zuzz/trust-engine', () => ({
 }));
 
 // ---------------------------------------------------------------------------
+// Mock @zuzz/storage — in-memory stub for tests
+// ---------------------------------------------------------------------------
+vi.mock('@zuzz/storage', () => ({
+  createStorageProvider: vi.fn(() => ({
+    upload: vi.fn().mockResolvedValue({ url: 'http://localhost/uploads/test.jpg', key: 'test.jpg', size: 100 }),
+    delete: vi.fn().mockResolvedValue(undefined),
+    getUrl: vi.fn().mockReturnValue('http://localhost/uploads/test.jpg'),
+    healthCheck: vi.fn().mockResolvedValue(true),
+  })),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock @zuzz/email — silent in tests
+// ---------------------------------------------------------------------------
+vi.mock('@zuzz/email', () => ({
+  createEmailProvider: vi.fn(() => ({
+    send: vi.fn().mockResolvedValue(undefined),
+  })),
+  otpTemplate: {
+    subject: vi.fn().mockReturnValue('OTP Code'),
+    html: vi.fn().mockReturnValue('<p>OTP</p>'),
+    text: vi.fn().mockReturnValue('OTP'),
+  },
+  welcomeTemplate: {
+    subject: vi.fn().mockReturnValue('Welcome'),
+    html: vi.fn().mockReturnValue('<p>Welcome</p>'),
+    text: vi.fn().mockReturnValue('Welcome'),
+  },
+}));
+
+// ---------------------------------------------------------------------------
 // Mock rate-limit-redis — not needed in tests
 // ---------------------------------------------------------------------------
 vi.mock('rate-limit-redis', () => ({

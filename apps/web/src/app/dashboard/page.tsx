@@ -51,7 +51,7 @@ export default function DashboardPage() {
   }
 
   const statCards = [
-    { label: 'המודעות שלי', value: stats.listings, icon: Car, href: '/dashboard', color: 'text-blue-600 bg-blue-100' },
+    { label: 'המודעות שלי', value: stats.listings, icon: Car, href: '/dashboard', color: 'text-brand-500 bg-brand-100' },
     { label: 'מועדפים', value: stats.favorites, icon: Heart, href: '/dashboard/favorites', color: 'text-red-600 bg-red-100' },
     { label: 'הודעות חדשות', value: stats.messages, icon: MessageCircle, href: '/dashboard/messages', color: 'text-green-600 bg-green-100' },
     { label: 'לידים', value: stats.leads, icon: Users, href: '/dashboard/leads', color: 'text-purple-600 bg-purple-100' },

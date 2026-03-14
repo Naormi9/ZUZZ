@@ -66,7 +66,7 @@ export default function FavoritesPage() {
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-medium text-gray-900 truncate">{listing.title}</h3>
-                  <p className="text-blue-600 font-bold mt-1">
+                  <p className="text-brand-500 font-bold mt-1">
                     ₪{listing.priceAmount?.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">{listing.city}</p>

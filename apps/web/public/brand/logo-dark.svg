@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Z (lighter for dark bg) -->
+  <text x="2" y="32" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" fill="#9CA3AF">Z</text>
+  <!-- U -->
+  <text x="28" y="32" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" fill="#D1D5DB">U</text>
+  <!-- ZZ (brand orange) -->
+  <text x="52" y="32" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" fill="#FC6E20">ZZ</text>
+  <!-- Arrow -->
+  <polygon points="108,16 120,20 108,24" fill="#FC6E20"/>
+</svg>

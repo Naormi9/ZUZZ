@@ -11,7 +11,7 @@ const STATUS_LABELS: Record<string, string> = {
   new: 'חדש', contacted: 'פנו', qualified: 'מתאים', converted: 'הומר', lost: 'אבד',
 };
 const STATUS_COLORS: Record<string, string> = {
-  new: 'bg-blue-100 text-blue-700', contacted: 'bg-yellow-100 text-yellow-700',
+  new: 'bg-brand-100 text-brand-700', contacted: 'bg-yellow-100 text-yellow-700',
   qualified: 'bg-green-100 text-green-700', converted: 'bg-emerald-100 text-emerald-700',
   lost: 'bg-gray-100 text-gray-700',
 };

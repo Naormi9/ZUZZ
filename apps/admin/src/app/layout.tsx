@@ -5,6 +5,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'ZUZZ ניהול — לוח בקרה',
   description: 'לוח בקרה וניהול של פלטפורמת ZUZZ',
+  icons: {
+    icon: '/brand/favicon.svg',
+  },
 };
 
 export default function AdminRootLayout({

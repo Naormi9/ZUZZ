@@ -27,7 +27,7 @@ export const welcomeTemplate: EmailTemplate<WelcomeEmailData> = {
       <li>לסגור עסקאות בצורה בטוחה ומהירה</li>
     </ul>
     <div style="text-align: center; margin: 24px 0;">
-      <a href="${loginUrl}" style="display: inline-block; background: #1a73e8; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 6px; font-size: 16px; font-weight: bold;">
+      <a href="${loginUrl}" style="display: inline-block; background: #FC6E20; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 6px; font-size: 16px; font-weight: bold;">
         התחל/י עכשיו
       </a>
     </div>

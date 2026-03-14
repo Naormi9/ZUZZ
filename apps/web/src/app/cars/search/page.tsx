@@ -320,7 +320,7 @@ function CarsSearchPage() {
             type="checkbox"
             checked={evOnly}
             onChange={(e) => setEvOnly(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
           />
           <span className="text-sm text-gray-700">חשמלי בלבד</span>
         </label>
@@ -330,7 +330,7 @@ function CarsSearchPage() {
             type="checkbox"
             checked={verifiedSeller}
             onChange={(e) => setVerifiedSeller(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
           />
           <span className="text-sm text-gray-700">מוכר מאומת</span>
         </label>
@@ -340,7 +340,7 @@ function CarsSearchPage() {
             type="checkbox"
             checked={noAccidents}
             onChange={(e) => setNoAccidents(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
           />
           <span className="text-sm text-gray-700">ללא תאונות</span>
         </label>
@@ -521,7 +521,7 @@ function CarsSearchPage() {
                             onClick={() => setPage(pageNum)}
                             className={`h-9 w-9 rounded-lg text-sm font-medium transition-colors ${
                               page === pageNum
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-brand-500 text-white'
                                 : 'text-gray-600 hover:bg-gray-100'
                             }`}
                           >

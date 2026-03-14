@@ -3,13 +3,49 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── ZUZZ Semantic Design Tokens ── */
+  :root {
+    /* Background */
+    --color-bg-default: #ffffff;
+    --color-bg-subtle: #f9fafb;
+    --color-bg-inverse: #1B1B1B;
+    --color-bg-cream: #FFE7D0;
+
+    /* Surface */
+    --color-surface-default: #ffffff;
+    --color-surface-subtle: #f3f4f6;
+
+    /* Text */
+    --color-text-primary: #1B1B1B;
+    --color-text-secondary: #323232;
+    --color-text-tertiary: #6b7280;
+    --color-text-inverse: #ffffff;
+    --color-text-muted: #9ca3af;
+
+    /* Border */
+    --color-border-default: #e5e7eb;
+    --color-border-muted: #f3f4f6;
+
+    /* Action */
+    --color-action-primary: #FC6E20;
+    --color-action-primary-hover: #E55A0D;
+
+    /* Status */
+    --color-success: #16a34a;
+    --color-warning: #d97706;
+    --color-error: #dc2626;
+
+    /* Focus */
+    --color-focus-ring: #FC6E20;
+  }
+
   html {
     direction: rtl;
     text-align: right;
   }
 
   body {
-    @apply bg-white text-gray-900 antialiased;
+    @apply bg-white text-brand-black antialiased;
     font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -54,7 +90,7 @@
     @apply py-12 sm:py-16 lg:py-20;
   }
 
-  /* RTL-aware focus ring */
+  /* RTL-aware focus ring — uses brand-orange */
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
   }

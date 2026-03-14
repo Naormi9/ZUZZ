@@ -127,14 +127,18 @@ See `.env.example` for the complete list with comments. Key variables:
 
 ## How Uploads Work in Dev
 
-Media files are stored locally in the `uploads/` directory at the API root. Files are served via Express static middleware. In production, uploads should use the S3/MinIO storage provider via the `@zuzz/storage` package.
+Uploads use the `@zuzz/storage` abstraction layer. In dev, when `STORAGE_ENDPOINT` is set (default in `.env.example`), uploads go to the local MinIO instance. When MinIO is not running and storage env vars are unset, uploads fall back to the local filesystem (`uploads/` directory) served via Express static middleware.
+
+In production, uploads go to S3/MinIO via the same abstraction — no code changes needed.
 
 ## How Auth Works in Dev
 
-1. Register or login triggers OTP generation (logged to console in dev)
-2. OTP is stored in the database with 10-minute expiry
-3. Use dev-login endpoint to skip OTP entirely
-4. JWT tokens expire after 7 days
+1. Register or login triggers OTP generation
+2. OTP email is sent via MailHog (when `SMTP_HOST=localhost` in `.env`). View at http://localhost:8025
+3. If email send fails, OTP code is logged to console as fallback
+4. OTP is stored in the database with 10-minute expiry
+5. Use dev-login endpoint to skip OTP entirely
+6. JWT tokens expire after 7 days
 
 ## Troubleshooting
 

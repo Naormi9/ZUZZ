@@ -52,7 +52,7 @@ function Toast({ toast, onDismiss }: { toast: ToastData; onDismiss: () => void }
   const colors = {
     success: 'bg-green-600',
     error: 'bg-red-600',
-    info: 'bg-blue-600',
+    info: 'bg-brand-charcoal',
     warning: 'bg-amber-600',
   };
 

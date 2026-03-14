@@ -5,7 +5,7 @@ export function Spinner({ className, size = 'md' }: { className?: string; size?:
   return (
     <div className={cn('flex items-center justify-center', className)}>
       <svg
-        className={cn('animate-spin text-blue-600', sizeClasses[size])}
+        className={cn('animate-spin text-brand-500', sizeClasses[size])}
         fill="none"
         viewBox="0 0 24 24"
       >

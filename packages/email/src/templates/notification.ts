@@ -18,7 +18,7 @@ export const notificationTemplate: EmailTemplate<NotificationEmailData> = {
     const ctaBlock =
       data.ctaText && data.ctaUrl
         ? `<div style="text-align: center; margin: 24px 0;">
-            <a href="${data.ctaUrl}" style="display: inline-block; background: #1a73e8; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 6px; font-size: 16px; font-weight: bold;">
+            <a href="${data.ctaUrl}" style="display: inline-block; background: #FC6E20; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 6px; font-size: 16px; font-weight: bold;">
               ${data.ctaText}
             </a>
            </div>`
