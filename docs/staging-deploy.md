@@ -71,17 +71,16 @@ NODE_ENV="production"
 RATE_LIMIT_ENABLED="true"
 LOG_LEVEL="info"
 
-# Maps/payments — mock/sandbox is OK for staging
-MAPS_PROVIDER="mock"
-PAYMENT_PROVIDER="sandbox"
+# Maps — use google with a dev/staging API key (mock is rejected in NODE_ENV=production)
+MAPS_PROVIDER="google"
+MAPS_API_KEY="your-staging-google-maps-key"
+
+# Payments — use stripe with a test-mode API key (sandbox is rejected in NODE_ENV=production)
+PAYMENT_PROVIDER="stripe"
+PAYMENT_API_KEY="sk_test_your-stripe-test-key"
 ```
 
-**Note:** The config validator will reject `MAPS_PROVIDER=mock` and `PAYMENT_PROVIDER=sandbox` in `NODE_ENV=production`. For staging, you have two options:
-
-1. Use `NODE_ENV=production` and set real provider values (recommended for production-parity testing)
-2. Temporarily relax the validation for staging (not recommended)
-
-For staging, consider keeping `NODE_ENV=production` but setting `MAPS_PROVIDER=google` with a dev API key.
+**Important:** The config validator rejects `MAPS_PROVIDER=mock` and `PAYMENT_PROVIDER=sandbox` when `NODE_ENV=production`. For staging, use real provider values with test/dev API keys. This ensures staging validates the same code paths as production.
 
 ## Deploy Order
 

@@ -21,7 +21,7 @@ Items that are known gaps but do not block a limited beta / staging deployment. 
 
 ## Media & Storage
 
-- **Upload route uses Multer local disk → then moves to S3.** In production, files briefly exist on the API server's disk before being moved. Large-scale usage should switch to presigned S3 upload URLs (client → S3 direct).
+- **Upload uses memory buffer → S3.** Files are buffered in API server memory before upload to S3. Large files or high concurrency may spike memory usage. For scale, switch to presigned S3 upload URLs (client → S3 direct).
 - **No CDN.** Media served directly from S3. Add CloudFront/Cloudflare for production performance.
 - **No image optimization pipeline.** Images stored as-is. Consider adding sharp/imgproxy for resizing and WebP conversion.
 

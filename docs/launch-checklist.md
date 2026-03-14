@@ -99,4 +99,4 @@ If critical issues found after launch:
 2. **Database migration issue:** Restore from pre-migration backup (`pnpm db:restore`)
 3. **Full rollback:** Put up maintenance page, restore DB backup, deploy previous version
 
-See `docs/runbooks.md` for detailed rollback procedures.
+See `docs/rollback-recovery.md` for detailed rollback procedures and `docs/go-live-runbook.md` for the full launch sequence.
