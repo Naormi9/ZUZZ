@@ -171,10 +171,26 @@ Prefer focused subagents with narrow responsibilities:
 - Production config rejects: placeholder AUTH_SECRET, minioadmin storage creds, localhost URLs, disabled rate limiting, mock providers
 
 ## Test coverage
-- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4)
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (15), promotions (7), subscriptions (5)
 - Trust engine: unit tests
 - E2E: Playwright tests for cars flow
 - All tests run via `pnpm test` in CI
+
+## SEO & Growth Architecture
+- robots.txt via Next.js route handler (blocks /api, /dashboard, /auth, /create)
+- Sitemap with static pages, cars-by-make, cars-by-city, homes-by-city
+- Dynamic metadata for car detail pages (make/model/year/price in title)
+- Vehicle JSON-LD structured data on car listings
+- Organization + WebSite JSON-LD globally
+- Canonical URLs on all pages
+- noindex on dashboard, auth, create pages and heavily-filtered search pages (3+ filters)
+- Open Graph and Twitter Card metadata on all key pages
+- Breadcrumbs on car detail and search pages
+- Internal linking grid: makes, cities, fuel types on cars pages
+- Editorial foundation: buying guide, selling guide, trust page, about page
+- Articles API: GET /api/articles, GET /api/articles/:slug
+- SEO utility library: apps/web/src/lib/seo.ts, apps/web/src/lib/json-ld.ts
+- Full documentation: docs/seo.md
 
 ## Documentation
 - docs/architecture.md — System architecture
@@ -183,6 +199,19 @@ Prefer focused subagents with narrow responsibilities:
 - docs/staging-deploy.md — Staging deployment guide
 - docs/production-checklist.md — Production readiness checklist
 - docs/runbooks.md — Operational runbooks
+- docs/seo.md — SEO architecture, metadata rules, indexing policy
+- docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
+
+## Dealer Portal
+- Organization model: create org → pending verification → admin approves/rejects → verified/suspended
+- Roles: owner, admin, member — with permission checks via `requireOrgMember()`
+- Dealer onboarding: `/dealer/onboarding` → POST /api/organizations
+- Dashboard: `/dashboard/dealer` — stats, inventory, leads, promotions, team, billing, settings
+- Public profile: `/dealers/[id]` — SEO-optimized with `generateMetadata()`
+- Promotion types: boost, highlight, featured, top_of_search, gallery
+- Subscription plans: free, basic, pro, enterprise (admin-assigned)
+- Admin tools: organization list with status filter, detail view, approve/reject/suspend/reactivate actions
+- API routes: /api/organizations, /api/promotions, /api/subscriptions
 
 ## Deployment readiness
 - Environment validated eagerly on API startup (fail-fast)

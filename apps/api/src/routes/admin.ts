@@ -260,15 +260,116 @@ adminRouter.patch('/reports/:id', async (req, res, next) => {
 // Organizations
 adminRouter.get('/organizations', async (req, res, next) => {
   try {
+    const status = req.query.status as string;
+    const where: any = {};
+    if (status) where.verificationStatus = status;
+
     const orgs = await prisma.organization.findMany({
+      where,
       include: {
         _count: { select: { listings: true, members: true } },
         dealerProfile: true,
+        members: {
+          where: { role: 'owner' },
+          include: { user: { select: { id: true, name: true, email: true } } },
+          take: 1,
+        },
+        subscriptions: {
+          where: { status: 'active' },
+          take: 1,
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
 
     res.json({ success: true, data: orgs });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Organization detail
+adminRouter.get('/organizations/:id', async (req, res, next) => {
+  try {
+    const org = await prisma.organization.findUnique({
+      where: { id: req.params.id },
+      include: {
+        dealerProfile: true,
+        members: {
+          include: { user: { select: { id: true, name: true, email: true, roles: true } } },
+        },
+        subscriptions: { orderBy: { createdAt: 'desc' }, take: 5 },
+        listings: { take: 10, orderBy: { createdAt: 'desc' }, include: { media: { take: 1 } } },
+        _count: { select: { listings: true, members: true } },
+      },
+    });
+    if (!org) throw new AppError(404, 'NOT_FOUND', 'ארגון לא נמצא');
+
+    res.json({ success: true, data: org });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Approve/reject/suspend organization
+adminRouter.post('/organizations/:id/action', async (req, res, next) => {
+  try {
+    const { action, reason } = req.body;
+    const org = await prisma.organization.findUnique({ where: { id: req.params.id } });
+    if (!org) throw new AppError(404, 'NOT_FOUND', 'ארגון לא נמצא');
+
+    const actionMap: Record<string, { verificationStatus: string; isActive?: boolean }> = {
+      approve: { verificationStatus: 'verified' },
+      reject: { verificationStatus: 'rejected' },
+      suspend: { verificationStatus: 'rejected', isActive: false },
+      reactivate: { verificationStatus: 'verified', isActive: true },
+    };
+
+    const update = actionMap[action];
+    if (!update) throw new AppError(400, 'INVALID', 'פעולה לא תקינה');
+
+    await prisma.organization.update({
+      where: { id: req.params.id },
+      data: {
+        verificationStatus: update.verificationStatus,
+        ...(update.isActive !== undefined ? { isActive: update.isActive } : {}),
+      },
+    });
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: {
+        userId: req.user!.id,
+        action: `organization_${action}`,
+        entityType: 'organization',
+        entityId: org.id,
+        metadata: { organizationName: org.name, reason },
+      },
+    });
+
+    // Notify org owner
+    const ownerMember = await prisma.organizationMember.findFirst({
+      where: { organizationId: org.id, role: 'owner' },
+    });
+    if (ownerMember) {
+      const titleMap: Record<string, string> = {
+        approve: 'הארגון אושר',
+        reject: 'הארגון נדחה',
+        suspend: 'הארגון הושעה',
+        reactivate: 'הארגון הופעל מחדש',
+      };
+      await prisma.notification.create({
+        data: {
+          userId: ownerMember.userId,
+          type: 'organization_status',
+          title: titleMap[action] || 'עדכון ארגון',
+          body: reason ? `סיבה: ${reason}` : `הסטטוס של "${org.name}" עודכן.`,
+          link: '/dashboard/dealer',
+        },
+      });
+    }
+
+    res.json({ success: true });
   } catch (err) {
     next(err);
   }

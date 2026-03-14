@@ -16,6 +16,9 @@ import { listingsRouter } from '../routes/listings';
 import { notificationsRouter } from '../routes/notifications';
 import { analyticsRouter } from '../routes/analytics';
 import { adminRouter } from '../routes/admin';
+import { organizationsRouter } from '../routes/organizations';
+import { promotionsRouter } from '../routes/promotions';
+import { subscriptionsRouter } from '../routes/subscriptions';
 import { errorHandler } from '../middleware/error-handler';
 
 export function createTestApp() {
@@ -36,6 +39,9 @@ export function createTestApp() {
   app.use('/api/notifications', notificationsRouter);
   app.use('/api/analytics', analyticsRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/organizations', organizationsRouter);
+  app.use('/api/promotions', promotionsRouter);
+  app.use('/api/subscriptions', subscriptionsRouter);
 
   // Error handling
   app.use(errorHandler);

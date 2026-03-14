@@ -84,6 +84,42 @@ vi.mock('@zuzz/database', () => {
     listingStatusHistory: {
       create: vi.fn(),
     },
+    organization: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+    },
+    organizationMember: {
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      delete: vi.fn(),
+    },
+    dealerProfile: {
+      upsert: vi.fn(),
+    },
+    promotion: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+    },
+    subscription: {
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      count: vi.fn(),
+    },
+    auditLog: {
+      create: vi.fn(),
+    },
     $queryRaw: vi.fn(),
     $disconnect: vi.fn(),
   };

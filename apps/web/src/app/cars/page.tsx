@@ -273,6 +273,44 @@ export default function CarsHomePage() {
         </div>
       </section>
 
+      {/* Search by city */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי עיר</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          {['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 'נתניה', 'ראשון לציון', 'פתח תקווה', 'אשדוד', 'רעננה', 'כפר סבא'].map((city) => (
+            <a
+              key={city}
+              href={`/cars/search?city=${encodeURIComponent(city)}`}
+              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors"
+            >
+              רכבים ב{city}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Search by type */}
+      <section className="max-w-7xl mx-auto px-4 py-12 border-t border-gray-100">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי סוג</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {[
+            { label: 'רכבים חשמליים', href: '/cars/search?fuelType=electric' },
+            { label: 'רכבים היברידיים', href: '/cars/search?fuelType=hybrid' },
+            { label: 'SUV וקרוסאובר', href: '/cars/search?bodyType=suv' },
+            { label: 'רכבי יד ראשונה', href: '/cars/search?maxHand=1' },
+            { label: 'מוכרים מאומתים', href: '/cars/search?verifiedSeller=true' },
+          ].map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors text-center"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-brand-50 border-t border-brand-100">
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">

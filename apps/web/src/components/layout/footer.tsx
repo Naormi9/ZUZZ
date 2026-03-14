@@ -1,12 +1,25 @@
+'use client';
+
 import Link from 'next/link';
 
 const footerSections = [
   {
-    title: 'קטגוריות',
+    title: 'רכב',
     links: [
-      { label: 'רכב', href: '/cars' },
-      { label: 'נדל"ן', href: '/homes' },
-      { label: 'שוק', href: '/market' },
+      { label: 'כל הרכבים', href: '/cars' },
+      { label: 'חיפוש רכבים', href: '/cars/search' },
+      { label: 'טויוטה', href: '/cars/search?make=%D7%98%D7%95%D7%99%D7%95%D7%98%D7%94' },
+      { label: 'יונדאי', href: '/cars/search?make=%D7%99%D7%95%D7%A0%D7%93%D7%90%D7%99' },
+      { label: 'קיה', href: '/cars/search?make=%D7%A7%D7%99%D7%94' },
+      { label: 'רכבים חשמליים', href: '/cars/search?fuelType=electric' },
+    ],
+  },
+  {
+    title: 'נדל"ן ושוק',
+    links: [
+      { label: 'דירות למכירה', href: '/homes' },
+      { label: 'חיפוש נכסים', href: '/homes/search' },
+      { label: 'ZUZZ Market', href: '/market' },
     ],
   },
   {
@@ -14,26 +27,18 @@ const footerSections = [
     links: [
       { label: 'אודות', href: '/about' },
       { label: 'צור קשר', href: '/contact' },
-      { label: 'בלוג', href: '/blog' },
-      { label: 'דרושים', href: '/careers' },
+      { label: 'בטיחות ואמון', href: '/trust' },
+      { label: 'מדריך קניית רכב', href: '/guides/buying-car' },
+      { label: 'מדריך מכירת רכב', href: '/guides/selling-car' },
     ],
   },
   {
-    title: 'תמיכה',
+    title: 'תמיכה ומידע',
     links: [
-      { label: 'מרכז עזרה', href: '/help' },
-      { label: 'בטיחות ואמון', href: '/trust' },
       { label: 'תנאי שימוש', href: '/terms' },
       { label: 'מדיניות פרטיות', href: '/privacy' },
-    ],
-  },
-  {
-    title: 'למפרסמים',
-    links: [
+      { label: 'נגישות', href: '/accessibility' },
       { label: 'פרסם מודעה', href: '/cars/create' },
-      { label: 'פורטל סוחרים', href: '/cars' },
-      { label: 'חבילות קידום', href: '/cars' },
-      { label: 'מנויים עסקיים', href: '/cars' },
     ],
   },
 ] as const;
@@ -62,7 +67,7 @@ export function Footer() {
               המקום שבו עסקאות זזות באמת
             </p>
             <p className="mt-1 text-xs text-gray-400">
-              פלטפורמת המסחר המובילה בישראל
+              פלטפורמת המסחר המובילה בישראל — רכב, נדל&quot;ן ושוק עם תשתית אמון מובנית.
             </p>
           </div>
 
@@ -74,7 +79,7 @@ export function Footer() {
               </h3>
               <ul className="mt-3 space-y-2">
                 {section.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={`${link.href}-${link.label}`}>
                     <Link
                       href={link.href}
                       className="text-sm text-gray-600 transition-colors hover:text-gray-900"
