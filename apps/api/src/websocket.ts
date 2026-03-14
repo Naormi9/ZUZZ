@@ -65,12 +65,20 @@ export function setupWebSocket(io: Server) {
     });
 
     socket.on('typing', (data: { conversationId: string }) => {
-      if (user) {
-        socket.to(`conversation:${data.conversationId}`).emit('typing', {
-          userId: user.id,
-          conversationId: data.conversationId,
-        });
+      if (!user) {
+        socket.emit('error', { message: 'Authentication required' });
+        return;
       }
+      // Only emit typing if user has actually joined the conversation room
+      const roomName = `conversation:${data.conversationId}`;
+      if (!socket.rooms.has(roomName)) {
+        socket.emit('error', { message: 'Not a member of this conversation' });
+        return;
+      }
+      socket.to(roomName).emit('typing', {
+        userId: user.id,
+        conversationId: data.conversationId,
+      });
     });
 
     socket.on('disconnect', () => {

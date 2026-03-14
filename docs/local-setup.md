@@ -64,26 +64,77 @@ curl -X POST http://localhost:4000/api/auth/dev-login \
   -d '{"email": "admin@zuzz.co.il"}'
 ```
 
+## Running Tests
+
+```bash
+# Run all unit/integration tests
+pnpm test
+
+# Run API tests only
+pnpm --filter @zuzz/api test
+
+# Run trust engine tests only
+pnpm --filter @zuzz/trust-engine test
+
+# Run E2E tests (requires running services — pnpm dev in another terminal)
+pnpm test:e2e
+
+# Run E2E with UI mode
+pnpm test:e2e:ui
+```
+
+## Linting & Type Checking
+
+```bash
+pnpm lint          # ESLint across all packages
+pnpm typecheck     # TypeScript checking across all packages
+pnpm format        # Auto-format with Prettier
+pnpm format:check  # Check formatting (used in CI)
+```
+
 ## Common Commands
 
 ```bash
 # Development
 pnpm dev           # Start all apps in dev mode
 pnpm build         # Build all packages
-pnpm lint          # Lint all packages
-pnpm typecheck     # Type-check all packages
-pnpm test          # Run tests
 
 # Database
-pnpm db:generate   # Generate Prisma client
-pnpm db:push       # Push schema changes
+pnpm db:generate   # Generate Prisma client after schema changes
+pnpm db:push       # Push schema changes (resets data!)
+pnpm db:migrate:dev -- --name describe_change  # Create migration
 pnpm db:seed       # Seed demo data
-pnpm db:studio     # Open Prisma Studio
+pnpm db:studio     # Open Prisma Studio GUI
 
 # Infrastructure
 pnpm docker:up     # Start Docker services
 pnpm docker:down   # Stop Docker services
 ```
+
+## Environment Variables
+
+See `.env.example` for the complete list with comments. Key variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `postgresql://zuzz:zuzz_dev@localhost:5432/zuzz_dev` | PostgreSQL connection |
+| `REDIS_URL` | `redis://localhost:6379` | Redis connection |
+| `AUTH_SECRET` | (placeholder) | JWT signing secret (min 32 chars) |
+| `STORAGE_ENDPOINT` | `http://localhost:9000` | MinIO/S3 endpoint |
+| `RATE_LIMIT_ENABLED` | `false` | Enable Redis-backed rate limiting |
+| `LOG_LEVEL` | `debug` | Pino log level |
+| `NODE_ENV` | `development` | Environment mode |
+
+## How Uploads Work in Dev
+
+Media files are stored locally in the `uploads/` directory at the API root. Files are served via Express static middleware. In production, uploads should use the S3/MinIO storage provider via the `@zuzz/storage` package.
+
+## How Auth Works in Dev
+
+1. Register or login triggers OTP generation (logged to console in dev)
+2. OTP is stored in the database with 10-minute expiry
+3. Use dev-login endpoint to skip OTP entirely
+4. JWT tokens expire after 7 days
 
 ## Troubleshooting
 
@@ -95,3 +146,9 @@ Run `pnpm db:generate` to generate the client.
 
 ### Port already in use
 Check for conflicting processes: `lsof -i :3000` / `lsof -i :4000`
+
+### Tests fail with import errors
+Ensure Prisma client is generated: `pnpm db:generate`
+
+### Upload directory missing
+The API creates `uploads/` automatically on startup. If permissions are wrong, create it manually: `mkdir -p apps/api/uploads`

@@ -70,7 +70,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   }
 }
 
-export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   try {
     const token =
       req.cookies?.token ||
@@ -78,7 +78,14 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
 
     if (token) {
       const payload = verifyToken(token);
-      req.user = payload;
+      // Verify user is still active in DB (prevents deactivated users from being recognized)
+      const user = await prisma.user.findUnique({
+        where: { id: payload.id },
+        select: { id: true, email: true, name: true, roles: true, isActive: true },
+      });
+      if (user && user.isActive) {
+        req.user = { id: user.id, email: user.email, name: user.name, roles: user.roles };
+      }
     }
   } catch {
     // Ignore auth errors for optional auth

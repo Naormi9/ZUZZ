@@ -41,6 +41,49 @@ vi.mock('@zuzz/database', () => {
       deleteMany: vi.fn(),
       createMany: vi.fn(),
     },
+    conversation: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+    },
+    message: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      updateMany: vi.fn(),
+    },
+    lead: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    favorite: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+    },
+    notification: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      updateMany: vi.fn(),
+      update: vi.fn(),
+    },
+    listingReport: {
+      create: vi.fn(),
+    },
+    moderationCase: {
+      create: vi.fn(),
+    },
+    recentlyViewed: {
+      upsert: vi.fn(),
+    },
+    listingStatusHistory: {
+      create: vi.fn(),
+    },
     $queryRaw: vi.fn(),
     $disconnect: vi.fn(),
   };

@@ -16,13 +16,15 @@ export class AppError extends Error {
   }
 }
 
-export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction) {
+  const requestId = req.requestId;
+
   if (err instanceof AppError) {
     if (err.statusCode >= 500) {
-      logger.error({ err, code: err.code }, err.message);
+      logger.error({ err, code: err.code, requestId }, err.message);
       captureException(err);
     } else {
-      logger.warn({ code: err.code, statusCode: err.statusCode }, err.message);
+      logger.warn({ code: err.code, statusCode: err.statusCode, requestId }, err.message);
     }
     return res.status(err.statusCode).json({
       success: false,
@@ -51,7 +53,18 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     });
   }
 
-  logger.error({ err }, 'Unhandled error');
+  // Multer file size errors
+  if (err && 'code' in err && (err as any).code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      success: false,
+      error: {
+        code: 'FILE_TOO_LARGE',
+        message: 'הקובץ גדול מדי (מקסימום 10MB)',
+      },
+    });
+  }
+
+  logger.error({ err, requestId, url: req.url, method: req.method }, 'Unhandled error');
   captureException(err);
 
   return res.status(500).json({
