@@ -1,5 +1,9 @@
 import { Server } from 'socket.io';
+import { prisma } from '@zuzz/database';
+import { createLogger } from '@zuzz/logger';
 import { verifyToken } from './middleware/auth';
+
+const logger = createLogger('api:websocket');
 
 export function setupWebSocket(io: Server) {
   io.use((socket, next) => {
@@ -19,11 +23,40 @@ export function setupWebSocket(io: Server) {
     const user = (socket as any).user;
     if (user) {
       socket.join(`user:${user.id}`);
+      logger.debug({ userId: user.id }, 'User connected to WebSocket');
     }
 
-    socket.on('join:conversation', (conversationId: string) => {
-      if (user) {
+    socket.on('join:conversation', async (conversationId: string) => {
+      if (!user) {
+        socket.emit('error', { message: 'Authentication required' });
+        return;
+      }
+
+      // Verify the user is a participant in this conversation
+      try {
+        const conversation = await prisma.conversation.findUnique({
+          where: { id: conversationId },
+          select: { buyerId: true, listing: { select: { userId: true } } },
+        });
+
+        if (!conversation) {
+          socket.emit('error', { message: 'Conversation not found' });
+          return;
+        }
+
+        const isBuyer = conversation.buyerId === user.id;
+        const isSeller = conversation.listing.userId === user.id;
+
+        if (!isBuyer && !isSeller) {
+          socket.emit('error', { message: 'Access denied' });
+          logger.warn({ userId: user.id, conversationId }, 'Unauthorized conversation join attempt');
+          return;
+        }
+
         socket.join(`conversation:${conversationId}`);
+      } catch (err) {
+        logger.error({ err, conversationId }, 'Error verifying conversation membership');
+        socket.emit('error', { message: 'Internal error' });
       }
     });
 
@@ -41,7 +74,9 @@ export function setupWebSocket(io: Server) {
     });
 
     socket.on('disconnect', () => {
-      // Cleanup handled automatically
+      if (user) {
+        logger.debug({ userId: user.id }, 'User disconnected from WebSocket');
+      }
     });
   });
 

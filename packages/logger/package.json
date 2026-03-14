@@ -1,0 +1,18 @@
+{
+  "name": "@zuzz/logger",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/ --ext .ts"
+  },
+  "dependencies": {
+    "pino": "^8.18.0",
+    "pino-pretty": "^10.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

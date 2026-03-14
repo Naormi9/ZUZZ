@@ -25,6 +25,39 @@ const envSchema = z.object({
   FEATURE_FLAGS_PROVIDER: z.enum(['local', 'launchdarkly']).default('local'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  SENTRY_DSN: z.string().url().optional(),
+  RATE_LIMIT_ENABLED: z.coerce.boolean().default(false),
+}).superRefine((data, ctx) => {
+  if (data.NODE_ENV === 'production') {
+    if (data.AUTH_SECRET.includes('change-me') || data.AUTH_SECRET.includes('dev-secret')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'AUTH_SECRET must not contain placeholder values in production',
+        path: ['AUTH_SECRET'],
+      });
+    }
+    if (data.STORAGE_ACCESS_KEY === 'minioadmin') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'STORAGE_ACCESS_KEY must not be default value in production',
+        path: ['STORAGE_ACCESS_KEY'],
+      });
+    }
+    if (data.MAPS_PROVIDER === 'mock') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'MAPS_PROVIDER must not be mock in production',
+        path: ['MAPS_PROVIDER'],
+      });
+    }
+    if (data.PAYMENT_PROVIDER === 'sandbox') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'PAYMENT_PROVIDER must not be sandbox in production',
+        path: ['PAYMENT_PROVIDER'],
+      });
+    }
+  }
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

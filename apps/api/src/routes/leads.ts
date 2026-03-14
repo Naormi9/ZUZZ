@@ -5,21 +5,35 @@ import { AppError } from '../middleware/error-handler';
 
 export const leadsRouter = Router();
 
+const VALID_LEAD_TYPES = ['contact', 'test_drive', 'inspection', 'financing', 'offer'] as const;
+const VALID_LEAD_STATUSES = ['new', 'contacted', 'qualified', 'converted', 'lost'] as const;
+
 // Create lead
 leadsRouter.post('/', authenticate, async (req, res, next) => {
   try {
     const { listingId, type, message, phone, email } = req.body;
 
+    if (!listingId) throw new AppError(400, 'INVALID', 'יש לספק מזהה מודעה');
+
+    const leadType = type || 'contact';
+    if (!VALID_LEAD_TYPES.includes(leadType)) {
+      throw new AppError(400, 'INVALID', 'סוג ליד לא תקין');
+    }
+
     const listing = await prisma.listing.findUnique({ where: { id: listingId } });
     if (!listing) throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+
+    if (listing.userId === req.user!.id) {
+      throw new AppError(400, 'INVALID', 'לא ניתן ליצור ליד למודעה שלך');
+    }
 
     const lead = await prisma.lead.create({
       data: {
         listingId,
         buyerId: req.user!.id,
         sellerId: listing.userId,
-        type: type || 'contact',
-        message,
+        type: leadType,
+        message: message?.slice(0, 1000),
         phone,
         email,
       },
@@ -72,11 +86,16 @@ leadsRouter.patch('/:id/status', authenticate, async (req, res, next) => {
       throw new AppError(404, 'NOT_FOUND', 'ליד לא נמצא');
     }
 
+    const newStatus = req.body.status;
+    if (!VALID_LEAD_STATUSES.includes(newStatus)) {
+      throw new AppError(400, 'INVALID', 'סטטוס לא תקין');
+    }
+
     const updated = await prisma.lead.update({
       where: { id: req.params.id },
       data: {
-        status: req.body.status,
-        respondedAt: req.body.status === 'contacted' ? new Date() : undefined,
+        status: newStatus,
+        respondedAt: newStatus === 'contacted' ? new Date() : undefined,
       },
     });
 
