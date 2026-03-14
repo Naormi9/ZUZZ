@@ -176,6 +176,22 @@ Prefer focused subagents with narrow responsibilities:
 - E2E: Playwright tests for cars flow
 - All tests run via `pnpm test` in CI
 
+## SEO & Growth Architecture
+- robots.txt via Next.js route handler (blocks /api, /dashboard, /auth, /create)
+- Sitemap with static pages, cars-by-make, cars-by-city, homes-by-city
+- Dynamic metadata for car detail pages (make/model/year/price in title)
+- Vehicle JSON-LD structured data on car listings
+- Organization + WebSite JSON-LD globally
+- Canonical URLs on all pages
+- noindex on dashboard, auth, create pages and heavily-filtered search pages (3+ filters)
+- Open Graph and Twitter Card metadata on all key pages
+- Breadcrumbs on car detail and search pages
+- Internal linking grid: makes, cities, fuel types on cars pages
+- Editorial foundation: buying guide, selling guide, trust page, about page
+- Articles API: GET /api/articles, GET /api/articles/:slug
+- SEO utility library: apps/web/src/lib/seo.ts, apps/web/src/lib/json-ld.ts
+- Full documentation: docs/seo.md
+
 ## Documentation
 - docs/architecture.md — System architecture
 - docs/local-setup.md — Local dev setup
@@ -183,6 +199,7 @@ Prefer focused subagents with narrow responsibilities:
 - docs/staging-deploy.md — Staging deployment guide
 - docs/production-checklist.md — Production readiness checklist
 - docs/runbooks.md — Operational runbooks
+- docs/seo.md — SEO architecture, metadata rules, indexing policy
 
 ## Deployment readiness
 - Environment validated eagerly on API startup (fail-fast)

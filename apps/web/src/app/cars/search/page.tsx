@@ -184,6 +184,32 @@ function CarsSearchPage() {
 
   const activeFilterCount = [make, model, yearFrom, priceTo, fuelType, gearbox, maxMileage, maxHand, evOnly, verifiedSeller, noAccidents].filter(Boolean).length;
 
+  // Dynamic title and noindex for search pages
+  useEffect(() => {
+    const parts: string[] = [];
+    if (make) parts.push(make);
+    if (model) parts.push(model);
+    if (fuelType) {
+      const fuelLabels: Record<string, string> = { petrol: 'בנזין', diesel: 'דיזל', hybrid: 'היברידי', electric: 'חשמלי', lpg: 'גז' };
+      parts.push(fuelLabels[fuelType] ?? fuelType);
+    }
+    const suffix = parts.length > 0 ? ` — ${parts.join(' ')}` : '';
+    document.title = `חיפוש רכבים${suffix} | ZUZZ`;
+
+    // noindex for heavily filtered pages (3+ params) to prevent index bloat
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    if (activeFilterCount >= 3) {
+      if (!metaRobots) {
+        metaRobots = document.createElement('meta');
+        metaRobots.setAttribute('name', 'robots');
+        document.head.appendChild(metaRobots);
+      }
+      metaRobots.setAttribute('content', 'noindex,follow');
+    } else if (metaRobots) {
+      metaRobots.setAttribute('content', 'index,follow');
+    }
+  }, [make, model, fuelType, activeFilterCount]);
+
   const filterContent = (
     <div className="space-y-6">
       {/* Make */}
@@ -363,9 +389,24 @@ function CarsSearchPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
+          {/* Breadcrumbs */}
+          <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-2">
+            <ol className="flex flex-wrap items-center gap-1">
+              <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
+              <li><span className="mx-1 text-gray-300">/</span></li>
+              <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
+              <li><span className="mx-1 text-gray-300">/</span></li>
+              <li className="text-gray-700 font-medium">
+                {make ? `${make}${model ? ` ${model}` : ''}` : 'חיפוש'}
+              </li>
+            </ol>
+          </nav>
+
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">חיפוש רכבים</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {make ? `רכבי ${make}${model ? ` ${model}` : ''} למכירה` : 'חיפוש רכבים'}
+              </h1>
               {!loading && (
                 <p className="text-sm text-gray-500 mt-1">
                   {total > 0 ? `${total.toLocaleString('he-IL')} תוצאות` : 'אין תוצאות'}
@@ -549,6 +590,31 @@ function CarsSearchPage() {
                 description="נסה לשנות את הסינון או להרחיב את החיפוש"
               />
             )}
+
+            {/* Internal links section — always visible for SEO */}
+            <section className="mt-12 border-t border-gray-200 pt-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">חיפושים פופולריים</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {['טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה', 'BMW', 'מרצדס', 'טסלה'].map((m) => (
+                  <a
+                    key={m}
+                    href={`/cars/search?make=${encodeURIComponent(m)}`}
+                    className="text-sm text-brand-600 hover:text-brand-800 hover:underline py-1"
+                  >
+                    רכבי {m} למכירה
+                  </a>
+                ))}
+                {['תל אביב', 'ירושלים', 'חיפה', 'באר שבע'].map((c) => (
+                  <a
+                    key={c}
+                    href={`/cars/search?city=${encodeURIComponent(c)}`}
+                    className="text-sm text-brand-600 hover:text-brand-800 hover:underline py-1"
+                  >
+                    רכבים ב{c}
+                  </a>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       </div>

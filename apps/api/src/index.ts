@@ -50,6 +50,7 @@ import { adminRouter } from './routes/admin';
 import { analyticsRouter } from './routes/analytics';
 import { uploadRouter } from './routes/upload';
 import { healthRouter } from './routes/health';
+import { articlesRouter } from './routes/articles';
 import { errorHandler } from './middleware/error-handler';
 import { globalRateLimiter, authRateLimiter, uploadRateLimiter, messageRateLimiter, leadRateLimiter } from './middleware/rate-limiter';
 import { requestId } from './middleware/request-id';
@@ -111,6 +112,7 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/upload', uploadRateLimiter, uploadRouter);
+app.use('/api/articles', articlesRouter);
 
 // Error handling
 app.use(errorHandler);

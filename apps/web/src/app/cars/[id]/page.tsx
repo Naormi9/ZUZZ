@@ -38,6 +38,7 @@ import {
   Car,
   ClipboardCheck,
 } from 'lucide-react';
+import { CarDetailJsonLd } from './car-detail-jsonld';
 
 interface CarMedia {
   id: string;
@@ -249,6 +250,40 @@ export default function CarDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* JSON-LD structured data */}
+      <CarDetailJsonLd
+        data={listing ? {
+          id: listing.id,
+          title: listing.title,
+          description: listing.description,
+          make: car.make,
+          model: car.model,
+          year: car.year,
+          mileage: car.mileage,
+          gearbox: car.gearbox,
+          fuelType: car.fuelType,
+          color: car.color,
+          price: listing.price.amount,
+          currency: listing.price.currency,
+          city: listing.location.city,
+          imageUrl: listing.media[0]?.url,
+          sellerName: listing.seller.name,
+        } : null}
+      />
+
+      {/* Breadcrumbs */}
+      <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 pt-4 text-sm text-gray-500">
+        <ol className="flex flex-wrap items-center gap-1">
+          <li><Link href="/" className="hover:text-gray-700">ראשי</Link></li>
+          <li><span className="mx-1 text-gray-300">/</span></li>
+          <li><Link href="/cars" className="hover:text-gray-700">רכב</Link></li>
+          <li><span className="mx-1 text-gray-300">/</span></li>
+          <li><Link href={`/cars/search?make=${encodeURIComponent(car.make)}`} className="hover:text-gray-700">{car.make}</Link></li>
+          <li><span className="mx-1 text-gray-300">/</span></li>
+          <li className="text-gray-700 font-medium">{car.make} {car.model} {car.year}</li>
+        </ol>
+      </nav>
+
       {/* Image Gallery */}
       <div className="bg-black">
         <div className="max-w-5xl mx-auto relative">
@@ -660,6 +695,35 @@ export default function CarDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Related Links */}
+        <section className="mt-8 border-t border-gray-200 pt-6">
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/cars/search?make=${encodeURIComponent(car.make)}`}
+              className="text-sm text-brand-600 hover:text-brand-800 hover:underline"
+            >
+              כל רכבי {car.make}
+            </Link>
+            <Link
+              href={`/cars/search?make=${encodeURIComponent(car.make)}&model=${encodeURIComponent(car.model)}`}
+              className="text-sm text-brand-600 hover:text-brand-800 hover:underline"
+            >
+              {car.make} {car.model} למכירה
+            </Link>
+            {listing.location.city && (
+              <Link
+                href={`/cars/search?city=${encodeURIComponent(listing.location.city)}`}
+                className="text-sm text-brand-600 hover:text-brand-800 hover:underline"
+              >
+                רכבים ב{listing.location.city}
+              </Link>
+            )}
+            <Link href="/cars" className="text-sm text-brand-600 hover:text-brand-800 hover:underline">
+              כל הרכבים
+            </Link>
+          </div>
+        </section>
 
         {/* Similar Cars */}
         {similarCars.length > 0 && (
