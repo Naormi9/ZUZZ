@@ -221,6 +221,11 @@ Prefer focused subagents with narrow responsibilities:
 - docs/staging-deploy.md — Staging deployment guide
 - docs/production-checklist.md — Production readiness checklist
 - docs/runbooks.md — Operational runbooks
+- docs/go-live-runbook.md — Step-by-step go-live procedure
+- docs/post-deploy-smoke-tests.md — Post-deploy verification checklist
+- docs/rollback-recovery.md — Rollback and recovery procedures
+- docs/known-limitations.md — Known gaps and when they become blocking
+- docs/launch-checklist.md — Launch day checklist
 - docs/seo.md — SEO architecture, metadata rules, indexing policy
 - docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
 
