@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Z -->
+  <text x="10" y="42" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="42" fill="#1B1B1B">Z</text>
+  <!-- U -->
+  <text x="40" y="42" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="42" fill="#323232">U</text>
+  <!-- ZZ -->
+  <text x="68" y="42" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="42" fill="#FC6E20">ZZ</text>
+  <!-- Arrow -->
+  <polygon points="130,21 142,26 130,31" fill="#FC6E20"/>
+  <!-- .co.il -->
+  <text x="144" y="30" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#FC6E20">.co.il</text>
+  <!-- Tagline -->
+  <text x="10" y="56" font-family="Arial, sans-serif" font-weight="400" font-size="9" fill="#323232">המקום שבו עסקאות זזות באמת.</text>
+</svg>

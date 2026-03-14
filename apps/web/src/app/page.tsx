@@ -8,7 +8,7 @@ const verticals = [
     description: 'מכוניות, אופנועים וכלי רכב מסחריים עם דירוג אמון מובנה',
     href: '/cars',
     icon: '🚗',
-    color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+    color: 'bg-brand-50 hover:bg-brand-100 border-brand-200',
   },
   {
     title: 'נדל"ן',
@@ -53,16 +53,16 @@ export default function HomePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-brand-600 to-brand-800 text-white">
+      <section className="bg-gradient-to-b from-brand-black to-brand-charcoal text-white">
         <div className="container-app py-16 sm:py-24 lg:py-32">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               ZUZZ
             </h1>
-            <p className="mt-4 text-xl text-brand-100 sm:text-2xl">
+            <p className="mt-4 text-xl text-brand-cream sm:text-2xl">
               המקום שבו עסקאות זזות באמת
             </p>
-            <p className="mt-2 text-base text-brand-200">
+            <p className="mt-2 text-base text-gray-400">
               פלטפורמת המסחר המובילה בישראל — עם תשתית אמון מובנית
             </p>
 
@@ -81,7 +81,7 @@ export default function HomePage() {
                   />
                   <button
                     type="submit"
-                    className="m-2 flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+                    className="m-2 flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-600"
                   >
                     <Search className="h-4 w-4" />
                     <span>חיפוש</span>
@@ -128,7 +128,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900">מודעות מובחרות</h2>
             <Link
               href="/cars/search"
-              className="text-sm font-medium text-brand-600 hover:text-brand-700"
+              className="text-sm font-medium text-brand-700 hover:text-brand-800"
             >
               הצג הכל ←
             </Link>
@@ -181,7 +181,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-brand-600 py-16 text-white">
+      <section className="bg-brand-500 py-16 text-white">
         <div className="container-app text-center">
           <h2 className="text-2xl font-bold sm:text-3xl">
             מוכנים להתחיל?

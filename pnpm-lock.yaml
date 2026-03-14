@@ -111,6 +111,9 @@ importers:
       '@zuzz/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@zuzz/email':
+        specifier: workspace:*
+        version: link:../../packages/email
       '@zuzz/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -120,6 +123,9 @@ importers:
       '@zuzz/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
+      '@zuzz/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
       '@zuzz/trust-engine':
         specifier: workspace:*
         version: link:../../packages/trust-engine

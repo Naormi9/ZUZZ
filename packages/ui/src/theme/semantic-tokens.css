@@ -1,0 +1,66 @@
+/*
+ * ZUZZ Semantic Design Tokens
+ *
+ * These CSS custom properties map brand tokens to semantic UI roles.
+ * Import in both apps/web and apps/admin globals.css.
+ *
+ * Brand palette:
+ *   black:    #1B1B1B
+ *   charcoal: #323232
+ *   cream:    #FFE7D0
+ *   orange:   #FC6E20
+ *
+ * Contrast safety (on white):
+ *   brand-500 (#FC6E20): 3.0:1 — OK for large text, icons, UI components
+ *   brand-600 (#E55A0D): 3.7:1 — OK for large/bold text
+ *   brand-700 (#C04A0A): 5.0:1 — AA for normal text (use for small text links)
+ *   brand-black (#1B1B1B): 17.6:1 — AAA
+ *   brand-charcoal (#323232): 12.6:1 — AAA
+ */
+
+:root {
+  /* ── Background ── */
+  --color-bg-default: #ffffff;
+  --color-bg-subtle: #f9fafb;
+  --color-bg-inverse: #1B1B1B;
+  --color-bg-cream: #FFE7D0;
+
+  /* ── Surface ── */
+  --color-surface-default: #ffffff;
+  --color-surface-subtle: #f3f4f6;
+  --color-surface-elevated: #ffffff;
+
+  /* ── Text ── */
+  --color-text-primary: #1B1B1B;
+  --color-text-secondary: #323232;
+  --color-text-tertiary: #6b7280;
+  --color-text-inverse: #ffffff;
+  --color-text-muted: #9ca3af;
+
+  /* ── Border ── */
+  --color-border-default: #e5e7eb;
+  --color-border-muted: #f3f4f6;
+  --color-border-strong: #323232;
+
+  /* ── Action (primary = brand-orange) ── */
+  --color-action-primary: #FC6E20;
+  --color-action-primary-hover: #E55A0D;
+  --color-action-primary-active: #C04A0A;
+  --color-action-secondary: #1B1B1B;
+  --color-action-secondary-hover: #323232;
+
+  /* ── Accent ── */
+  --color-accent: #FC6E20;
+  --color-accent-subtle: #FFF4EB;
+
+  /* ── Status ── */
+  --color-success: #16a34a;
+  --color-success-subtle: #f0fdf4;
+  --color-warning: #d97706;
+  --color-warning-subtle: #fffbeb;
+  --color-error: #dc2626;
+  --color-error-subtle: #fef2f2;
+
+  /* ── Focus ── */
+  --color-focus-ring: #FC6E20;
+}

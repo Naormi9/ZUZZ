@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     'פלטפורמת המסחר המובילה בישראל. רכב, נדל"ן ושוק — עם תשתית אמון מובנית.',
   keywords: ['לוח מודעות', 'רכב', 'נדלן', 'שוק', 'ישראל', 'ZUZZ'],
+  icons: {
+    icon: '/brand/favicon.svg',
+  },
 };
 
 export default function RootLayout({

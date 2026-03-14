@@ -262,8 +262,8 @@ export default function CreateCarPage() {
             key={s.step}
             onClick={() => s.step <= currentStep && listingId && setCurrentStep(s.step)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-              s.step === currentStep ? 'bg-blue-600 text-white' :
-              s.step < currentStep ? 'bg-blue-100 text-blue-700' :
+              s.step === currentStep ? 'bg-brand-500 text-white' :
+              s.step < currentStep ? 'bg-brand-100 text-brand-700' :
               'bg-gray-100 text-gray-400'
             }`}
           >
@@ -426,7 +426,7 @@ export default function CreateCarPage() {
                         <X className="h-3 w-3" />
                       </button>
                       {idx === 0 && (
-                        <span className="absolute bottom-1 left-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded">ראשית</span>
+                        <span className="absolute bottom-1 left-1 bg-brand-500 text-white text-[10px] px-1.5 py-0.5 rounded">ראשית</span>
                       )}
                     </div>
                   ))}
@@ -435,10 +435,10 @@ export default function CreateCarPage() {
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 transition-colors"
+                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand-400 transition-colors"
               >
                 {uploading ? (
-                  <Loader2 className="w-12 h-12 mx-auto text-blue-500 animate-spin mb-3" />
+                  <Loader2 className="w-12 h-12 mx-auto text-brand-500 animate-spin mb-3" />
                 ) : (
                   <Upload className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                 )}
@@ -491,10 +491,10 @@ export default function CreateCarPage() {
                 </div>
                 <div
                   onClick={() => docInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-brand-400 transition-colors"
                 >
                   {uploading ? (
-                    <Loader2 className="w-8 h-8 mx-auto text-blue-500 animate-spin mb-2" />
+                    <Loader2 className="w-8 h-8 mx-auto text-brand-500 animate-spin mb-2" />
                   ) : (
                     <Upload className="w-8 h-8 mx-auto text-gray-300 mb-2" />
                   )}
@@ -525,7 +525,7 @@ export default function CreateCarPage() {
                   />
                 )}
                 <h3 className="font-bold text-lg">{formData.make} {formData.model} {formData.trim} {formData.year}</h3>
-                <p className="text-xl font-bold text-blue-600 mt-1">\u20AA{formData.priceAmount.toLocaleString()}</p>
+                <p className="text-xl font-bold text-brand-500 mt-1">\u20AA{formData.priceAmount.toLocaleString()}</p>
                 {formData.isNegotiable && <Badge variant="secondary" className="mt-1">ניתן למשא ומתן</Badge>}
                 <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
                   <div><span className="text-gray-500">קילומטראז׳:</span> {formData.mileage.toLocaleString()}</div>
@@ -541,9 +541,9 @@ export default function CreateCarPage() {
                 )}
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4 text-sm text-blue-800">
+              <div className="bg-brand-50 rounded-lg p-4 text-sm text-brand-800">
                 <p className="font-medium">לפני הפרסום:</p>
-                <ul className="mt-1 space-y-1 text-blue-700">
+                <ul className="mt-1 space-y-1 text-brand-700">
                   <li>&#x2022; ציון האמון יחושב אוטומטית</li>
                   <li>&#x2022; המודעה תפורסם מיידית</li>
                   <li>&#x2022; ניתן לערוך גם לאחר הפרסום</li>
@@ -575,7 +575,7 @@ function Checkbox({ label, checked, onChange }: { label: string; checked: boolea
   return (
     <label className="flex items-center gap-3 cursor-pointer">
       <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)}
-        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+        className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
       <span className="text-sm text-gray-700">{label}</span>
     </label>
   );

@@ -7,7 +7,7 @@ import { Skeleton } from '@zuzz/ui';
 import { adminApi, type DashboardMetrics } from '@/lib/api';
 
 const metricCards = [
-  { key: 'totalUsers' as const, label: 'סה"כ משתמשים', icon: '👥', color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'totalUsers' as const, label: 'סה"כ משתמשים', icon: '👥', color: 'text-brand-500', bg: 'bg-brand-50' },
   { key: 'activeListings' as const, label: 'מודעות פעילות', icon: '📋', color: 'text-green-600', bg: 'bg-green-50' },
   { key: 'pendingModeration' as const, label: 'ממתין למודרציה', icon: '⏳', color: 'text-yellow-600', bg: 'bg-yellow-50' },
   { key: 'openReports' as const, label: 'דיווחים פתוחים', icon: '🚩', color: 'text-red-600', bg: 'bg-red-50' },

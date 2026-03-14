@@ -1,18 +1,14 @@
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
+import crypto from 'crypto';
 import { prisma } from '@zuzz/database';
 import { createLogger } from '@zuzz/logger';
 import { authenticate } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { getStorage } from '../lib/storage';
 
 const logger = createLogger('api:upload');
-
-const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
 
 // Allowed MIME types and corresponding extensions
 const ALLOWED_MEDIA_TYPES: Record<string, string[]> = {
@@ -36,22 +32,18 @@ function validateFileExtension(file: Express.Multer.File, allowedTypes: Record<s
   return mimeExtensions.includes(ext);
 }
 
-function sanitizeFilename(originalname: string): string {
-  // Remove path traversal attempts and special chars
-  const base = path.basename(originalname).replace(/[^a-zA-Z0-9._-]/g, '_');
-  const ext = path.extname(base).toLowerCase();
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+function generateStorageKey(prefix: string, originalname: string): string {
+  const ext = path.extname(originalname).toLowerCase();
+  const hash = crypto.randomBytes(8).toString('hex');
+  const timestamp = Date.now();
+  return `${prefix}/${timestamp}-${hash}${ext}`;
 }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    cb(null, sanitizeFilename(file.originalname));
-  },
-});
+// Use memory storage so files go to buffer, then we push to the storage provider
+const memoryStorage = multer.memoryStorage();
 
 const mediaUpload = multer({
-  storage,
+  storage: memoryStorage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MEDIA_TYPES[file.mimetype]) {
@@ -67,7 +59,7 @@ const mediaUpload = multer({
 });
 
 const documentUpload = multer({
-  storage,
+  storage: memoryStorage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_DOCUMENT_TYPES[file.mimetype]) {
@@ -105,23 +97,35 @@ uploadRouter.post('/listing/:listingId/media', authenticate, mediaUpload.array('
       throw new AppError(400, 'TOO_MANY_FILES', `ניתן להעלות עד ${MAX_MEDIA_FILES} קבצים`);
     }
 
+    const storage = getStorage();
+
     const media = await Promise.all(
-      files.map((file, index) =>
-        prisma.listingMedia.create({
+      files.map(async (file, index) => {
+        const key = generateStorageKey(`listings/${req.params.listingId}/media`, file.originalname);
+
+        const result = await storage.upload({
+          key,
+          body: file.buffer,
+          contentType: file.mimetype,
+          isPublic: true,
+          maxSize: MAX_FILE_SIZE,
+        });
+
+        return prisma.listingMedia.create({
           data: {
             listingId: req.params.listingId!,
-            url: `/uploads/${file.filename}`,
-            thumbnailUrl: `/uploads/${file.filename}`,
+            url: result.url,
+            thumbnailUrl: result.url, // TODO: generate actual thumbnails
             type: 'image',
             mimeType: file.mimetype,
-            size: file.size,
+            size: result.size,
             order: existingCount + index,
           },
-        }),
-      ),
+        });
+      }),
     );
 
-    logger.info({ listingId: req.params.listingId, count: files.length }, 'Media uploaded');
+    logger.info({ listingId: req.params.listingId, count: files.length }, 'Media uploaded via storage provider');
     res.json({ success: true, data: media });
   } catch (err) {
     next(err);
@@ -147,16 +151,27 @@ uploadRouter.post('/listing/:listingId/document', authenticate, documentUpload.s
       throw new AppError(400, 'INVALID_DOC_TYPE', 'סוג מסמך לא תקין');
     }
 
+    const storage = getStorage();
+    const key = generateStorageKey(`listings/${req.params.listingId}/documents`, file.originalname);
+
+    const result = await storage.upload({
+      key,
+      body: file.buffer,
+      contentType: file.mimetype,
+      isPublic: false, // Documents are not publicly accessible by default
+      maxSize: MAX_FILE_SIZE,
+    });
+
     const doc = await prisma.listingDocument.create({
       data: {
         listingId: req.params.listingId!,
         type: docType,
-        url: `/uploads/${file.filename}`,
+        url: result.url,
         name: file.originalname.slice(0, 255),
       },
     });
 
-    logger.info({ listingId: req.params.listingId, type: docType }, 'Document uploaded');
+    logger.info({ listingId: req.params.listingId, type: docType }, 'Document uploaded via storage provider');
     res.json({ success: true, data: doc });
   } catch (err) {
     next(err);
@@ -175,14 +190,23 @@ uploadRouter.delete('/media/:id', authenticate, async (req, res, next) => {
       throw new AppError(404, 'NOT_FOUND', 'קובץ לא נמצא');
     }
 
-    await prisma.listingMedia.delete({ where: { id: req.params.id } });
-
-    // Try to delete file from disk — only from uploads dir (prevent path traversal)
-    const filename = path.basename(media.url);
-    const filePath = path.join(UPLOAD_DIR, filename);
-    if (filePath.startsWith(UPLOAD_DIR) && fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Try to delete from storage provider
+    try {
+      const storage = getStorage();
+      // Extract key from URL — the key is the path after the bucket/base URL
+      const url = media.url;
+      // For S3 URLs the key is embedded in the URL path; for local it's the relative path
+      // We try to extract it; worst case we just delete the DB record
+      const urlObj = new URL(url, 'http://localhost');
+      const key = urlObj.pathname.replace(/^\//, '');
+      if (key) {
+        await storage.delete(key);
+      }
+    } catch (err) {
+      logger.warn({ mediaId: req.params.id, err }, 'Failed to delete file from storage, DB record will still be removed');
     }
+
+    await prisma.listingMedia.delete({ where: { id: req.params.id } });
 
     res.json({ success: true });
   } catch (err) {

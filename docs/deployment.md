@@ -85,7 +85,7 @@ Use `/api/health/ready` for load balancer readiness checks.
 ## Deployment Checklist
 
 ### Pre-deploy
-- [ ] All CI checks pass (lint, typecheck, test, build)
+- [ ] All CI checks pass (lint, typecheck, test, build, e2e)
 - [ ] Database migrations applied
 - [ ] Environment variables set (especially `AUTH_SECRET`, `STORAGE_*`, `NODE_ENV=production`)
 - [ ] `RATE_LIMIT_ENABLED=true`
@@ -114,9 +114,30 @@ ghcr.io/<org>/zuzz-admin:staging
 
 Staging can use `NODE_ENV=production` with a staging database to test production behavior.
 
+## Email
+
+Email is wired via `@zuzz/email` with SMTP support. When `SMTP_HOST` is set, emails are sent via SMTP (nodemailer). When unset, falls back to console logging (dev only).
+
+For production, set these in your environment:
+```
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
+SMTP_FROM=noreply@zuzz.co.il
+```
+
+OTP and welcome emails are automatically sent during auth flows.
+
+## Storage
+
+Upload storage uses the `@zuzz/storage` abstraction. When `STORAGE_ENDPOINT`, `STORAGE_ACCESS_KEY`, and `STORAGE_SECRET_KEY` are set, uploads go to S3/MinIO. When unset, falls back to local filesystem (`uploads/` directory).
+
+Media files are stored under `listings/{listingId}/media/` keys. Documents use `listings/{listingId}/documents/`.
+
 ## Known Deferred Items
 
-- Email sending is not yet wired to a real SMTP/provider in production
 - Vehicle registry API integration is mocked
 - Maps provider defaults to mock
 - Payment provider defaults to sandbox

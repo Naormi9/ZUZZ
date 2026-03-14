@@ -88,8 +88,17 @@ export function AdminSidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-gray-200 px-6">
         <Link href="/admin" className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-blue-600">ZUZZ</span>
-          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+          <img
+            src="/brand/logo-mark.svg"
+            alt="ZUZZ"
+            className="h-7 w-auto"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+          <span className="hidden text-2xl font-bold text-brand-black">ZUZZ</span>
+          <span className="rounded bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
             ניהול
           </span>
         </Link>
@@ -104,12 +113,12 @@ export function AdminSidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'bg-blue-50 text-blue-700'
+                    ? 'bg-brand-50 text-brand-700'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
                 <span
-                  className={isActive(item.href) ? 'text-blue-600' : 'text-gray-400'}
+                  className={isActive(item.href) ? 'text-brand-500' : 'text-gray-400'}
                 >
                   {item.icon}
                 </span>

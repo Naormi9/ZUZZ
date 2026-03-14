@@ -23,7 +23,7 @@ export const otpTemplate: EmailTemplate<OtpEmailData> = {
     <p style="color: #333; font-size: 16px;">${greeting}</p>
     <p style="color: #333; font-size: 16px;">קוד האימות שלך הוא:</p>
     <div style="text-align: center; margin: 24px 0;">
-      <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1a73e8; background: #f0f4ff; padding: 12px 24px; border-radius: 8px; display: inline-block;">
+      <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #FC6E20; background: #FFF4EB; padding: 12px 24px; border-radius: 8px; display: inline-block;">
         ${data.code}
       </span>
     </div>

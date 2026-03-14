@@ -71,13 +71,13 @@ export default function CarsHomePage() {
   return (
     <div dir="rtl" className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-bl from-blue-700 via-blue-600 to-blue-800 text-white">
+      <section className="bg-gradient-to-bl from-brand-black via-brand-charcoal to-brand-black text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center mb-10">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
               מצא את הרכב הבא שלך
             </h1>
-            <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
               אלפי רכבים עם ציון אמון, מסמכים מאומתים ומוכרים מזוהים.
               עסקאות שזזות באמת.
             </p>
@@ -143,7 +143,7 @@ export default function CarsHomePage() {
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">רכבים מומלצים</h2>
-          <Link href="/cars/search" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+          <Link href="/cars/search" className="text-brand-700 hover:text-brand-800 text-sm font-medium">
             הצג הכל ←
           </Link>
         </div>
@@ -192,7 +192,7 @@ export default function CarsHomePage() {
         ) : (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">אין רכבים מומלצים כרגע</p>
-            <Link href="/cars/search" className="text-blue-600 hover:underline mt-2 inline-block">
+            <Link href="/cars/search" className="text-brand-500 hover:underline mt-2 inline-block">
               חפש רכבים
             </Link>
           </div>
@@ -207,7 +207,7 @@ export default function CarsHomePage() {
             <a
               key={make}
               href={`/cars/search?make=${encodeURIComponent(make)}`}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors"
             >
               {make}
             </a>
@@ -235,7 +235,7 @@ export default function CarsHomePage() {
             </div>
 
             <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                 </svg>
@@ -274,7 +274,7 @@ export default function CarsHomePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-blue-50 border-t border-blue-100">
+      <section className="bg-brand-50 border-t border-brand-100">
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">רוצה למכור את הרכב?</h2>
           <p className="text-gray-600 mb-6">פרסם מודעה ב-ZUZZ תוך דקות ותגיע לקונים רציניים.</p>

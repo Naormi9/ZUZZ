@@ -291,7 +291,7 @@ export default function CarDetailPage() {
                       key={media.id}
                       onClick={() => setActiveImage(idx)}
                       className={`flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${
-                        idx === activeImage ? 'border-blue-500' : 'border-transparent opacity-70 hover:opacity-100'
+                        idx === activeImage ? 'border-brand-500' : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
                     >
                       <img
@@ -354,7 +354,7 @@ export default function CarDetailPage() {
 
               {/* Price */}
               <div className="mt-4 flex items-center gap-3">
-                <span className="text-3xl font-bold text-blue-600">
+                <span className="text-3xl font-bold text-brand-500">
                   {listing.price.currency === 'ILS' ? '₪' : '$'}
                   {listing.price.amount.toLocaleString('he-IL')}
                 </span>
@@ -497,7 +497,7 @@ export default function CarDetailPage() {
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-blue-500" />
+                    <Shield className="h-5 w-5 text-brand-500" />
                     גורמי אמון
                   </h2>
                   <div className="space-y-3">
@@ -579,7 +579,7 @@ export default function CarDetailPage() {
                           placeholder="הודעה (אופציונלי)"
                           value={leadMessage}
                           onChange={(e) => setLeadMessage(e.target.value)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none"
                           rows={3}
                         />
                         <Button
@@ -614,7 +614,7 @@ export default function CarDetailPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-gray-900">{listing.seller.name}</span>
                       {listing.seller.isVerified && (
-                        <Badge className="text-xs bg-blue-100 text-blue-700">מאומת</Badge>
+                        <Badge className="text-xs bg-brand-50 text-brand-700">מאומת</Badge>
                       )}
                       {listing.seller.isDealer && (
                         <Badge className="text-xs bg-purple-100 text-purple-700">סוחר</Badge>

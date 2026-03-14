@@ -70,7 +70,16 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-blue-600">ZUZZ</h1>
+            <img
+              src="/brand/logo-mark.svg"
+              alt="ZUZZ"
+              className="h-10 mx-auto"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <h1 className="hidden text-2xl font-bold text-brand-500">ZUZZ</h1>
             <p className="text-gray-500 mt-1">
               {mode === 'verify' ? 'הזן את הקוד שנשלח לאימייל' : mode === 'register' ? 'הרשמה' : 'התחברות'}
             </p>
@@ -85,7 +94,7 @@ export default function LoginPage() {
               <p className="text-sm text-gray-600 text-center">קוד נשלח אל <strong>{email}</strong></p>
               <Input label="קוד אימות" placeholder="123456" value={code} onChange={e => setCode(e.target.value)} maxLength={6} className="text-center text-lg tracking-wider" />
               <Button className="w-full" onClick={handleVerify} loading={loading}>אימות</Button>
-              <button onClick={() => setMode('login')} className="text-sm text-blue-600 hover:underline w-full text-center">
+              <button onClick={() => setMode('login')} className="text-sm text-brand-700 hover:underline w-full text-center">
                 חזרה
               </button>
             </div>
@@ -96,7 +105,7 @@ export default function LoginPage() {
               <Button className="w-full" onClick={handleRegister} loading={loading}>הרשמה</Button>
               <p className="text-sm text-center text-gray-500">
                 כבר רשום?{' '}
-                <button onClick={() => setMode('login')} className="text-blue-600 hover:underline">התחבר</button>
+                <button onClick={() => setMode('login')} className="text-brand-500 hover:underline">התחבר</button>
               </p>
             </div>
           ) : (
@@ -106,7 +115,7 @@ export default function LoginPage() {
               <Button className="w-full" variant="ghost" onClick={handleDevLogin} loading={loading}>כניסה מהירה (פיתוח)</Button>
               <p className="text-sm text-center text-gray-500">
                 אין חשבון?{' '}
-                <button onClick={() => setMode('register')} className="text-blue-600 hover:underline">הרשם עכשיו</button>
+                <button onClick={() => setMode('register')} className="text-brand-500 hover:underline">הרשם עכשיו</button>
               </p>
             </div>
           )}

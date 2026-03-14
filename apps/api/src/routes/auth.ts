@@ -3,8 +3,10 @@ import { prisma } from '@zuzz/database';
 import { loginSchema, registerSchema, verifyOtpSchema } from '@zuzz/validation';
 import { generateOtp } from '@zuzz/shared-utils';
 import { createLogger } from '@zuzz/logger';
+import { otpTemplate, welcomeTemplate } from '@zuzz/email';
 import { signToken, authenticate } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { getEmail } from '../lib/email';
 
 const logger = createLogger('api:auth');
 
@@ -27,8 +29,24 @@ authRouter.post('/login', async (req, res, next) => {
       data: { userId: user.id, email, code, type: 'login', expiresAt },
     });
 
-    // TODO: Send email via email provider
-    logger.debug({ email, code }, 'OTP generated');
+    // Send OTP email
+    try {
+      const emailProvider = getEmail();
+      const templateData = { code, expiresInMinutes: 10, userName: user.name };
+      await emailProvider.send({
+        to: email,
+        subject: otpTemplate.subject(templateData),
+        html: otpTemplate.html(templateData),
+        text: otpTemplate.text(templateData),
+      });
+      logger.info({ email }, 'OTP email sent');
+    } catch (emailErr) {
+      logger.error({ email, err: emailErr }, 'Failed to send OTP email');
+      // In dev, log the code to console so dev can still work
+      if (process.env.NODE_ENV !== 'production') {
+        logger.debug({ email, code }, 'OTP code (email send failed, dev fallback)');
+      }
+    }
 
     res.json({ success: true, data: { message: 'קוד אימות נשלח לאימייל' } });
   } catch (err) {
@@ -68,7 +86,23 @@ authRouter.post('/register', async (req, res, next) => {
       data: { userId: user.id, email: data.email, code, type: 'login', expiresAt },
     });
 
-    logger.debug({ email: data.email, code }, 'OTP generated');
+    // Send OTP + welcome email
+    try {
+      const emailProvider = getEmail();
+      const templateData = { code, expiresInMinutes: 10, userName: data.name };
+      await emailProvider.send({
+        to: data.email,
+        subject: otpTemplate.subject(templateData),
+        html: otpTemplate.html(templateData),
+        text: otpTemplate.text(templateData),
+      });
+      logger.info({ email: data.email }, 'Registration OTP email sent');
+    } catch (emailErr) {
+      logger.error({ email: data.email, err: emailErr }, 'Failed to send registration OTP email');
+      if (process.env.NODE_ENV !== 'production') {
+        logger.debug({ email: data.email, code }, 'OTP code (email send failed, dev fallback)');
+      }
+    }
 
     res.status(201).json({
       success: true,
