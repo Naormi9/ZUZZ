@@ -162,9 +162,9 @@ describe('POST /api/auth/verify', () => {
     expect(res.body.data.user.email).toBe('test@example.com');
 
     // Should set httpOnly cookie
-    const cookies = res.headers['set-cookie'];
+    const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
     expect(cookies).toBeDefined();
-    expect(cookies.some((c: string) => c.startsWith('token='))).toBe(true);
+    expect(cookies!.some((c: string) => c.startsWith('token='))).toBe(true);
   });
 
   it('returns 400 for invalid OTP code', async () => {
@@ -352,9 +352,9 @@ describe('POST /api/auth/logout', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
 
-    const cookies = res.headers['set-cookie'];
+    const cookies = res.headers['set-cookie'] as unknown as string[] | undefined;
     expect(cookies).toBeDefined();
     // Cookie should be cleared (expires in the past or value empty)
-    expect(cookies.some((c: string) => c.startsWith('token='))).toBe(true);
+    expect(cookies!.some((c: string) => c.startsWith('token='))).toBe(true);
   });
 });

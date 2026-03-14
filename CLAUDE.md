@@ -143,6 +143,33 @@ Prefer focused subagents with narrow responsibilities:
 - qa-e2e
 - docs-devex
 
+## Security & hardening notes
+- Rate limiting is Redis-backed, controlled by `RATE_LIMIT_ENABLED` env var
+- Rate limiters exist for: global, auth, upload, messages, leads, reports
+- Analytics summary endpoint requires admin/moderator role
+- All user-scoped mutations have ownership checks
+- WebSocket conversation rooms require membership verification
+- Typing events require room membership
+- `optionalAuth` verifies user is active in DB (not just token validity)
+- Upload route validates MIME type + file extension match
+- Media reorder validates all media IDs belong to the listing
+- Report endpoint prevents self-reporting and duplicate reports
+- Request correlation IDs via `X-Request-ID` header
+- Multer file size errors return proper 413 status
+- `@zuzz/config` validates environment on startup with Zod, rejects unsafe production defaults
+
+## Test coverage
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4)
+- Trust engine: unit tests
+- E2E: Playwright tests for cars flow
+- All tests run via `pnpm test` in CI
+
+## Documentation
+- docs/architecture.md — System architecture
+- docs/local-setup.md — Local dev setup
+- docs/deployment.md — Deployment guide & checklist
+- docs/runbooks.md — Operational runbooks
+
 ## Non-goals
 - Do not turn this into a shallow clone
 - Do not optimize for ad clutter

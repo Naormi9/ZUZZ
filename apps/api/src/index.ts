@@ -40,7 +40,8 @@ import { analyticsRouter } from './routes/analytics';
 import { uploadRouter } from './routes/upload';
 import { healthRouter } from './routes/health';
 import { errorHandler } from './middleware/error-handler';
-import { globalRateLimiter, authRateLimiter, uploadRateLimiter } from './middleware/rate-limiter';
+import { globalRateLimiter, authRateLimiter, uploadRateLimiter, messageRateLimiter, leadRateLimiter } from './middleware/rate-limiter';
+import { requestId } from './middleware/request-id';
 import { setupWebSocket } from './websocket';
 
 const logger = createLogger('api');
@@ -58,6 +59,7 @@ const io = new SocketServer(httpServer, {
 });
 
 // Middleware
+app.use(requestId);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: [
@@ -68,7 +70,15 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(pinoHttp({ logger: logger as any, autoLogging: { ignore: (req) => (req as any).url === '/api/health/live' } }));
+app.use(pinoHttp({
+  logger: logger as any,
+  autoLogging: { ignore: (req) => (req as any).url === '/api/health/live' },
+  genReqId: (req) => (req as any).requestId,
+  serializers: {
+    req: (req) => ({ method: req.method, url: req.url, requestId: req.id }),
+    res: (res) => ({ statusCode: res.statusCode }),
+  },
+}));
 app.use(globalRateLimiter);
 
 // Serve uploaded files
@@ -84,8 +94,8 @@ app.use('/api/homes', homesRouter);
 app.use('/api/market', marketRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/favorites', favoritesRouter);
-app.use('/api/messages', messagesRouter);
-app.use('/api/leads', leadsRouter);
+app.use('/api/messages', messageRateLimiter, messagesRouter);
+app.use('/api/leads', leadRateLimiter, leadsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/analytics', analyticsRouter);

@@ -3,6 +3,7 @@ import { prisma } from '@zuzz/database';
 import { createListingBaseSchema, reportListingSchema } from '@zuzz/validation';
 import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { reportRateLimiter } from '../middleware/rate-limiter';
 import { serializeListingDetail } from '../serializers/listing';
 
 export const listingsRouter = Router();
@@ -123,13 +124,26 @@ listingsRouter.patch('/:id/status', authenticate, async (req, res, next) => {
 });
 
 // Report listing
-listingsRouter.post('/:id/report', authenticate, async (req, res, next) => {
+listingsRouter.post('/:id/report', authenticate, reportRateLimiter, async (req, res, next) => {
   try {
     const data = reportListingSchema.parse(req.body);
 
     const listing = await prisma.listing.findUnique({ where: { id: req.params.id } });
     if (!listing) {
       throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+    }
+
+    // Prevent users from reporting their own listings
+    if (listing.userId === req.user!.id) {
+      throw new AppError(400, 'INVALID', 'לא ניתן לדווח על מודעה שלך');
+    }
+
+    // Prevent duplicate reports from the same user on the same listing
+    const existingReport = await prisma.listingReport.findFirst({
+      where: { listingId: req.params.id!, reportedBy: req.user!.id },
+    });
+    if (existingReport) {
+      throw new AppError(409, 'ALREADY_REPORTED', 'כבר דיווחת על מודעה זו');
     }
 
     const report = await prisma.listingReport.create({

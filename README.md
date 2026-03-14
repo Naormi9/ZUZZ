@@ -21,6 +21,7 @@ A Hebrew-first, RTL-native, trust-centric classifieds and transaction platform f
 | ORM | Prisma |
 | Auth | JWT + Email OTP |
 | Realtime | Socket.IO |
+| CI | GitHub Actions |
 
 ## Quick Start
 
@@ -49,18 +50,28 @@ pnpm dev
 ## Commands
 
 ```bash
-pnpm dev           # Start all apps
-pnpm build         # Build all
-pnpm lint          # Lint
-pnpm typecheck     # Type-check
-pnpm test          # Run tests
-pnpm format        # Format code
-pnpm db:generate   # Generate Prisma client
-pnpm db:push       # Push schema to DB
-pnpm db:seed       # Seed demo data
-pnpm db:studio     # Open Prisma Studio
-pnpm docker:up     # Start infrastructure
-pnpm docker:down   # Stop infrastructure
+# Development
+pnpm dev               # Start all apps
+pnpm build             # Build all
+pnpm lint              # Lint (ESLint across all packages)
+pnpm typecheck         # Type-check all packages
+pnpm test              # Run unit/integration tests (vitest)
+pnpm test:e2e          # Run Playwright E2E tests
+pnpm format            # Format code with Prettier
+pnpm format:check      # Check formatting (CI)
+
+# Database
+pnpm db:generate       # Generate Prisma client
+pnpm db:push           # Push schema to DB (dev only)
+pnpm db:migrate:dev    # Create new migration (dev)
+pnpm db:migrate:deploy # Apply migrations (staging/production)
+pnpm db:migrate:status # Check migration status
+pnpm db:seed           # Seed demo data
+pnpm db:studio         # Open Prisma Studio
+
+# Infrastructure
+pnpm docker:up         # Start PostgreSQL, Redis, MinIO, MailHog
+pnpm docker:down       # Stop infrastructure
 ```
 
 ## Project Structure
@@ -74,27 +85,47 @@ packages/
   ui/           — Shared React components
   types/        — TypeScript types
   validation/   — Zod schemas
-  config/       — Environment config
+  config/       — Environment config with Zod validation
   database/     — Prisma schema & client
+  logger/       — Structured logging (Pino)
+  redis/        — Shared Redis client
   shared-utils/ — Utility functions
   trust-engine/ — Trust scoring system
   storage/      — S3 storage abstraction
-  email/        — Email provider
-  search/       — Search provider
+  email/        — Email provider abstraction
+  search/       — Search provider abstraction
   analytics/    — Event tracking
   feature-flags/— Feature flags
   integrations/ — External service adapters
 docs/           — Documentation
+e2e/            — Playwright E2E tests
 infrastructure/ — Docker configs, scripts
 ```
 
-## Architecture
+## Documentation
 
-See [docs/architecture.md](docs/architecture.md) for detailed architecture overview.
+| Document | Description |
+|----------|-------------|
+| [docs/architecture.md](docs/architecture.md) | System architecture overview |
+| [docs/local-setup.md](docs/local-setup.md) | Local development setup guide |
+| [docs/deployment.md](docs/deployment.md) | Deployment guide & checklist |
+| [docs/runbooks.md](docs/runbooks.md) | Operational runbooks |
 
-## Local Setup Guide
+## Testing
 
-See [docs/local-setup.md](docs/local-setup.md) for detailed setup instructions.
+- **Unit/Integration tests**: `pnpm test` — Uses vitest with mocked Prisma/Redis
+- **E2E tests**: `pnpm test:e2e` — Uses Playwright against running web + API
+- **Trust engine tests**: `pnpm --filter @zuzz/trust-engine test`
+
+## Security
+
+- JWT-based authentication with email OTP verification
+- Role-based access control (user, admin, moderator)
+- Redis-backed rate limiting on auth, uploads, messages, leads, reports
+- Request correlation IDs for log tracing
+- File upload validation (MIME type + extension matching)
+- Ownership checks on all user-scoped mutations
+- WebSocket room authorization for conversations
 
 ## License
 

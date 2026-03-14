@@ -194,14 +194,23 @@ uploadRouter.delete('/media/:id', authenticate, async (req, res, next) => {
 uploadRouter.put('/listing/:listingId/media/reorder', authenticate, async (req, res, next) => {
   try {
     const { order } = req.body;
-    if (!Array.isArray(order)) {
+    if (!Array.isArray(order) || order.length === 0) {
       throw new AppError(400, 'INVALID', 'סדר לא תקין');
     }
 
-    // Validate that all items belong to this listing and user owns it
+    // Validate listing ownership
     const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId } });
     if (!listing || listing.userId !== req.user!.id) {
       throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
+    }
+
+    // Verify all media IDs belong to this listing to prevent cross-listing manipulation
+    const mediaIds = order.map((item: { id: string; order: number }) => item.id);
+    const existingMedia = await prisma.listingMedia.count({
+      where: { id: { in: mediaIds }, listingId: req.params.listingId! },
+    });
+    if (existingMedia !== mediaIds.length) {
+      throw new AppError(400, 'INVALID', 'חלק מהקבצים אינם שייכים למודעה זו');
     }
 
     await Promise.all(

@@ -9,6 +9,13 @@ import { authRouter } from '../routes/auth';
 import { carsRouter } from '../routes/cars';
 import { healthRouter } from '../routes/health';
 import { uploadRouter } from '../routes/upload';
+import { messagesRouter } from '../routes/messages';
+import { leadsRouter } from '../routes/leads';
+import { favoritesRouter } from '../routes/favorites';
+import { listingsRouter } from '../routes/listings';
+import { notificationsRouter } from '../routes/notifications';
+import { analyticsRouter } from '../routes/analytics';
+import { adminRouter } from '../routes/admin';
 import { errorHandler } from '../middleware/error-handler';
 
 export function createTestApp() {
@@ -22,6 +29,13 @@ export function createTestApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/cars', carsRouter);
   app.use('/api/upload', uploadRouter);
+  app.use('/api/messages', messagesRouter);
+  app.use('/api/leads', leadsRouter);
+  app.use('/api/favorites', favoritesRouter);
+  app.use('/api/listings', listingsRouter);
+  app.use('/api/notifications', notificationsRouter);
+  app.use('/api/analytics', analyticsRouter);
+  app.use('/api/admin', adminRouter);
 
   // Error handling
   app.use(errorHandler);
