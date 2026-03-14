@@ -51,6 +51,9 @@ import { analyticsRouter } from './routes/analytics';
 import { uploadRouter } from './routes/upload';
 import { healthRouter } from './routes/health';
 import { articlesRouter } from './routes/articles';
+import { organizationsRouter } from './routes/organizations';
+import { promotionsRouter } from './routes/promotions';
+import { subscriptionsRouter } from './routes/subscriptions';
 import { errorHandler } from './middleware/error-handler';
 import { globalRateLimiter, authRateLimiter, uploadRateLimiter, messageRateLimiter, leadRateLimiter } from './middleware/rate-limiter';
 import { requestId } from './middleware/request-id';
@@ -113,6 +116,9 @@ app.use('/api/admin', adminRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/upload', uploadRateLimiter, uploadRouter);
 app.use('/api/articles', articlesRouter);
+app.use('/api/organizations', organizationsRouter);
+app.use('/api/promotions', promotionsRouter);
+app.use('/api/subscriptions', subscriptionsRouter);
 
 // Error handling
 app.use(errorHandler);

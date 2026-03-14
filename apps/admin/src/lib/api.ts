@@ -101,8 +101,18 @@ class AdminApiClient {
   }
 
   // Organizations
-  getOrganizations() {
-    return this.get<any[]>('/api/admin/organizations');
+  getOrganizations(params?: { status?: string }) {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    return this.get<any[]>(`/api/admin/organizations?${query.toString()}`);
+  }
+
+  getOrganization(id: string) {
+    return this.get<any>(`/api/admin/organizations/${id}`);
+  }
+
+  orgAction(orgId: string, action: 'approve' | 'reject' | 'suspend' | 'reactivate', reason?: string) {
+    return this.post(`/api/admin/organizations/${orgId}/action`, { action, reason });
   }
 
   // Feature Flags

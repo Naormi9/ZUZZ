@@ -171,7 +171,7 @@ Prefer focused subagents with narrow responsibilities:
 - Production config rejects: placeholder AUTH_SECRET, minioadmin storage creds, localhost URLs, disabled rate limiting, mock providers
 
 ## Test coverage
-- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4)
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (15), promotions (7), subscriptions (5)
 - Trust engine: unit tests
 - E2E: Playwright tests for cars flow
 - All tests run via `pnpm test` in CI
@@ -200,6 +200,18 @@ Prefer focused subagents with narrow responsibilities:
 - docs/production-checklist.md — Production readiness checklist
 - docs/runbooks.md — Operational runbooks
 - docs/seo.md — SEO architecture, metadata rules, indexing policy
+- docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
+
+## Dealer Portal
+- Organization model: create org → pending verification → admin approves/rejects → verified/suspended
+- Roles: owner, admin, member — with permission checks via `requireOrgMember()`
+- Dealer onboarding: `/dealer/onboarding` → POST /api/organizations
+- Dashboard: `/dashboard/dealer` — stats, inventory, leads, promotions, team, billing, settings
+- Public profile: `/dealers/[id]` — SEO-optimized with `generateMetadata()`
+- Promotion types: boost, highlight, featured, top_of_search, gallery
+- Subscription plans: free, basic, pro, enterprise (admin-assigned)
+- Admin tools: organization list with status filter, detail view, approve/reject/suspend/reactivate actions
+- API routes: /api/organizations, /api/promotions, /api/subscriptions
 
 ## Deployment readiness
 - Environment validated eagerly on API startup (fail-fast)
