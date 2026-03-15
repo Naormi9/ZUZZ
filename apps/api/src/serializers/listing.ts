@@ -1,26 +1,64 @@
-import type {
-  Listing,
-  ListingMedia,
-  ListingDocument,
-  TrustFactor,
-  CarListing,
-  PropertyListing,
-  MarketListing,
-  User,
-} from '@zuzz/database';
+/**
+ * Listing serializers for API responses.
+ * Uses inline types to avoid coupling to Prisma generated types.
+ */
 
-type ListingWithRelations = Listing & {
-  media?: ListingMedia[];
-  documents?: ListingDocument[];
-  trustFactors?: TrustFactor[];
-  carDetails?: CarListing | null;
-  propertyDetails?: PropertyListing | null;
-  marketDetails?: MarketListing | null;
-  user?: Pick<User, 'id' | 'name'> & {
+type ListingWithRelations = {
+  id: string;
+  title: string;
+  description: string | null;
+  priceAmount: number;
+  priceCurrency: string;
+  isNegotiable: boolean;
+  status: string;
+  vertical: string;
+  city: string | null;
+  region: string | null;
+  trustScore: number | null;
+  completenessScore: number;
+  isFeatured: boolean;
+  isPromoted: boolean;
+  viewCount: number;
+  favoriteCount: number;
+  createdAt: Date;
+  publishedAt: Date | null;
+  media?: Array<{
+    id: string;
+    url: string;
+    thumbnailUrl: string | null;
+    type: string;
+    order: number;
+    mimeType?: string | null;
+    size?: number | null;
+  }>;
+  documents?: Array<{
+    id: string;
+    type: string;
+    name: string;
+    url: string;
+    verificationStatus: string;
+    uploadedAt: Date;
+  }>;
+  trustFactors?: Array<{
+    type: string;
+    label: string;
+    labelHe: string | null;
+    status: string;
+    description: string | null;
+    category: string;
+    score: number;
+  }>;
+  carDetails?: Record<string, any> | null;
+  propertyDetails?: Record<string, any> | null;
+  marketDetails?: Record<string, any> | null;
+  user?: {
+    id: string;
+    name: string;
     createdAt?: Date;
-    profile?: any;
-    _count?: any;
-    organizationMembers?: any[];
+    avatarUrl?: string | null;
+    profile?: Record<string, any> | null;
+    _count?: Record<string, number>;
+    organizationMembers?: Array<{ organization: Record<string, any> }>;
   };
   isFavorited?: boolean;
 };
@@ -46,14 +84,14 @@ export function serializeListingCard(listing: ListingWithRelations) {
     vertical: listing.vertical,
     viewCount: listing.viewCount,
     favoriteCount: listing.favoriteCount,
-    media: media.map((m: ListingMedia) => ({
+    media: media.map((m) => ({
       id: m.id,
       url: m.url,
       thumbnailUrl: m.thumbnailUrl,
       type: m.type as 'image' | 'video',
       order: m.order,
     })),
-    trustFactors: trustFactors.map((f: TrustFactor) => ({
+    trustFactors: trustFactors.map((f) => ({
       key: f.type,
       label: f.labelHe || f.label,
       status: f.status,
@@ -81,7 +119,7 @@ export function serializeListingCard(listing: ListingWithRelations) {
   };
 }
 
-function serializeCarBrief(car: CarListing) {
+function serializeCarBrief(car: Record<string, any>) {
   return {
     make: car.make,
     model: car.model,
@@ -161,7 +199,7 @@ export function serializeListingDetail(listing: ListingWithRelations) {
             : []),
         ]
       : [],
-    documents: (listing.documents ?? []).map((d: ListingDocument) => ({
+    documents: (listing.documents ?? []).map((d) => ({
       id: d.id,
       type: d.type,
       label: getDocumentLabel(d.type),
@@ -176,7 +214,7 @@ export function serializeListingDetail(listing: ListingWithRelations) {
   };
 }
 
-function serializeSeller(user: any) {
+function serializeSeller(user: NonNullable<ListingWithRelations['user']>) {
   const profile = user.profile;
   const orgMember = user.organizationMembers?.[0];
   return {
@@ -219,7 +257,7 @@ function getDocumentLabel(type: string): string {
 export function serializeSearchResults(
   listings: ListingWithRelations[],
   pagination: { total: number; page: number; pageSize: number },
-  facets?: any[],
+  facets?: Array<{ field: string; label: string; values: Array<{ value: string; label: string; count: number }> }>,
 ) {
   return {
     items: listings.map(serializeListingCard),

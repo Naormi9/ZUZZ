@@ -39,7 +39,7 @@ favoritesRouter.get('/', authenticate, async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        data: favorites.map((f) => ({ ...f.listing, favoritedAt: f.createdAt })),
+        data: favorites.map((f: any) => ({ ...f.listing, favoritedAt: f.createdAt })),
         total,
         page,
         pageSize,
@@ -52,7 +52,7 @@ favoritesRouter.get('/', authenticate, async (req, res, next) => {
   }
 });
 
-// Toggle favorite
+// Toggle favorite (uses transaction to keep favoriteCount consistent)
 favoritesRouter.post('/:listingId', authenticate, async (req, res, next) => {
   try {
     const existing = await prisma.favorite.findUnique({
@@ -65,20 +65,24 @@ favoritesRouter.post('/:listingId', authenticate, async (req, res, next) => {
     });
 
     if (existing) {
-      await prisma.favorite.delete({ where: { id: existing.id } });
-      await prisma.listing.update({
-        where: { id: req.params.listingId! },
-        data: { favoriteCount: { decrement: 1 } },
-      });
+      await prisma.$transaction([
+        prisma.favorite.delete({ where: { id: existing.id } }),
+        prisma.listing.update({
+          where: { id: req.params.listingId! },
+          data: { favoriteCount: { decrement: 1 } },
+        }),
+      ]);
       res.json({ success: true, data: { isFavorited: false } });
     } else {
-      await prisma.favorite.create({
-        data: { userId: req.user!.id, listingId: req.params.listingId! },
-      });
-      await prisma.listing.update({
-        where: { id: req.params.listingId! },
-        data: { favoriteCount: { increment: 1 } },
-      });
+      await prisma.$transaction([
+        prisma.favorite.create({
+          data: { userId: req.user!.id, listingId: req.params.listingId! },
+        }),
+        prisma.listing.update({
+          where: { id: req.params.listingId! },
+          data: { favoriteCount: { increment: 1 } },
+        }),
+      ]);
       res.json({ success: true, data: { isFavorited: true } });
     }
   } catch (err) {

@@ -71,6 +71,9 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   private resolveKey(key: string): string {
+    if (key.includes('..') || key.startsWith('/') || key.startsWith('\\')) {
+      throw new Error('Invalid storage key: path traversal not allowed');
+    }
     return path.join(this.baseDir, key);
   }
 

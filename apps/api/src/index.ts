@@ -84,10 +84,26 @@ app.use(requestId);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(
   cors({
-    origin: [
-      process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001',
+      ].filter(Boolean);
+
+      // Allow requests with no origin (mobile apps, server-to-server, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.some((allowed) => origin === allowed)) {
+        return callback(null, true);
+      }
+
+      // Allow capacitor:// origin for mobile app
+      if (origin.startsWith('capacitor://')) {
+        return callback(null, true);
+      }
+
+      callback(new Error('CORS not allowed'));
+    },
     credentials: true,
   }),
 );

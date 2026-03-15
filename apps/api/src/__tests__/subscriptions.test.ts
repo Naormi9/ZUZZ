@@ -84,6 +84,14 @@ describe('POST /api/subscriptions/admin/assign', () => {
   it('assigns subscription as admin', async () => {
     mockAuthUser(testAdmin);
 
+    // Mock target user existence check
+    mockPrisma.user.findUnique.mockResolvedValueOnce({
+      id: 'target-user',
+      name: 'Target',
+      email: 'target@example.com',
+      isActive: true,
+    });
+
     mockPrisma.subscription.updateMany.mockResolvedValueOnce({ count: 0 });
     mockPrisma.subscription.create.mockResolvedValueOnce({
       id: 'sub-new',
