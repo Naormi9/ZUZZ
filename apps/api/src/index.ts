@@ -58,6 +58,9 @@ import { deviceTokensRouter } from './routes/device-tokens';
 import { savedSearchesRouter } from './routes/saved-searches';
 import { listingWatchesRouter } from './routes/listing-watches';
 import { checkoutRouter } from './routes/checkout';
+import { pushRouter } from './routes/push';
+import { growthRouter } from './routes/growth';
+import { paymentsRouter } from './routes/payments';
 import { errorHandler } from './middleware/error-handler';
 import {
   globalRateLimiter,
@@ -153,6 +156,9 @@ app.use('/api/device-tokens', deviceTokensRouter);
 app.use('/api/saved-searches', savedSearchesRouter);
 app.use('/api/listing-watches', listingWatchesRouter);
 app.use('/api/checkout', checkoutRouter);
+app.use('/api/push', pushRouter);
+app.use('/api/growth', growthRouter);
+app.use('/api/payments', paymentsRouter);
 
 // Error handling
 app.use(errorHandler);

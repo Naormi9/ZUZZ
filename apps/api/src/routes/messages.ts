@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '@zuzz/database';
 import { authenticate } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { notifyUser } from '../lib/push';
 
 export const messagesRouter = Router();
 
@@ -154,6 +155,17 @@ messagesRouter.post('/send', authenticate, async (req, res, next) => {
           : { buyerUnreadCount: { increment: 1 } }),
       },
     });
+
+    // Send push notification to the other party
+    const recipientId = isBuyer ? conv.sellerId : conv.buyerId;
+    notifyUser(
+      recipientId,
+      'new_message',
+      'הודעה חדשה',
+      content.trim().slice(0, 100),
+      `/dashboard/messages/${conv.id}`,
+      { conversationId: conv.id },
+    ).catch(() => {}); // fire-and-forget
 
     res.status(201).json({ success: true, data: { message, conversationId: conv.id } });
   } catch (err) {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '@zuzz/database';
 import { authenticate } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
+import { notifyUser } from '../lib/push';
 
 export const leadsRouter = Router();
 
@@ -48,16 +49,15 @@ leadsRouter.post('/', authenticate, async (req, res, next) => {
       },
     });
 
-    // Create notification for seller
-    await prisma.notification.create({
-      data: {
-        userId: listing.userId,
-        type: 'lead_received',
-        title: 'ליד חדש',
-        body: `התקבל ליד חדש עבור "${listing.title}"`,
-        link: `/dashboard/leads`,
-      },
-    });
+    // Notify seller via push + in-app
+    await notifyUser(
+      listing.userId,
+      'new_lead',
+      'ליד חדש',
+      `התקבל ליד חדש עבור "${listing.title}"`,
+      '/dashboard/leads',
+      { listingId, leadId: lead.id },
+    );
 
     res.status(201).json({ success: true, data: lead });
   } catch (err) {
