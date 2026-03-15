@@ -19,6 +19,9 @@ import { adminRouter } from '../routes/admin';
 import { organizationsRouter } from '../routes/organizations';
 import { promotionsRouter } from '../routes/promotions';
 import { subscriptionsRouter } from '../routes/subscriptions';
+import { pushRouter } from '../routes/push';
+import { growthRouter } from '../routes/growth';
+import { paymentsRouter } from '../routes/payments';
 import { errorHandler } from '../middleware/error-handler';
 
 export function createTestApp() {
@@ -42,6 +45,9 @@ export function createTestApp() {
   app.use('/api/organizations', organizationsRouter);
   app.use('/api/promotions', promotionsRouter);
   app.use('/api/subscriptions', subscriptionsRouter);
+  app.use('/api/push', pushRouter);
+  app.use('/api/growth', growthRouter);
+  app.use('/api/payments', paymentsRouter);
 
   // Error handling
   app.use(errorHandler);

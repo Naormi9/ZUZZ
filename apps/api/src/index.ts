@@ -54,6 +54,9 @@ import { articlesRouter } from './routes/articles';
 import { organizationsRouter } from './routes/organizations';
 import { promotionsRouter } from './routes/promotions';
 import { subscriptionsRouter } from './routes/subscriptions';
+import { pushRouter } from './routes/push';
+import { growthRouter } from './routes/growth';
+import { paymentsRouter } from './routes/payments';
 import { errorHandler } from './middleware/error-handler';
 import {
   globalRateLimiter,
@@ -145,6 +148,9 @@ app.use('/api/articles', articlesRouter);
 app.use('/api/organizations', organizationsRouter);
 app.use('/api/promotions', promotionsRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
+app.use('/api/push', pushRouter);
+app.use('/api/growth', growthRouter);
+app.use('/api/payments', paymentsRouter);
 
 // Error handling
 app.use(errorHandler);

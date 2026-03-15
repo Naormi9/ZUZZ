@@ -5,6 +5,7 @@ import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
 import { reportRateLimiter } from '../middleware/rate-limiter';
 import { serializeListingDetail } from '../serializers/listing';
+import { notifyUser, notifyListingWatchers } from '../lib/push';
 
 export const listingsRouter = Router();
 
@@ -127,6 +128,34 @@ listingsRouter.patch('/:id/status', authenticate, async (req, res, next) => {
         changedBy: req.user!.id,
       },
     });
+
+    // Notify listing owner about status change (if changed by admin)
+    if (!isOwner && isAdmin) {
+      const statusLabels: Record<string, string> = {
+        active: 'פעילה',
+        rejected: 'נדחתה',
+        paused: 'הושהתה',
+      };
+      notifyUser(
+        listing.userId,
+        'listing_status',
+        `סטטוס מודעה עודכן`,
+        `המודעה "${listing.title}" כעת ${statusLabels[status] || status}`,
+        `/listings/${listing.id}`,
+        { listingId: listing.id },
+      ).catch(() => {});
+    }
+
+    // Notify watchers when listing is sold
+    if (status === 'sold') {
+      notifyListingWatchers(
+        listing.id,
+        listing.userId,
+        'listing_status',
+        'מודעה נמכרה',
+        `המודעה "${listing.title}" סומנה כנמכרה`,
+      ).catch(() => {});
+    }
 
     res.json({ success: true, data: updated });
   } catch (err) {

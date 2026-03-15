@@ -213,7 +213,7 @@ Prefer focused subagents with narrow responsibilities:
 
 ## Test coverage
 
-- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (17), promotions (7), subscriptions (7)
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (17), promotions (7), subscriptions (7), push (8), payments (10), growth (10)
 - Trust engine: unit tests (5)
 - Web mobile integration: capacitor detection (6), deep links (15), share (2)
 - E2E: Playwright tests for cars flow
@@ -254,6 +254,42 @@ Prefer focused subagents with narrow responsibilities:
 - docs/launch-checklist.md — Launch day checklist
 - docs/seo.md — SEO architecture, metadata rules, indexing policy
 - docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
+- docs/push-notifications.md — Push notification system (FCM/APNS)
+- docs/monetization.md — Monetization, Stripe integration, plans and promotions
+- docs/mobile-release.md — Mobile app release and store submission guide
+- docs/growth-system.md — Growth & retention features (alerts, recommendations, analytics)
+
+## Push Notifications
+
+- End-to-end push notifications via FCM (Android) and APNS (iOS)
+- DeviceToken model stores tokens per user
+- Push service: `apps/api/src/lib/push.ts` — unified send with mock/FCM provider
+- API routes: POST /api/push/register, POST /api/push/unregister, GET /api/push/devices
+- Admin tools: GET /api/push/admin/tokens, POST /api/push/admin/resend/:id, POST /api/push/admin/test
+- Notification triggers: new_lead, new_message, saved_search_match, listing_status, price_alert
+- Rate limited: 30 notifications/minute/user (Redis-backed)
+- Invalid tokens auto-deactivated
+
+## Monetization
+
+- Plans: free (₪0), basic (₪99/mo), pro (₪299/mo)
+- Promotion types: boost, highlight, featured, top_of_search, gallery
+- Payment provider adapter: sandbox (dev) or Stripe (production)
+- Stripe Checkout integration with webhook handling
+- Auto invoice generation with 17% VAT
+- API routes: /api/payments/plans, /api/payments/checkout/subscription, /api/payments/checkout/promotion
+- Admin: /api/payments/admin/all, /api/payments/admin/invoices
+
+## Growth & Retention
+
+- Saved search alerts: instant, daily, weekly frequencies
+- Price change alerts for favorited listings
+- Recently viewed tracking
+- Recommendations: similar listings, popular listings, personalized "for you"
+- Email digest preferences per user
+- Analytics event tracking
+- Admin growth metrics dashboard: /api/growth/admin/metrics
+- Cron endpoints for processing saved search and price alerts
 
 ## Dealer Portal
 
