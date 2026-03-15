@@ -68,8 +68,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
-        <CardContent className="p-6">
-          <div className="text-center mb-6">
+        <CardContent className="p-6 sm:p-8">
+          <div className="text-center mb-8">
             <img
               src="/brand/logo-mark.svg"
               alt="ZUZZ"
@@ -79,8 +79,8 @@ export default function LoginPage() {
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
               }}
             />
-            <h1 className="hidden text-2xl font-bold text-brand-500">ZUZZ</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="hidden text-2xl font-bold text-brand-black tracking-tight">ZUZZ</h1>
+            <p className="text-gray-500 mt-2 text-sm">
               {mode === 'verify'
                 ? 'הזן את הקוד שנשלח לאימייל'
                 : mode === 'register'

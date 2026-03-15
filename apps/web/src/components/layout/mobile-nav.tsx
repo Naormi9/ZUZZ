@@ -17,7 +17,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 start-0 end-0 z-50 border-t border-gray-200 bg-white safe-area-bottom sm:hidden">
+    <nav className="fixed bottom-0 start-0 end-0 z-50 border-t border-gray-100 bg-white/95 backdrop-blur safe-area-bottom sm:hidden supports-[backdrop-filter]:bg-white/80">
       <div className="flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -38,7 +38,7 @@ export function MobileNav() {
               )}
             >
               {isHighlight ? (
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-white shadow-md">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg shadow-brand-500/30">
                   <Icon className="h-5 w-5" />
                 </span>
               ) : (

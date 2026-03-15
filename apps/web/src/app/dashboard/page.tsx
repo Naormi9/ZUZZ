@@ -67,28 +67,28 @@ export default function DashboardPage() {
       value: stats.listings,
       icon: Car,
       href: '/dashboard',
-      color: 'text-brand-500 bg-brand-100',
+      color: 'text-brand-600 bg-brand-50',
     },
     {
       label: 'מועדפים',
       value: stats.favorites,
       icon: Heart,
       href: '/dashboard/favorites',
-      color: 'text-red-600 bg-red-100',
+      color: 'text-red-600 bg-red-50',
     },
     {
       label: 'הודעות חדשות',
       value: stats.messages,
       icon: MessageCircle,
       href: '/dashboard/messages',
-      color: 'text-green-600 bg-green-100',
+      color: 'text-green-600 bg-green-50',
     },
     {
       label: 'לידים',
       value: stats.leads,
       icon: Users,
       href: '/dashboard/leads',
-      color: 'text-purple-600 bg-purple-100',
+      color: 'text-purple-600 bg-purple-50',
     },
   ];
 
@@ -104,10 +104,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">שלום, {user?.name}</h1>
+          <h1 className="text-2xl font-bold text-brand-black tracking-tight">שלום, {user?.name}</h1>
           <p className="text-gray-500 text-sm mt-1">לוח הבקרה שלך</p>
         </div>
         <Link href="/cars/create">
@@ -147,7 +147,7 @@ export default function DashboardPage() {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">המודעות שלי</h2>
+            <h2 className="text-lg font-bold text-brand-black tracking-tight">המודעות שלי</h2>
           </div>
           {loading ? (
             <div className="space-y-3">

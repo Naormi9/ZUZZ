@@ -107,9 +107,9 @@ export default function DealerProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-4">
@@ -144,7 +144,7 @@ export default function DealerProfilePage() {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900">{org.name}</h1>
+                <h1 className="text-2xl font-bold text-brand-black tracking-tight">{org.name}</h1>
                 {org.verificationStatus === 'verified' && (
                   <Badge className="text-xs bg-green-100 text-green-700 gap-1">
                     <Shield className="h-3 w-3" />
@@ -197,9 +197,43 @@ export default function DealerProfilePage() {
         </div>
       </div>
 
+      {/* Dealer Stats */}
+      {org.dealerProfile && (org.dealerProfile.avgResponseTime || org.dealerProfile.rating !== null) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {org.dealerProfile.rating !== null && (
+              <div className="rounded-xl bg-amber-50 p-4 text-center">
+                <p className="text-2xl font-bold text-amber-700">{org.dealerProfile.rating}</p>
+                <p className="text-xs text-amber-600 mt-0.5">דירוג ממוצע</p>
+              </div>
+            )}
+            {org.dealerProfile.reviewCount > 0 && (
+              <div className="rounded-xl bg-blue-50 p-4 text-center">
+                <p className="text-2xl font-bold text-blue-700">{org.dealerProfile.reviewCount}</p>
+                <p className="text-xs text-blue-600 mt-0.5">ביקורות</p>
+              </div>
+            )}
+            {org.dealerProfile.avgResponseTime && (
+              <div className="rounded-xl bg-emerald-50 p-4 text-center">
+                <p className="text-2xl font-bold text-emerald-700">
+                  {org.dealerProfile.avgResponseTime < 60
+                    ? `${org.dealerProfile.avgResponseTime} דק׳`
+                    : `${Math.round(org.dealerProfile.avgResponseTime / 60)} שעות`}
+                </p>
+                <p className="text-xs text-emerald-600 mt-0.5">זמן תגובה</p>
+              </div>
+            )}
+            <div className="rounded-xl bg-brand-50 p-4 text-center">
+              <p className="text-2xl font-bold text-brand-700">{org._count.listings}</p>
+              <p className="text-xs text-brand-600 mt-0.5">מודעות</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Listings */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 className="text-xl font-bold text-brand-black mb-6 tracking-tight">
           {listingsTotal > 0 ? `${listingsTotal} מודעות פעילות` : 'אין מודעות פעילות'}
         </h2>
 

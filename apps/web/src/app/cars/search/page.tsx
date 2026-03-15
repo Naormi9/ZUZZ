@@ -24,7 +24,7 @@ import {
   EmptyState,
 } from '@zuzz/ui';
 import { api } from '@/lib/api';
-import { SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SlidersHorizontal, ChevronLeft, ChevronRight, X, Bell, Search } from 'lucide-react';
 
 interface SearchApiResponse {
   success: boolean;
@@ -398,7 +398,7 @@ function CarsSearchPage() {
       </div>
 
       {/* Checkboxes */}
-      <div className="space-y-3 border-t border-gray-200 pt-4">
+      <div className="space-y-3 border-t border-gray-100 pt-4">
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -443,10 +443,10 @@ function CarsSearchPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-2">
             <ol className="flex flex-wrap items-center gap-1">
@@ -474,7 +474,7 @@ function CarsSearchPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-brand-black tracking-tight">
                 {make ? `רכבי ${make}${model ? ` ${model}` : ''} למכירה` : 'חיפוש רכבים'}
               </h1>
               {!loading && (
@@ -547,17 +547,80 @@ function CarsSearchPage() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Active Filter Chips */}
+          {activeFilterCount > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2 items-center">
+              {make && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {make}
+                  <button onClick={() => setMake('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {model && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {model}
+                  <button onClick={() => setModel('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {(yearFrom || yearTo) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  שנתון: {yearFrom || '?'}-{yearTo || '?'}
+                  <button onClick={() => { setYearFrom(''); setYearTo(''); }} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {(priceFrom || priceTo) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  מחיר: {priceFrom ? `₪${Number(priceFrom).toLocaleString()}` : '?'}-{priceTo ? `₪${Number(priceTo).toLocaleString()}` : '?'}
+                  <button onClick={() => { setPriceFrom(''); setPriceTo(''); }} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {fuelType && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {FUEL_TYPES.find(f => f.value === fuelType)?.label ?? fuelType}
+                  <button onClick={() => setFuelType('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {gearbox && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {GEARBOX_OPTIONS.find(g => g.value === gearbox)?.label ?? gearbox}
+                  <button onClick={() => setGearbox('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {maxMileage && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  עד {Number(maxMileage).toLocaleString()} ק&quot;מ
+                  <button onClick={() => setMaxMileage('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {verifiedSeller && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-medium">
+                  מוכר מאומת
+                  <button onClick={() => setVerifiedSeller(false)} className="hover:text-emerald-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {noAccidents && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-medium">
+                  ללא תאונות
+                  <button onClick={() => setNoAccidents(false)} className="hover:text-emerald-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              <button onClick={clearFilters} className="text-xs text-gray-500 hover:text-gray-700 underline">
+                נקה הכל
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-72 flex-shrink-0">
             <Card>
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-900">סינון</h2>
+                  <h2 className="font-bold text-brand-black">סינון</h2>
                   {activeFilterCount > 0 && (
                     <Badge variant="secondary">{activeFilterCount} פעילים</Badge>
                   )}
@@ -569,6 +632,28 @@ function CarsSearchPage() {
 
           {/* Results */}
           <div className="flex-1 min-w-0">
+            {/* Results summary bar */}
+            {!loading && total > 0 && (
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+                <p className="text-sm text-gray-500">
+                  מציג {Math.min((page - 1) * 20 + 1, total)}-{Math.min(page * 20, total)} מתוך {total.toLocaleString('he-IL')} תוצאות
+                </p>
+                <button
+                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
+                  onClick={() => {
+                    // Save search placeholder - shows alert opt-in
+                    const url = `/cars/search?${buildQuery()}`;
+                    if (typeof window !== 'undefined') {
+                      window.alert('התראות על חיפוש זה יהיו זמינות בקרוב!');
+                    }
+                  }}
+                >
+                  <Bell className="h-4 w-4" />
+                  שמור חיפוש
+                </button>
+              </div>
+            )}
+
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -673,15 +758,41 @@ function CarsSearchPage() {
                 )}
               </>
             ) : (
-              <EmptyState
-                title="לא נמצאו תוצאות"
-                description="נסה לשנות את הסינון או להרחיב את החיפוש"
-              />
+              <div className="py-20 text-center">
+                <Search className="h-16 w-16 text-gray-200 mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-brand-black mb-2 tracking-tight">לא נמצאו תוצאות</h3>
+                <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+                  נסה לשנות את הסינון או להרחיב את החיפוש
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Button variant="outline" onClick={clearFilters}>
+                    נקה את כל הסינונים
+                  </Button>
+                  <Link href="/cars">
+                    <Button variant="ghost">חזור לדף הרכב</Button>
+                  </Link>
+                </div>
+                {/* Suggested alternatives */}
+                <div className="mt-10 pt-8 border-t border-gray-100">
+                  <p className="text-sm font-semibold text-gray-600 mb-4">חיפושים פופולריים</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {['טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'BMW', 'מרצדס'].map((m) => (
+                      <a
+                        key={m}
+                        href={`/cars/search?make=${encodeURIComponent(m)}`}
+                        className="rounded-full border border-gray-100 bg-white px-4 py-2 text-sm font-medium text-brand-black hover:border-brand-300 hover:bg-brand-50 transition-all"
+                      >
+                        {m}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Internal links section — always visible for SEO */}
-            <section className="mt-12 border-t border-gray-200 pt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">חיפושים פופולריים</h3>
+            <section className="mt-14 border-t border-gray-100 pt-8">
+              <h3 className="text-lg font-bold text-brand-black mb-4 tracking-tight">חיפושים פופולריים</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {['טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה', 'BMW', 'מרצדס', 'טסלה'].map((m) => (
                   <a

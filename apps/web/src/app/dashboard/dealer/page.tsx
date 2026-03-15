@@ -97,9 +97,10 @@ export default function DealerDashboardPage() {
   }
 
   const STATUS_MAP: Record<string, { label: string; color: string }> = {
-    pending: { label: 'ממתין לאישור', color: 'bg-yellow-100 text-yellow-700' },
-    verified: { label: 'מאושר', color: 'bg-green-100 text-green-700' },
-    rejected: { label: 'נדחה', color: 'bg-red-100 text-red-700' },
+    pending: { label: 'ממתין לאישור', color: 'bg-amber-50 text-amber-700' },
+    verified: { label: 'מאומת', color: 'bg-emerald-50 text-emerald-700' },
+    rejected: { label: 'נדחה', color: 'bg-red-50 text-red-700' },
+    suspended: { label: 'מושעה', color: 'bg-red-50 text-red-700' },
   };
 
   const statCards = analytics
@@ -108,42 +109,42 @@ export default function DealerDashboardPage() {
           label: 'מודעות פעילות',
           value: analytics.activeListings,
           icon: Package,
-          color: 'text-brand-500 bg-brand-100',
+          color: 'text-brand-600 bg-brand-50',
           href: '/dashboard/dealer/inventory',
         },
         {
           label: 'לידים חדשים',
           value: analytics.newLeads,
           icon: Users,
-          color: 'text-purple-600 bg-purple-100',
+          color: 'text-purple-600 bg-purple-50',
           href: '/dashboard/dealer/leads',
         },
         {
           label: 'צפיות',
           value: analytics.totalViews,
           icon: Eye,
-          color: 'text-blue-600 bg-blue-100',
+          color: 'text-blue-600 bg-blue-50',
           href: '/dashboard/dealer/inventory',
         },
         {
           label: 'מועדפים',
           value: analytics.totalFavorites,
           icon: Heart,
-          color: 'text-red-600 bg-red-100',
+          color: 'text-red-600 bg-red-50',
           href: '/dashboard/dealer/inventory',
         },
         {
           label: 'קידומים פעילים',
           value: analytics.activePromotions,
           icon: Megaphone,
-          color: 'text-amber-600 bg-amber-100',
+          color: 'text-amber-600 bg-amber-50',
           href: '/dashboard/dealer/promotions',
         },
         {
           label: 'סה"כ לידים',
           value: analytics.totalLeads,
           icon: TrendingUp,
-          color: 'text-green-600 bg-green-100',
+          color: 'text-green-600 bg-green-50',
           href: '/dashboard/dealer/leads',
         },
       ]
@@ -168,7 +169,7 @@ export default function DealerDashboardPage() {
           ) : (
             <>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900">{org?.name}</h1>
+                <h1 className="text-2xl font-bold text-brand-black tracking-tight">{org?.name}</h1>
                 <Badge
                   className={`text-xs ${STATUS_MAP[org?.verificationStatus || 'pending']?.color}`}
                 >

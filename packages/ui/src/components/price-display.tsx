@@ -29,9 +29,9 @@ export function PriceDisplay({
   };
 
   return (
-    <div className={cn('flex items-baseline gap-1', className)}>
-      <span className={cn('font-bold text-gray-900', sizes[size])}>{formatted}</span>
-      {isNegotiable && <span className="text-xs text-gray-500">ניתן למשא ומתן</span>}
+    <div className={cn('flex items-baseline gap-1.5', className)}>
+      <span className={cn('font-bold text-brand-black tracking-tight', sizes[size])}>{formatted}</span>
+      {isNegotiable && <span className="text-xs text-gray-400 font-medium">ניתן למשא ומתן</span>}
     </div>
   );
 }

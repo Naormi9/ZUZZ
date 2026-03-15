@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from '@zuzz/ui';
 import { api } from '../../lib/api';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 
 const POPULAR_MAKES = [
   'טויוטה',
@@ -50,6 +51,7 @@ const YEAR_RANGES = [
 export default function CarsHomePage() {
   const [featuredCars, setFeaturedCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { items: recentlyViewed } = useRecentlyViewed('cars');
   const [selectedMake, setSelectedMake] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
@@ -85,19 +87,19 @@ export default function CarsHomePage() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50">
+    <div dir="rtl" className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-gradient-to-bl from-brand-black via-brand-charcoal to-brand-black text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">מצא את הרכב הבא שלך</h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tighter">מצא את הרכב הבא שלך</h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
               אלפי רכבים עם ציון אמון, מסמכים מאומתים ומוכרים מזוהים. עסקאות שזזות באמת.
             </p>
           </div>
 
           {/* Quick Search */}
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               {/* Make */}
               <div>
@@ -151,7 +153,7 @@ export default function CarsHomePage() {
               </div>
             </div>
 
-            <Button onClick={handleSearch} className="w-full sm:w-auto px-8">
+            <Button onClick={handleSearch} size="lg" className="w-full sm:w-auto px-10">
               חיפוש רכבים
             </Button>
           </div>
@@ -159,23 +161,23 @@ export default function CarsHomePage() {
       </section>
 
       {/* Featured Listings */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">רכבים מומלצים</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="section-heading">רכבים מומלצים</h2>
           <Link
             href="/cars/search"
-            className="text-brand-700 hover:text-brand-800 text-sm font-medium"
+            className="text-brand-600 hover:text-brand-700 text-sm font-semibold transition-colors"
           >
             הצג הכל ←
           </Link>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-xl border bg-white overflow-hidden">
-                <Skeleton className="aspect-[4/3] w-full" />
-                <div className="p-3 space-y-2">
+              <div key={i} className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
+                <Skeleton className="aspect-[4/3] w-full rounded-none" />
+                <div className="p-4 space-y-2.5">
                   <Skeleton className="h-5 w-24" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-3 w-32" />
@@ -184,7 +186,7 @@ export default function CarsHomePage() {
             ))}
           </div>
         ) : featuredCars.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {featuredCars.map((car) => (
               <ListingCard
                 key={car.id}
@@ -227,15 +229,41 @@ export default function CarsHomePage() {
         )}
       </section>
 
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-gray-50">
+          <h2 className="section-heading mb-6">נצפו לאחרונה</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {recentlyViewed.slice(0, 8).map((item) => (
+              <a
+                key={item.id}
+                href={`/cars/${item.id}`}
+                className="flex-shrink-0 w-44 rounded-xl border border-gray-100 bg-white overflow-hidden hover:shadow-md transition-shadow"
+              >
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-24 object-cover" />
+                ) : (
+                  <div className="w-full h-24 bg-gray-100" />
+                )}
+                <div className="p-2.5">
+                  <p className="text-xs font-semibold text-brand-black truncate">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">₪{item.price.toLocaleString('he-IL')}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Popular Makes */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי יצרן</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <h2 className="section-heading mb-8">חיפוש לפי יצרן</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {POPULAR_MAKES.map((make) => (
             <a
               key={make}
               href={`/cars/search?make=${encodeURIComponent(make)}`}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors"
+              className="flex items-center justify-center rounded-xl border border-gray-100 bg-white px-4 py-3.5 text-sm font-semibold text-brand-black hover:border-brand-300 hover:bg-brand-50 transition-all duration-150"
             >
               {make}
             </a>
@@ -244,12 +272,12 @@ export default function CarsHomePage() {
       </section>
 
       {/* Why ZUZZ Cars - Trust Section */}
-      <section className="bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">למה ZUZZ Cars?</h2>
+      <section className="bg-gray-50/50 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <h2 className="section-heading text-center mb-14">למה ZUZZ Cars?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -259,8 +287,8 @@ export default function CarsHomePage() {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">ציון אמון לכל מודעה</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-bold text-brand-black mb-2 tracking-tight">ציון אמון לכל מודעה</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
                 ציון אמון מבוסס מסמכים, אימות מוכר, היסטוריית רכב ועוד.
               </p>
             </div>
@@ -276,14 +304,14 @@ export default function CarsHomePage() {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">מוכרים מזוהים</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-bold text-brand-black mb-2 tracking-tight">מוכרים מזוהים</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
                 אימות זהות, אימות בעלות על הרכב ובדיקת סוחרים מורשים.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -293,14 +321,14 @@ export default function CarsHomePage() {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">מסמכים ברורים</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-bold text-brand-black mb-2 tracking-tight">מסמכים ברורים</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
                 רישיון רכב, טסט, ביטוח ודוח בדיקה — הכל שקוף ונגיש.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -310,8 +338,8 @@ export default function CarsHomePage() {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">תקשורת ישירה</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-bold text-brand-black mb-2 tracking-tight">תקשורת ישירה</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
                 הודעות, שיחה טלפונית או תיאום בדיקה — ישירות מהמודעה.
               </p>
             </div>
@@ -320,8 +348,8 @@ export default function CarsHomePage() {
       </section>
 
       {/* Search by city */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי עיר</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <h2 className="section-heading mb-8">חיפוש לפי עיר</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {[
             'תל אביב',
@@ -340,7 +368,7 @@ export default function CarsHomePage() {
             <a
               key={city}
               href={`/cars/search?city=${encodeURIComponent(city)}`}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors"
+              className="flex items-center justify-center rounded-xl border border-gray-100 bg-white px-4 py-3.5 text-sm font-semibold text-brand-black hover:border-brand-300 hover:bg-brand-50 transition-all duration-150"
             >
               רכבים ב{city}
             </a>
@@ -349,8 +377,8 @@ export default function CarsHomePage() {
       </section>
 
       {/* Search by type */}
-      <section className="max-w-7xl mx-auto px-4 py-12 border-t border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">חיפוש לפי סוג</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-gray-100">
+        <h2 className="section-heading mb-8">חיפוש לפי סוג</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
             { label: 'רכבים חשמליים', href: '/cars/search?fuelType=electric' },
@@ -362,7 +390,7 @@ export default function CarsHomePage() {
             <a
               key={link.href}
               href={link.href}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-brand-300 hover:bg-brand-50 transition-colors text-center"
+              className="flex items-center justify-center rounded-xl border border-gray-100 bg-white px-4 py-3.5 text-sm font-semibold text-brand-black hover:border-brand-300 hover:bg-brand-50 transition-all duration-150 text-center"
             >
               {link.label}
             </a>
@@ -371,11 +399,11 @@ export default function CarsHomePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-brand-50 border-t border-brand-100">
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">רוצה למכור את הרכב?</h2>
-          <p className="text-gray-600 mb-6">פרסם מודעה ב-ZUZZ תוך דקות ותגיע לקונים רציניים.</p>
-          <Button onClick={() => (window.location.href = '/cars/create')} className="px-8">
+      <section className="bg-brand-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-tight">רוצה למכור את הרכב?</h2>
+          <p className="text-gray-400 mb-8">פרסם מודעה ב-ZUZZ תוך דקות ותגיע לקונים רציניים.</p>
+          <Button onClick={() => (window.location.href = '/cars/create')} size="lg" className="px-10">
             פרסם מודעת רכב
           </Button>
         </div>

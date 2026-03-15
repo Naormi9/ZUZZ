@@ -3,6 +3,7 @@ import { Providers } from '@/lib/providers';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { MobileNav } from '@/components/layout/mobile-nav';
+import { CompareTray } from '@/components/compare-tray';
 import { MobileAppShell } from '@/components/mobile/mobile-app-shell';
 import { NetworkBanner } from '@/components/mobile/network-banner';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="flex-1 pb-safe">{children}</main>
           <Footer />
+          <CompareTray />
           <MobileNav />
         </Providers>
       </body>

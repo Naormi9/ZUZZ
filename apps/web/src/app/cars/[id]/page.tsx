@@ -39,6 +39,9 @@ import {
   ClipboardCheck,
 } from 'lucide-react';
 import { CarDetailJsonLd } from './car-detail-jsonld';
+import { useCompare } from '@/lib/hooks/use-compare';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
+import { ArrowLeftRight } from 'lucide-react';
 
 interface CarMedia {
   id: string;
@@ -140,6 +143,9 @@ export default function CarDetailPage() {
   const [leadSent, setLeadSent] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
+  const { addToCompare, removeFromCompare, isInCompare, isFull: compareFull } = useCompare();
+  const { addItem: addRecentlyViewed } = useRecentlyViewed('cars');
+
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -158,7 +164,21 @@ export default function CarDetailPage() {
       }
     }
     if (id) load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Track recently viewed
+  useEffect(() => {
+    if (listing) {
+      addRecentlyViewed({
+        id: listing.id,
+        title: listing.title,
+        price: listing.price.amount,
+        imageUrl: listing.media[0]?.url,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listing?.id]);
 
   async function toggleFavorite() {
     if (!isAuthenticated) {
@@ -202,9 +222,9 @@ export default function CarDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Skeleton className="aspect-[16/9] w-full rounded-xl mb-6" />
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Skeleton className="aspect-[16/9] w-full rounded-2xl mb-6" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-4">
               <Skeleton className="h-10 w-3/4" />
@@ -223,10 +243,10 @@ export default function CarDetailPage() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">המודעה לא נמצאה</h1>
-          <p className="text-gray-500 mb-4">ייתכן שהמודעה הוסרה או שהקישור שגוי.</p>
+          <h1 className="text-2xl font-bold text-brand-black mb-2 tracking-tight">המודעה לא נמצאה</h1>
+          <p className="text-gray-500 mb-6">ייתכן שהמודעה הוסרה או שהקישור שגוי.</p>
           <Link href="/cars/search">
             <Button>חזור לחיפוש</Button>
           </Link>
@@ -255,7 +275,7 @@ export default function CarDetailPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* JSON-LD structured data */}
       <CarDetailJsonLd
         data={
@@ -282,7 +302,7 @@ export default function CarDetailPage() {
       />
 
       {/* Breadcrumbs */}
-      <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 pt-4 text-sm text-gray-500">
+      <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 text-sm text-gray-500">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
             <Link href="/" className="hover:text-gray-700">
@@ -387,7 +407,7 @@ export default function CarDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-6">
@@ -395,7 +415,7 @@ export default function CarDetailPage() {
             <div>
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{listing.title}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-brand-black tracking-tight">{listing.title}</h1>
                   <p className="text-sm text-gray-500 mt-1">
                     {listing.location.city}{' '}
                     {listing.location.area ? `- ${listing.location.area}` : ''}
@@ -417,6 +437,30 @@ export default function CarDetailPage() {
                     className="p-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
                   >
                     <Share2 className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (isInCompare(listing.id)) {
+                        removeFromCompare(listing.id);
+                      } else {
+                        addToCompare({
+                          id: listing.id,
+                          title: listing.title,
+                          price: listing.price.amount,
+                          imageUrl: listing.media[0]?.url,
+                          year: car.year,
+                          mileage: car.mileage,
+                        });
+                      }
+                    }}
+                    className={`p-2 rounded-full border transition-colors ${
+                      isInCompare(listing.id)
+                        ? 'bg-brand-500 border-brand-500 text-white'
+                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                    }`}
+                    title={isInCompare(listing.id) ? 'הסר מהשוואה' : 'הוסף להשוואה'}
+                  >
+                    <ArrowLeftRight className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => setShowReport(!showReport)}
@@ -445,7 +489,7 @@ export default function CarDetailPage() {
             {/* Vehicle Facts Grid */}
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">פרטי הרכב</h2>
+                <h2 className="text-lg font-bold text-brand-black mb-4 tracking-tight">פרטי הרכב</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {vehicleFacts.map((fact) => (
                     <div key={fact.label} className="text-center p-3 rounded-lg bg-gray-50">
@@ -462,7 +506,7 @@ export default function CarDetailPage() {
             {car.isEV && (
               <Card className="border-green-200 bg-green-50">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <Zap className="h-5 w-5 text-green-600" />
                     נתוני רכב חשמלי
                   </h2>
@@ -496,7 +540,7 @@ export default function CarDetailPage() {
             {listing.description && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">תיאור</h2>
+                  <h2 className="text-lg font-bold text-brand-black mb-3 tracking-tight">תיאור</h2>
                   <p className="text-gray-700 whitespace-pre-line leading-relaxed">
                     {listing.description}
                   </p>
@@ -508,7 +552,7 @@ export default function CarDetailPage() {
             {listing.sellerStatements.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">הצהרות המוכר</h2>
+                  <h2 className="text-lg font-bold text-brand-black mb-4 tracking-tight">הצהרות המוכר</h2>
                   <div className="space-y-3">
                     {listing.sellerStatements.map((statement) => (
                       <div key={statement.key} className="flex items-start gap-3">
@@ -554,7 +598,7 @@ export default function CarDetailPage() {
             {listing.documents.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <FileText className="h-5 w-5 text-gray-400" />
                     מסמכים
                   </h2>
@@ -562,7 +606,7 @@ export default function CarDetailPage() {
                     {listing.documents.map((doc) => (
                       <div
                         key={doc.id}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50"
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50"
                       >
                         <FileText className="h-5 w-5 text-gray-400 flex-shrink-0" />
                         <span className="text-sm text-gray-700 flex-1">{doc.label}</span>
@@ -586,26 +630,47 @@ export default function CarDetailPage() {
             {listing.trustFactors.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <Shield className="h-5 w-5 text-brand-500" />
                     גורמי אמון
                   </h2>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {listing.trustFactors.map((factor) => (
-                      <div key={factor.key} className="flex items-start gap-3">
+                      <div
+                        key={factor.key}
+                        className={`flex items-start gap-3 p-3 rounded-lg ${
+                          factor.status === 'positive'
+                            ? 'bg-emerald-50/70'
+                            : factor.status === 'negative'
+                              ? 'bg-red-50/70'
+                              : 'bg-gray-50'
+                        }`}
+                      >
                         <div
-                          className={`flex-shrink-0 mt-0.5 w-2 h-2 rounded-full ${
+                          className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center ${
                             factor.status === 'positive'
-                              ? 'bg-green-500'
+                              ? 'bg-emerald-100 text-emerald-600'
                               : factor.status === 'negative'
-                                ? 'bg-red-500'
-                                : 'bg-gray-300'
+                                ? 'bg-red-100 text-red-600'
+                                : 'bg-gray-200 text-gray-500'
                           }`}
-                        />
+                        >
+                          {factor.status === 'positive' ? (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : factor.status === 'negative' ? (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          )}
+                        </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{factor.label}</p>
                           {factor.description && (
-                            <p className="text-xs text-gray-500">{factor.description}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{factor.description}</p>
                           )}
                         </div>
                       </div>
@@ -646,7 +711,7 @@ export default function CarDetailPage() {
 
                 {/* Lead Form */}
                 {showLeadForm && (
-                  <div className="border-t border-gray-200 pt-4 space-y-3">
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
                     {leadSent ? (
                       <div className="text-center py-4">
                         <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
@@ -702,7 +767,7 @@ export default function CarDetailPage() {
             {/* Seller Card */}
             <Card>
               <CardContent className="p-5">
-                <h3 className="font-semibold text-gray-900 mb-3">פרטי המוכר</h3>
+                <h3 className="font-bold text-brand-black mb-3 tracking-tight">פרטי המוכר</h3>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     {listing.seller.avatarUrl ? (
@@ -775,7 +840,7 @@ export default function CarDetailPage() {
         </div>
 
         {/* Related Links */}
-        <section className="mt-8 border-t border-gray-200 pt-6">
+        <section className="mt-8 border-t border-gray-100 pt-6">
           <div className="flex flex-wrap gap-3">
             <Link
               href={`/cars/search?make=${encodeURIComponent(car.make)}`}
@@ -806,10 +871,41 @@ export default function CarDetailPage() {
           </div>
         </section>
 
+        {/* Key Highlights */}
+        <section className="mt-8 border-t border-gray-100 pt-6">
+          <h3 className="text-lg font-bold text-brand-black mb-4 tracking-tight">למה הרכב הזה?</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {listing.trustScore >= 70 && (
+              <div className="rounded-xl bg-emerald-50 p-3 text-center">
+                <p className="text-sm font-bold text-emerald-700">ציון אמון גבוה</p>
+                <p className="text-xs text-emerald-600 mt-0.5">{listing.trustScore}/100</p>
+              </div>
+            )}
+            {car.hand <= 2 && (
+              <div className="rounded-xl bg-brand-50 p-3 text-center">
+                <p className="text-sm font-bold text-brand-700">יד {car.hand === 1 ? 'ראשונה' : 'שנייה'}</p>
+                <p className="text-xs text-brand-600 mt-0.5">בעלות מועטה</p>
+              </div>
+            )}
+            {listing.documents.length > 0 && (
+              <div className="rounded-xl bg-blue-50 p-3 text-center">
+                <p className="text-sm font-bold text-blue-700">{listing.documents.length} מסמכים</p>
+                <p className="text-xs text-blue-600 mt-0.5">מידע שקוף</p>
+              </div>
+            )}
+            {listing.seller.isVerified && (
+              <div className="rounded-xl bg-purple-50 p-3 text-center">
+                <p className="text-sm font-bold text-purple-700">מוכר מאומת</p>
+                <p className="text-xs text-purple-600 mt-0.5">זהות מאושרת</p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Similar Cars */}
         {similarCars.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">רכבים דומים</h2>
+            <h2 className="text-xl font-bold text-brand-black mb-6 tracking-tight">רכבים דומים</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-x-auto">
               {similarCars.map((car) => (
                 <ListingCard
@@ -838,6 +934,41 @@ export default function CarDetailPage() {
             </div>
           </section>
         )}
+      </div>
+
+      {/* Mobile Sticky CTA */}
+      <div className="fixed bottom-12 sm:bottom-0 start-0 end-0 z-30 bg-white/95 backdrop-blur border-t border-gray-100 p-3 safe-area-bottom lg:hidden supports-[backdrop-filter]:bg-white/80">
+        <div className="flex items-center gap-3 max-w-lg mx-auto">
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-bold text-brand-black truncate">
+              {listing.price.currency === 'ILS' ? '₪' : '$'}{listing.price.amount.toLocaleString('he-IL')}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{listing.title}</p>
+          </div>
+          <Button
+            size="sm"
+            className="flex-shrink-0 gap-1.5"
+            onClick={() => {
+              if (!isAuthenticated) {
+                window.location.href = '/auth/login';
+                return;
+              }
+              window.location.href = `/dashboard/messages?to=${listing.seller.id}&listing=${id}`;
+            }}
+          >
+            <MessageCircle className="h-4 w-4" />
+            הודעה
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-shrink-0 gap-1.5"
+            onClick={() => setShowLeadForm(true)}
+          >
+            <Phone className="h-4 w-4" />
+            טלפון
+          </Button>
+        </div>
       </div>
     </div>
   );
