@@ -134,6 +134,7 @@ vi.mock('@zuzz/database', () => {
     },
     payment: {
       findFirst: vi.fn(),
+      findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -180,6 +181,16 @@ vi.mock('@zuzz/database', () => {
       create: vi.fn(),
       findMany: vi.fn(),
       count: vi.fn(),
+    },
+    listingWatch: {
+      upsert: vi.fn(),
+      findMany: vi.fn(),
+      updateMany: vi.fn(),
+      count: vi.fn(),
+    },
+    priceHistory: {
+      create: vi.fn(),
+      findMany: vi.fn(),
     },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(async (ops: any[]) => Promise.all(ops)),

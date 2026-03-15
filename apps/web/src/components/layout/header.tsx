@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Plus, User, Menu, X } from 'lucide-react';
+import { Search, Plus, User, Menu, X, Bell } from 'lucide-react';
 import { Button } from '@zuzz/ui';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { api } from '@/lib/api';
 
 const navigation = [
   { label: 'רכב', href: '/cars' },
@@ -15,7 +16,15 @@ const navigation = [
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const { user, isAuthenticated, logout } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.get<{ success: boolean; data: { unreadCount: number } }>('/api/notifications?pageSize=1')
+      .then((res) => setUnreadNotifications(res.data.unreadCount))
+      .catch(() => {});
+  }, [isAuthenticated]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur safe-area-top supports-[backdrop-filter]:bg-white/80">
@@ -68,6 +77,21 @@ export function Header() {
               </Button>
             </Link>
 
+            {/* Notification Bell */}
+            {isAuthenticated && (
+              <Link
+                href="/dashboard/notifications"
+                className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute top-1 end-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold text-white">
+                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* User Menu / Login */}
             {isAuthenticated ? (
               <div className="relative">
@@ -93,6 +117,32 @@ export function Header() {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       מועדפים
+                    </Link>
+                    <Link
+                      href="/dashboard/saved-searches"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      חיפושים שמורים
+                    </Link>
+                    <Link
+                      href="/dashboard/watches"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      מעקב מחירים
+                    </Link>
+                    <Link
+                      href="/dashboard/notifications"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      התראות
+                      {unreadNotifications > 0 && (
+                        <span className="mr-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-500 px-1.5 text-[10px] font-bold text-white">
+                          {unreadNotifications}
+                        </span>
+                      )}
                     </Link>
                     <Link
                       href="/dashboard/settings"

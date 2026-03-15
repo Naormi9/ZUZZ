@@ -24,6 +24,8 @@ import {
   EmptyState,
 } from '@zuzz/ui';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { analytics } from '@/lib/analytics';
 import { SlidersHorizontal, ChevronLeft, ChevronRight, X, Bell, Search } from 'lucide-react';
 
 interface SearchApiResponse {
@@ -111,6 +113,7 @@ export default function CarsSearchPageWrapper() {
 function CarsSearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const [results, setResults] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -640,11 +643,34 @@ function CarsSearchPage() {
                 </p>
                 <button
                   className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
-                  onClick={() => {
-                    // Save search placeholder - shows alert opt-in
-                    const url = `/cars/search?${buildQuery()}`;
-                    if (typeof window !== 'undefined') {
-                      window.alert('התראות על חיפוש זה יהיו זמינות בקרוב!');
+                  onClick={async () => {
+                    if (!isAuthenticated) {
+                      window.location.href = '/auth/login';
+                      return;
+                    }
+                    try {
+                      const filters: Record<string, unknown> = {};
+                      if (make) filters.make = make;
+                      if (model) filters.model = model;
+                      if (yearFrom) filters.yearFrom = yearFrom;
+                      if (yearTo) filters.yearTo = yearTo;
+                      if (priceFrom) filters.priceFrom = priceFrom;
+                      if (priceTo) filters.priceTo = priceTo;
+                      if (fuelType) filters.fuelType = fuelType;
+                      if (gearbox) filters.gearbox = gearbox;
+                      if (maxMileage) filters.maxMileage = maxMileage;
+                      if (verifiedSeller) filters.verifiedSeller = true;
+                      const res = await api.post<{ success: boolean; data: { id: string } }>('/api/saved-searches', {
+                        vertical: 'cars',
+                        name: make ? `${make}${model ? ` ${model}` : ''}` : null,
+                        filters,
+                        alertEnabled: true,
+                        alertFrequency: 'daily',
+                      });
+                      analytics.searchSave(res.data.id, filters);
+                      window.alert('החיפוש נשמר! תקבל התראות על תוצאות חדשות.');
+                    } catch {
+                      window.alert('שגיאה בשמירת החיפוש. נסה שוב.');
                     }
                   }}
                 >

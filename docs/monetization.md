@@ -1,47 +1,87 @@
-# Monetization System
+# Monetization
 
-Revenue infrastructure for ZUZZ marketplace.
+## Overview
 
-## Plans
+ZUZZ monetizes through subscriptions (recurring) and promotions (one-time per listing).
 
-| Plan | Price/month | Max Listings | Promotions | Features |
-|------|------------|--------------|------------|----------|
-| Free | ₪0 | 3 | 0 | Basic trust score, standard support |
-| Dealer Basic | ₪99 | 20 | 2/month | Enhanced trust, lead management |
-| Dealer Pro | ₪299 | Unlimited | Unlimited | Premium trust, analytics, priority support |
+## Subscription Plans
+
+| Plan | Price (ILS/month) | Key Features |
+|------|-------------------|--------------|
+| Free | 0 | 3 active listings, basic trust score, unlimited messages |
+| Basic | ₪99 | 20 listings, full trust score, basic stats, dealer logo |
+| Pro | ₪249/₪299 | Unlimited listings, advanced stats, team management, promotion discounts |
+| Enterprise | ₪499 | Everything in Pro + API access, custom integrations, dedicated account manager |
+
+Plans are returned by `GET /api/checkout/plans` and `GET /api/payments/plans` (public, no auth required).
 
 ## Promotion Types
 
-| Type | Price/week | Effect |
-|------|-----------|--------|
-| Boost | ₪29 | Higher ranking in search |
-| Highlight | ₪49 | Visual highlight in listings |
-| Featured | ₪99 | Featured badge + priority |
-| Top of Search | ₪149 | Always at top of results |
-| Gallery | ₪69 | Enhanced media display |
+| Type | Price (ILS/week) | Effect |
+|------|------------------|--------|
+| Boost | ₪29 | Increased visibility in search results |
+| Highlight | ₪49 | Visual highlight on listing card |
+| Featured | ₪99 | Featured section placement |
+| Top of Search | ₪149 | Top position in search results |
+| Gallery | ₪69 | Enhanced image gallery display |
 
-## Payment Flow
+Duration: 1–90 days, priced per week (rounded up).
 
+## Checkout Flow
+
+### 1. Create Session
+`POST /api/checkout/create-session` or `POST /api/payments/checkout/subscription`
+
+**Subscription:**
+```json
+{
+  "type": "subscription",
+  "plan": "pro",
+  "durationMonths": 3,
+  "organizationId": "org-123"
+}
 ```
-User selects plan/promotion
-         │
-         ▼
-POST /api/payments/checkout/subscription
-  or /api/payments/checkout/promotion
-         │
-         ▼
-Payment Provider creates checkout session
-  ├── Sandbox: auto-completes (dev/test)
-  └── Stripe: redirects to Stripe Checkout
-         │
-         ▼
-On success → activate subscription/promotion
-         │
-         ▼
-Generate Invoice (with 17% VAT)
+
+**Promotion:**
+```json
+{
+  "type": "promotion",
+  "promotionType": "featured",
+  "listingId": "listing-123",
+  "durationDays": 14
+}
 ```
+
+Returns `checkoutUrl` to redirect user to payment.
+
+### 2. Payment Completion
+
+**Sandbox mode:** `GET /api/checkout/sandbox-complete?paymentId=...` auto-completes payment.
+
+**Production:** Payment provider sends webhook to `POST /api/checkout/webhook` or `POST /api/payments/webhook`.
+
+### 3. Post-Payment Processing
+
+On successful payment:
+1. Payment status updated to `completed`
+2. Invoice generated with VAT (17%)
+3. For subscriptions: previous active subscription cancelled, new one created
+4. For promotions: promotion created, listing marked as promoted
 
 ## API Endpoints
+
+### Checkout Routes
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/checkout/plans` | Public | List available plans |
+| POST | `/api/checkout/create-session` | User | Start checkout session |
+| GET | `/api/checkout/sandbox-complete` | — | Sandbox payment completion |
+| POST | `/api/checkout/webhook` | — | Payment webhook handler |
+| GET | `/api/checkout/payment/:id` | User | Payment details with invoices |
+| GET | `/api/checkout/payments` | User | Paginated payment history |
+
+### Payment Routes
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -92,14 +132,28 @@ When `PAYMENT_PROVIDER=sandbox` (default in dev):
 
 ## Invoice Generation
 
-Invoices are automatically created on payment completion:
-- Invoice number: `INV-{timestamp}-{random}`
-- Includes 17% VAT calculation
-- Stored in the `invoices` table with line items
+Invoices are auto-generated on payment completion:
+- Sequential invoice numbers: `INV-000001`, `INV-000002`, ...
+- Amount, tax (17% VAT), total
+- Line items with descriptions
 - Admin can view all invoices via `/api/payments/admin/invoices`
+
+## Payment Providers
+
+| Provider | Status | Env Vars |
+|----------|--------|----------|
+| Sandbox | Active (dev/test) | Default when no provider configured |
+| Stripe | Production | `STRIPE_SECRET_KEY`, `PAYMENT_PROVIDER=stripe` |
+
+## Frontend Pages
+
+- `/pricing` — Plan comparison and selection
+- `/checkout/success` — Post-payment success screen
+- Dashboard billing section for payment history
 
 ## Testing
 
 ```bash
+pnpm test -- checkout.test
 pnpm test -- payments.test
 ```

@@ -41,7 +41,8 @@ import {
 import { CarDetailJsonLd } from './car-detail-jsonld';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
-import { ArrowLeftRight } from 'lucide-react';
+import { ArrowLeftRight, Eye as EyeIcon } from 'lucide-react';
+import { analytics } from '@/lib/analytics';
 
 interface CarMedia {
   id: string;
@@ -167,9 +168,10 @@ export default function CarDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Track recently viewed
+  // Track recently viewed and analytics
   useEffect(() => {
     if (listing) {
+      analytics.listingView(listing.id, 'cars');
       addRecentlyViewed({
         id: listing.id,
         title: listing.title,
@@ -461,6 +463,21 @@ export default function CarDetailPage() {
                     title={isInCompare(listing.id) ? 'הסר מהשוואה' : 'הוסף להשוואה'}
                   >
                     <ArrowLeftRight className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await api.post('/api/listing-watches', { listingId: listing.id });
+                        analytics.listingWatch(listing.id);
+                        window.alert('נוסף למעקב מחירים! תקבל התראה כשהמחיר ירד.');
+                      } catch {
+                        window.alert('יש להתחבר כדי לעקוב אחרי מחירים');
+                      }
+                    }}
+                    className="p-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                    title="עקוב אחרי מחיר"
+                  >
+                    <EyeIcon className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => setShowReport(!showReport)}
