@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, ApiError } from '@/lib/api';
+import { isCapacitorNative } from '@/lib/mobile/capacitor';
 
 interface User {
   id: string;
@@ -114,6 +115,28 @@ export const useAuth = create<AuthState>()(
     }),
     {
       name: 'zuzz-auth',
+      storage: createJSONStorage(() => {
+        // On native, use Capacitor Preferences (async storage adapter)
+        if (typeof window !== 'undefined' && isCapacitorNative()) {
+          return {
+            getItem: async (name: string): Promise<string | null> => {
+              const { Preferences } = await import('@capacitor/preferences');
+              const { value } = await Preferences.get({ key: name });
+              return value;
+            },
+            setItem: async (name: string, value: string): Promise<void> => {
+              const { Preferences } = await import('@capacitor/preferences');
+              await Preferences.set({ key: name, value });
+            },
+            removeItem: async (name: string): Promise<void> => {
+              const { Preferences } = await import('@capacitor/preferences');
+              await Preferences.remove({ key: name });
+            },
+          };
+        }
+        // Web fallback: standard localStorage
+        return localStorage;
+      }),
       partialize: (state) => ({
         user: state.user,
         token: state.token,
