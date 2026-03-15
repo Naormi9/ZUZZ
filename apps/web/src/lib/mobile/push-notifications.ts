@@ -125,28 +125,29 @@ export async function registerPushListeners(
 
 /**
  * Send push token to backend for storage.
- * Backend endpoint: POST /api/push/register
- *
- * This is a stub — the backend endpoint needs to be implemented to:
- * 1. Accept { token, platform, userId }
- * 2. Store in a push_tokens table
- * 3. Use for sending notifications via APNS/FCM
+ * Backend endpoint: POST /api/device-tokens/register
  */
 export async function registerTokenWithBackend(
   token: PushToken,
   apiBase: string,
-  authToken: string,
+  authToken?: string,
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${apiBase}/api/push/register`, {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (authToken) {
+      headers.Authorization = `Bearer ${authToken}`;
+    }
+
+    const response = await fetch(`${apiBase}/api/device-tokens/register`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
+      headers,
+      credentials: 'include',
       body: JSON.stringify({
         token: token.value,
         platform: token.platform,
+        provider: 'fcm',
       }),
     });
     return response.ok;

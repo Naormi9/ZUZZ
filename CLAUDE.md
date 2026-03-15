@@ -213,7 +213,7 @@ Prefer focused subagents with narrow responsibilities:
 
 ## Test coverage
 
-- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (17), promotions (7), subscriptions (7)
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (17), promotions (7), subscriptions (7), device-tokens (6), saved-searches (8), listing-watches (7), checkout (10)
 - Trust engine: unit tests (5)
 - Web mobile integration: capacitor detection (6), deep links (15), share (2)
 - E2E: Playwright tests for cars flow
@@ -254,6 +254,10 @@ Prefer focused subagents with narrow responsibilities:
 - docs/launch-checklist.md — Launch day checklist
 - docs/seo.md — SEO architecture, metadata rules, indexing policy
 - docs/dealer-portal.md — Dealer portal architecture, APIs, and onboarding flow
+- docs/push-notifications.md — Push notification architecture, providers, and device token management
+- docs/retention-system.md — Saved searches, price watches, and notification center
+- docs/monetization.md — Subscription plans, promotion types, checkout flow, and invoicing
+- docs/analytics-events.md — Client-side analytics event catalog and instrumentation
 
 ## Dealer Portal
 

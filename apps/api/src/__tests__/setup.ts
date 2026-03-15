@@ -120,6 +120,36 @@ vi.mock('@zuzz/database', () => {
     auditLog: {
       create: vi.fn(),
     },
+    deviceToken: {
+      upsert: vi.fn(),
+      updateMany: vi.fn(),
+      findMany: vi.fn(),
+    },
+    savedSearch: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+    },
+    listingWatch: {
+      upsert: vi.fn(),
+      findMany: vi.fn(),
+      updateMany: vi.fn(),
+      count: vi.fn(),
+    },
+    payment: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+    },
+    invoice: {
+      create: vi.fn(),
+      count: vi.fn(),
+    },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(async (ops: any[]) => Promise.all(ops)),
     $disconnect: vi.fn(),

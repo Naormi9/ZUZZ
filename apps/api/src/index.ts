@@ -54,6 +54,10 @@ import { articlesRouter } from './routes/articles';
 import { organizationsRouter } from './routes/organizations';
 import { promotionsRouter } from './routes/promotions';
 import { subscriptionsRouter } from './routes/subscriptions';
+import { deviceTokensRouter } from './routes/device-tokens';
+import { savedSearchesRouter } from './routes/saved-searches';
+import { listingWatchesRouter } from './routes/listing-watches';
+import { checkoutRouter } from './routes/checkout';
 import { errorHandler } from './middleware/error-handler';
 import {
   globalRateLimiter,
@@ -145,6 +149,10 @@ app.use('/api/articles', articlesRouter);
 app.use('/api/organizations', organizationsRouter);
 app.use('/api/promotions', promotionsRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
+app.use('/api/device-tokens', deviceTokensRouter);
+app.use('/api/saved-searches', savedSearchesRouter);
+app.use('/api/listing-watches', listingWatchesRouter);
+app.use('/api/checkout', checkoutRouter);
 
 // Error handling
 app.use(errorHandler);
