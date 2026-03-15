@@ -98,19 +98,19 @@ export default function HomesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="bg-gradient-to-bl from-teal-700 via-teal-600 to-teal-800 text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">מצא את הבית הבא שלך</h1>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tighter">מצא את הבית הבא שלך</h1>
             <p className="text-lg text-teal-100 max-w-2xl mx-auto">
               נכסים עם בעלים מאומתים, מידע שקוף ותהליך עסקה ברור.
             </p>
           </div>
 
           {/* Quick Search */}
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">סוג נכס</label>
@@ -161,7 +161,7 @@ export default function HomesPage() {
               </div>
             </div>
 
-            <Button onClick={handleSearch} className="w-full sm:w-auto px-8">
+            <Button onClick={handleSearch} size="lg" className="w-full sm:w-auto px-10">
               חיפוש נכסים
             </Button>
           </div>
@@ -169,9 +169,9 @@ export default function HomesPage() {
       </section>
 
       {/* Featured Listings */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">נכסים מומלצים</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="section-heading">נכסים מומלצים</h2>
           <Link
             href="/homes/search"
             className="text-teal-600 hover:text-teal-700 text-sm font-medium"
@@ -230,8 +230,8 @@ export default function HomesPage() {
       </section>
 
       {/* Popular Cities */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">ערים פופולריות</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <h2 className="section-heading mb-8">ערים פופולריות</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
             'תל אביב',
@@ -250,7 +250,7 @@ export default function HomesPage() {
             <Link
               key={city}
               href={`/homes/search?city=${encodeURIComponent(city)}`}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:border-teal-300 hover:bg-teal-50 transition-colors"
+              className="flex items-center justify-center rounded-xl border border-gray-100 bg-white px-4 py-3.5 text-sm font-semibold text-brand-black hover:border-teal-300 hover:bg-teal-50 transition-all duration-150"
             >
               {city}
             </Link>
@@ -259,13 +259,13 @@ export default function HomesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-teal-50 border-t border-teal-100">
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">רוצה למכור או להשכיר נכס?</h2>
-          <p className="text-gray-600 mb-6">
+      <section className="bg-brand-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-tight">רוצה למכור או להשכיר נכס?</h2>
+          <p className="text-gray-400 mb-8">
             פרסם מודעה ב-ZUZZ Homes עם אימות בעלות וחשיפה מקסימלית.
           </p>
-          <Button onClick={() => (window.location.href = '/homes/create')} className="px-8">
+          <Button onClick={() => (window.location.href = '/homes/create')} size="lg" className="px-10">
             פרסם מודעת נכס
           </Button>
         </div>

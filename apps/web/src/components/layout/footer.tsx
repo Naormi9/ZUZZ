@@ -45,7 +45,7 @@ const footerSections = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 pb-24 sm:pb-8">
+    <footer className="border-t border-gray-100 bg-gray-50/50 pb-24 sm:pb-8">
       <div className="container-app py-12">
         {/* Footer Grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
@@ -90,7 +90,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-8 sm:flex-row">
           <p className="text-xs text-gray-400">
             &copy; {new Date().getFullYear()} ZUZZ. כל הזכויות שמורות.
           </p>

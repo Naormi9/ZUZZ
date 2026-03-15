@@ -53,12 +53,12 @@ export default function MarketPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="bg-gradient-to-bl from-purple-700 via-purple-600 to-purple-800 text-white">
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">ZUZZ Market</h1>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tighter">ZUZZ Market</h1>
             <p className="text-lg text-purple-100 max-w-2xl mx-auto">
               קנה ומכור כל דבר — עם אמון מובנה ומוכרים מזוהים.
             </p>
@@ -72,14 +72,14 @@ export default function MarketPage() {
       </section>
 
       {/* Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">קטגוריות</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <h2 className="section-heading mb-8">קטגוריות</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.value}
               href={`/market/search?category=${cat.value}`}
-              className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 hover:border-purple-300 hover:bg-purple-50 transition-colors group"
+              className="flex flex-col items-center justify-center rounded-xl border border-gray-100 bg-white p-4 hover:border-purple-300 hover:bg-purple-50 transition-all duration-150 group"
             >
               <span className="text-2xl mb-2">{cat.icon}</span>
               <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
@@ -91,9 +91,9 @@ export default function MarketPage() {
       </section>
 
       {/* Recent Listings */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">מודעות אחרונות</h2>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="section-heading">מודעות אחרונות</h2>
           <Link
             href="/market/search"
             className="text-purple-600 hover:text-purple-700 text-sm font-medium"

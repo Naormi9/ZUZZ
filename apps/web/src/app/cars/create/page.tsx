@@ -301,8 +301,8 @@ export default function CreateCarPage() {
   const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">פרסום רכב למכירה</h1>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <h1 className="text-2xl font-bold mb-6 text-brand-black tracking-tight">פרסום רכב למכירה</h1>
 
       {/* Step Indicator */}
       <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2">
@@ -338,7 +338,7 @@ export default function CreateCarPage() {
           {/* Step 1: Identify */}
           {currentStep === 1 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">זיהוי הרכב</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">זיהוי הרכב</h2>
               <p className="text-sm text-gray-500">הזן מספר רישוי לחיפוש אוטומטי, או הזן ידנית</p>
               <div className="flex gap-2">
                 <Input
@@ -387,7 +387,7 @@ export default function CreateCarPage() {
           {/* Step 2: Details */}
           {currentStep === 2 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">פרטי הרכב</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">פרטי הרכב</h2>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="יצרן"
@@ -509,7 +509,7 @@ export default function CreateCarPage() {
           {/* Step 3: Statements */}
           {currentStep === 3 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">הצהרות מוכר</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">הצהרות מוכר</h2>
               <p className="text-sm text-gray-500">
                 נא לענות בכנות — הצהרות אלו משפיעות על ציון האמון
               </p>
@@ -585,7 +585,7 @@ export default function CreateCarPage() {
           {/* Step 4: Pricing + Location */}
           {currentStep === 4 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">תמחור ומיקום</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">תמחור ומיקום</h2>
               <Input
                 label="מחיר (\u20AA) *"
                 type="number"
@@ -627,7 +627,7 @@ export default function CreateCarPage() {
           {/* Step 5: Photos */}
           {currentStep === 5 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">תמונות</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">תמונות</h2>
               <p className="text-sm text-gray-500">הוסף תמונות של הרכב (עד 20 תמונות)</p>
 
               {uploadedMedia.length > 0 && (
@@ -684,7 +684,7 @@ export default function CreateCarPage() {
           {/* Step 6: Documents */}
           {currentStep === 6 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">מסמכים</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">מסמכים</h2>
               <p className="text-sm text-gray-500">העלאת מסמכים מעלה את ציון האמון של המודעה</p>
 
               {uploadedDocs.length > 0 && (
@@ -748,7 +748,7 @@ export default function CreateCarPage() {
           {/* Step 7: Preview */}
           {currentStep === 7 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">תצוגה מקדימה</h2>
+              <h2 className="text-lg font-bold text-brand-black tracking-tight">תצוגה מקדימה</h2>
               <div className="bg-gray-50 rounded-lg p-4">
                 {uploadedMedia.length > 0 && (
                   <img
@@ -819,7 +819,7 @@ export default function CreateCarPage() {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-4 border-t">
+          <div className="flex justify-between mt-8 pt-4 border-t border-gray-100">
             <Button variant="ghost" onClick={handleBack} disabled={currentStep === 1}>
               חזרה
             </Button>

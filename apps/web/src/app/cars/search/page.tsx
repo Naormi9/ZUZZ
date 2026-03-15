@@ -398,7 +398,7 @@ function CarsSearchPage() {
       </div>
 
       {/* Checkboxes */}
-      <div className="space-y-3 border-t border-gray-200 pt-4">
+      <div className="space-y-3 border-t border-gray-100 pt-4">
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -443,10 +443,10 @@ function CarsSearchPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {/* Breadcrumbs */}
           <nav aria-label="breadcrumb" className="text-sm text-gray-500 mb-2">
             <ol className="flex flex-wrap items-center gap-1">
@@ -474,7 +474,7 @@ function CarsSearchPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-brand-black tracking-tight">
                 {make ? `רכבי ${make}${model ? ` ${model}` : ''} למכירה` : 'חיפוש רכבים'}
               </h1>
               {!loading && (
@@ -550,14 +550,14 @@ function CarsSearchPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-72 flex-shrink-0">
             <Card>
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-900">סינון</h2>
+                  <h2 className="font-bold text-brand-black">סינון</h2>
                   {activeFilterCount > 0 && (
                     <Badge variant="secondary">{activeFilterCount} פעילים</Badge>
                   )}
@@ -680,8 +680,8 @@ function CarsSearchPage() {
             )}
 
             {/* Internal links section — always visible for SEO */}
-            <section className="mt-12 border-t border-gray-200 pt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">חיפושים פופולריים</h3>
+            <section className="mt-14 border-t border-gray-100 pt-8">
+              <h3 className="text-lg font-bold text-brand-black mb-4 tracking-tight">חיפושים פופולריים</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {['טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'סקודה', 'BMW', 'מרצדס', 'טסלה'].map((m) => (
                   <a

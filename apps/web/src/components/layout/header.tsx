@@ -18,7 +18,7 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur safe-area-top supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur safe-area-top supports-[backdrop-filter]:bg-white/80">
       <div className="container-app">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
@@ -42,7 +42,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-black"
               >
                 {item.label}
               </Link>
@@ -79,7 +79,7 @@ export function Header() {
                   <span className="hidden sm:inline">{user?.name ?? 'החשבון שלי'}</span>
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
                     <Link
                       href="/dashboard"
                       onClick={() => setUserMenuOpen(false)}
@@ -136,7 +136,7 @@ export function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-gray-200 pb-4 md:hidden">
+          <div className="border-t border-gray-100 pb-4 md:hidden">
             <nav className="mt-2 flex flex-col gap-1">
               {navigation.map((item) => (
                 <Link

@@ -47,8 +47,8 @@ export function ListingCard({
     <Wrapper
       href={href}
       className={cn(
-        'group block rounded-xl border bg-white overflow-hidden transition-shadow hover:shadow-md',
-        isFeatured ? 'border-amber-300 ring-1 ring-amber-200' : 'border-gray-200',
+        'group block rounded-2xl border bg-white overflow-hidden transition-all duration-200 hover:shadow-md',
+        isFeatured ? 'border-amber-300 ring-1 ring-amber-100' : 'border-gray-100',
         className,
       )}
     >
@@ -107,12 +107,12 @@ export function ListingCard({
       </div>
 
       {/* Content */}
-      <div className="p-3">
+      <div className="p-3 sm:p-4">
         {/* Price */}
         <PriceDisplay amount={price} currency={currency} isNegotiable={isNegotiable} size="sm" />
 
         {/* Title */}
-        <h3 className="text-sm font-medium text-gray-900 mt-1 line-clamp-2">{title}</h3>
+        <h3 className="text-sm font-semibold text-brand-black mt-1 line-clamp-2 tracking-tight">{title}</h3>
 
         {/* Details grid */}
         {details.length > 0 && (
@@ -124,7 +124,7 @@ export function ListingCard({
         )}
 
         {/* Bottom row: location + trust */}
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-gray-50">
           {city && <span className="text-xs text-gray-400">{city}</span>}
           <div className="flex items-center gap-1">
             {badges.map((b, i) => (

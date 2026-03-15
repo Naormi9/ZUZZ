@@ -12,26 +12,26 @@ export function TrustBadge({ score, size = 'md', showLabel = true, className }: 
   const getColor = (s: number) => {
     if (s >= 80)
       return {
-        bg: 'bg-emerald-100',
-        text: 'text-emerald-800',
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
         border: 'border-emerald-200',
         label: 'אמון גבוה',
       };
     if (s >= 60)
       return {
-        bg: 'bg-brand-100',
-        text: 'text-brand-800',
+        bg: 'bg-brand-50',
+        text: 'text-brand-700',
         border: 'border-brand-200',
         label: 'אמון טוב',
       };
     if (s >= 40)
       return {
-        bg: 'bg-amber-100',
-        text: 'text-amber-800',
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
         border: 'border-amber-200',
         label: 'אמון בינוני',
       };
-    return { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200', label: 'אמון נמוך' };
+    return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', label: 'אמון נמוך' };
   };
 
   const color = getColor(score);

@@ -202,9 +202,9 @@ export default function CarDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <Skeleton className="aspect-[16/9] w-full rounded-xl mb-6" />
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Skeleton className="aspect-[16/9] w-full rounded-2xl mb-6" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-4">
               <Skeleton className="h-10 w-3/4" />
@@ -223,10 +223,10 @@ export default function CarDetailPage() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">המודעה לא נמצאה</h1>
-          <p className="text-gray-500 mb-4">ייתכן שהמודעה הוסרה או שהקישור שגוי.</p>
+          <h1 className="text-2xl font-bold text-brand-black mb-2 tracking-tight">המודעה לא נמצאה</h1>
+          <p className="text-gray-500 mb-6">ייתכן שהמודעה הוסרה או שהקישור שגוי.</p>
           <Link href="/cars/search">
             <Button>חזור לחיפוש</Button>
           </Link>
@@ -255,7 +255,7 @@ export default function CarDetailPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* JSON-LD structured data */}
       <CarDetailJsonLd
         data={
@@ -282,7 +282,7 @@ export default function CarDetailPage() {
       />
 
       {/* Breadcrumbs */}
-      <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 pt-4 text-sm text-gray-500">
+      <nav aria-label="breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 text-sm text-gray-500">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
             <Link href="/" className="hover:text-gray-700">
@@ -387,7 +387,7 @@ export default function CarDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-6">
@@ -395,7 +395,7 @@ export default function CarDetailPage() {
             <div>
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{listing.title}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-brand-black tracking-tight">{listing.title}</h1>
                   <p className="text-sm text-gray-500 mt-1">
                     {listing.location.city}{' '}
                     {listing.location.area ? `- ${listing.location.area}` : ''}
@@ -445,7 +445,7 @@ export default function CarDetailPage() {
             {/* Vehicle Facts Grid */}
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">פרטי הרכב</h2>
+                <h2 className="text-lg font-bold text-brand-black mb-4 tracking-tight">פרטי הרכב</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {vehicleFacts.map((fact) => (
                     <div key={fact.label} className="text-center p-3 rounded-lg bg-gray-50">
@@ -462,7 +462,7 @@ export default function CarDetailPage() {
             {car.isEV && (
               <Card className="border-green-200 bg-green-50">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <Zap className="h-5 w-5 text-green-600" />
                     נתוני רכב חשמלי
                   </h2>
@@ -496,7 +496,7 @@ export default function CarDetailPage() {
             {listing.description && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">תיאור</h2>
+                  <h2 className="text-lg font-bold text-brand-black mb-3 tracking-tight">תיאור</h2>
                   <p className="text-gray-700 whitespace-pre-line leading-relaxed">
                     {listing.description}
                   </p>
@@ -508,7 +508,7 @@ export default function CarDetailPage() {
             {listing.sellerStatements.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">הצהרות המוכר</h2>
+                  <h2 className="text-lg font-bold text-brand-black mb-4 tracking-tight">הצהרות המוכר</h2>
                   <div className="space-y-3">
                     {listing.sellerStatements.map((statement) => (
                       <div key={statement.key} className="flex items-start gap-3">
@@ -554,7 +554,7 @@ export default function CarDetailPage() {
             {listing.documents.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <FileText className="h-5 w-5 text-gray-400" />
                     מסמכים
                   </h2>
@@ -562,7 +562,7 @@ export default function CarDetailPage() {
                     {listing.documents.map((doc) => (
                       <div
                         key={doc.id}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50"
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 bg-gray-50/50"
                       >
                         <FileText className="h-5 w-5 text-gray-400 flex-shrink-0" />
                         <span className="text-sm text-gray-700 flex-1">{doc.label}</span>
@@ -586,7 +586,7 @@ export default function CarDetailPage() {
             {listing.trustFactors.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-brand-black mb-4 flex items-center gap-2 tracking-tight">
                     <Shield className="h-5 w-5 text-brand-500" />
                     גורמי אמון
                   </h2>
@@ -646,7 +646,7 @@ export default function CarDetailPage() {
 
                 {/* Lead Form */}
                 {showLeadForm && (
-                  <div className="border-t border-gray-200 pt-4 space-y-3">
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
                     {leadSent ? (
                       <div className="text-center py-4">
                         <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
@@ -702,7 +702,7 @@ export default function CarDetailPage() {
             {/* Seller Card */}
             <Card>
               <CardContent className="p-5">
-                <h3 className="font-semibold text-gray-900 mb-3">פרטי המוכר</h3>
+                <h3 className="font-bold text-brand-black mb-3 tracking-tight">פרטי המוכר</h3>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     {listing.seller.avatarUrl ? (
@@ -775,7 +775,7 @@ export default function CarDetailPage() {
         </div>
 
         {/* Related Links */}
-        <section className="mt-8 border-t border-gray-200 pt-6">
+        <section className="mt-8 border-t border-gray-100 pt-6">
           <div className="flex flex-wrap gap-3">
             <Link
               href={`/cars/search?make=${encodeURIComponent(car.make)}`}
@@ -809,7 +809,7 @@ export default function CarDetailPage() {
         {/* Similar Cars */}
         {similarCars.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">רכבים דומים</h2>
+            <h2 className="text-xl font-bold text-brand-black mb-6 tracking-tight">רכבים דומים</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-x-auto">
               {similarCars.map((car) => (
                 <ListingCard
