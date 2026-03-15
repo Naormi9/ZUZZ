@@ -47,6 +47,7 @@ model User {
   cannedReplies       CannedReply[]
   recentlyViewed      RecentlyViewed[]
   priceAlerts         PriceAlert[]
+  promotions          Promotion[]
   emailDigestPref     EmailDigestPreference?
 
   @@index([email])
@@ -675,8 +676,10 @@ model Promotion {
   createdAt DateTime @default(now())
 
   listing Listing @relation(fields: [listingId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
   @@index([listingId])
+  @@index([userId])
   @@map("promotions")
 }
 
