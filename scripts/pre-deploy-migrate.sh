@@ -24,11 +24,11 @@ fi
 # 1. Check current status
 echo ""
 echo "📋 Migration status:"
-npx prisma migrate status --schema packages/database/prisma/schema.prisma 2>&1 || true
+pnpm --filter @zuzz/database db:migrate:status 2>&1 || true
 
 # 2. Backup if pg_dump is available
 if command -v pg_dump &> /dev/null; then
-    BACKUP_DIR="${BACKUP_DIR:-/tmp/zuzz-backups}"
+    BACKUP_DIR="${BACKUP_DIR:-/var/backups/zuzz}"
     mkdir -p "$BACKUP_DIR"
     BACKUP_FILE="$BACKUP_DIR/pre_migrate_$(date +%Y%m%d_%H%M%S).dump"
     echo ""
@@ -39,12 +39,12 @@ fi
 # 3. Apply migrations
 echo ""
 echo "🚀 Applying pending migrations..."
-npx prisma migrate deploy --schema packages/database/prisma/schema.prisma
+pnpm --filter @zuzz/database db:migrate:deploy
 
 # 4. Verify
 echo ""
 echo "✅ Migration complete. Final status:"
-npx prisma migrate status --schema packages/database/prisma/schema.prisma
+pnpm --filter @zuzz/database db:migrate:status
 
 echo ""
 echo "=== Migration finished ==="
