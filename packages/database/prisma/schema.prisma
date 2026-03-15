@@ -357,6 +357,8 @@ model CarListing {
   @@index([gearbox])
   @@index([mileage])
   @@index([sellerType])
+  @@index([licensePlate])
+  @@index([vin])
   @@map("car_listings")
 }
 

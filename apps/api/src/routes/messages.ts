@@ -23,7 +23,7 @@ messagesRouter.get('/conversations', authenticate, async (req, res, next) => {
       orderBy: { lastMessageAt: 'desc' },
     });
 
-    const data = conversations.map((conv) => ({
+    const data = conversations.map((conv: any) => ({
       ...conv,
       unreadCount: conv.buyerId === req.user!.id ? conv.buyerUnreadCount : conv.sellerUnreadCount,
       otherUser: conv.buyerId === req.user!.id ? conv.seller : conv.buyer,
@@ -173,7 +173,7 @@ messagesRouter.get('/unread-count', authenticate, async (req, res, next) => {
       },
     });
 
-    const total = conversations.reduce((sum, conv) => {
+    const total = conversations.reduce((sum: number, conv: any) => {
       if (conv.buyerId === req.user!.id) return sum + conv.buyerUnreadCount;
       return sum + conv.sellerUnreadCount;
     }, 0);

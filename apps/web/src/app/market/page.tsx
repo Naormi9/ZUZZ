@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button, ListingCard, Skeleton, Card, CardContent } from '@zuzz/ui';
 import { api } from '@/lib/api';
 
@@ -33,6 +34,7 @@ const CATEGORIES = [
 ];
 
 export default function MarketPage() {
+  const router = useRouter();
   const [recentItems, setRecentItems] = useState<MarketItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +63,7 @@ export default function MarketPage() {
               קנה ומכור כל דבר — עם אמון מובנה ומוכרים מזוהים.
             </p>
             <div className="mt-6">
-              <Button onClick={() => (window.location.href = '/market/create')} className="px-8">
+              <Button onClick={() => router.push('/market/create')} className="px-8">
                 פרסם מודעה חינם
               </Button>
             </div>

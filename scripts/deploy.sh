@@ -19,8 +19,10 @@ set -euo pipefail
 
 ENVIRONMENT="${1:-staging}"
 COMPOSE_FILE="docker-compose.production.yml"
-HEALTH_URL="http://localhost:4000/api/health"
-READY_URL="http://localhost:4000/api/health/ready"
+API_HOST="${API_HOST:-localhost}"
+API_PORT="${API_PORT:-4000}"
+HEALTH_URL="http://${API_HOST}:${API_PORT}/api/health"
+READY_URL="http://${API_HOST}:${API_PORT}/api/health/ready"
 MAX_HEALTH_RETRIES=30
 HEALTH_RETRY_INTERVAL=5
 

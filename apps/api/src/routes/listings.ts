@@ -72,6 +72,13 @@ listingsRouter.get('/:id', optionalAuth, async (req, res, next) => {
 listingsRouter.patch('/:id/status', authenticate, async (req, res, next) => {
   try {
     const { status, reason } = req.body;
+    if (!status || typeof status !== 'string') {
+      throw new AppError(400, 'INVALID', 'סטטוס נדרש');
+    }
+    const validStatuses = ['draft', 'pending_review', 'active', 'paused', 'sold', 'archived', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      throw new AppError(400, 'INVALID', 'סטטוס לא תקין');
+    }
     const listing = await prisma.listing.findUnique({
       where: { id: req.params.id },
     });

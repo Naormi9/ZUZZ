@@ -173,9 +173,12 @@ carsRouter.put('/:id/location', authenticate, async (req, res, next) => {
     }
 
     const { city, region } = req.body;
+    if (!city || typeof city !== 'string' || city.trim().length === 0) {
+      throw new AppError(400, 'INVALID', 'עיר נדרשת');
+    }
     const updated = await prisma.listing.update({
       where: { id: req.params.id },
-      data: { city, region },
+      data: { city: city.trim(), region: region?.trim() || null },
     });
 
     res.json({ success: true, data: updated });
@@ -400,12 +403,12 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
         {
           field: 'make',
           label: 'יצרן',
-          values: facets[0].map((f) => ({ value: f.make, label: f.make, count: f._count.make })),
+          values: facets[0].map((f: any) => ({ value: f.make, label: f.make, count: f._count.make })),
         },
         {
           field: 'fuelType',
           label: 'סוג דלק',
-          values: facets[1].map((f) => ({
+          values: facets[1].map((f: any) => ({
             value: f.fuelType,
             label: f.fuelType,
             count: f._count.fuelType,
@@ -414,7 +417,7 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
         {
           field: 'gearbox',
           label: 'תיבת הילוכים',
-          values: facets[2].map((f) => ({
+          values: facets[2].map((f: any) => ({
             value: f.gearbox,
             label: f.gearbox,
             count: f._count.gearbox,
@@ -424,8 +427,8 @@ carsRouter.get('/search', optionalAuth, async (req, res, next) => {
           field: 'bodyType',
           label: 'סוג מרכב',
           values: facets[3]
-            .filter((f) => f.bodyType)
-            .map((f) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })),
+            .filter((f: any) => f.bodyType)
+            .map((f: any) => ({ value: f.bodyType!, label: f.bodyType!, count: f._count.bodyType })),
         },
       ]),
     });
@@ -445,7 +448,7 @@ carsRouter.get('/makes', async (_req, res, next) => {
 
     res.json({
       success: true,
-      data: makes.map((m) => ({ make: m.make, count: m._count.make })),
+      data: makes.map((m: any) => ({ make: m.make, count: m._count.make })),
     });
   } catch (err) {
     next(err);
@@ -463,7 +466,7 @@ carsRouter.get('/models/:make', async (req, res, next) => {
 
     res.json({
       success: true,
-      data: models.map((m) => ({ model: m.model, count: m._count.model })),
+      data: models.map((m: any) => ({ model: m.model, count: m._count.model })),
     });
   } catch (err) {
     next(err);

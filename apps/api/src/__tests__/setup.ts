@@ -121,6 +121,7 @@ vi.mock('@zuzz/database', () => {
       create: vi.fn(),
     },
     $queryRaw: vi.fn(),
+    $transaction: vi.fn(async (ops: any[]) => Promise.all(ops)),
     $disconnect: vi.fn(),
   };
 

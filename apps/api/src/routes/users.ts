@@ -128,7 +128,7 @@ usersRouter.get('/:id/seller-card', async (req, res, next) => {
       data: {
         user: { id: user.id, name: user.name, memberSince: user.createdAt },
         profile,
-        organizations: user.organizationMembers.map((m) => m.organization),
+        organizations: user.organizationMembers.map((m: any) => m.organization),
       },
     });
   } catch (err) {

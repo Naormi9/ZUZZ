@@ -7,7 +7,18 @@ export function createLogger(name: string) {
     name,
     level: process.env.LOG_LEVEL ?? (isDev ? 'debug' : 'info'),
     redact: {
-      paths: ['req.headers.authorization', 'req.headers.cookie', 'password', 'token', 'secret'],
+      paths: [
+        'req.headers.authorization',
+        'req.headers.cookie',
+        'password',
+        'token',
+        'secret',
+        'apiKey',
+        'phone',
+        'email',
+        'creditCard',
+        'personalNumber',
+      ],
       censor: '[REDACTED]',
     },
     ...(isDev

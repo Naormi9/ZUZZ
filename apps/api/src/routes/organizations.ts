@@ -24,10 +24,24 @@ organizationsRouter.post('/', authenticate, async (req, res, next) => {
   try {
     const { name, type, description, phone, email, website, city, region, address, licenseNumber } =
       req.body;
-    if (!name || !type) throw new AppError(400, 'INVALID', 'שם וסוג ארגון נדרשים');
+    if (!name || typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 200) {
+      throw new AppError(400, 'INVALID', 'שם ארגון נדרש (2-200 תווים)');
+    }
+    if (!type) throw new AppError(400, 'INVALID', 'סוג ארגון נדרש');
 
     const validTypes = ['dealer', 'agency', 'developer', 'business'];
     if (!validTypes.includes(type)) throw new AppError(400, 'INVALID', 'סוג ארגון לא תקין');
+
+    // Validate optional fields
+    if (email && typeof email === 'string' && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      throw new AppError(400, 'INVALID', 'כתובת אימייל לא תקינה');
+    }
+    if (licenseNumber && typeof licenseNumber === 'string' && licenseNumber.length > 50) {
+      throw new AppError(400, 'INVALID', 'מספר רישיון ארוך מדי');
+    }
+    if (website && typeof website === 'string' && !website.match(/^https?:\/\/.+/)) {
+      throw new AppError(400, 'INVALID', 'כתובת אתר לא תקינה');
+    }
 
     // Check if user already owns an org
     const existing = await prisma.organizationMember.findFirst({
@@ -87,7 +101,7 @@ organizationsRouter.get('/my', authenticate, async (req, res, next) => {
       },
     });
 
-    const orgs = memberships.map((m) => ({
+    const orgs = memberships.map((m: any) => ({
       ...m.organization,
       myRole: m.role,
     }));
@@ -124,6 +138,18 @@ organizationsRouter.patch('/:id', authenticate, async (req, res, next) => {
     await requireOrgMember(req.user!.id, req.params.id!, ['owner', 'admin']);
 
     const { name, description, phone, email, website, city, region, address, logoUrl } = req.body;
+
+    // Validate URL fields
+    if (logoUrl !== undefined && logoUrl !== null && typeof logoUrl === 'string' && logoUrl.length > 0) {
+      if (!logoUrl.match(/^https?:\/\/.+/)) {
+        throw new AppError(400, 'INVALID', 'כתובת לוגו לא תקינה');
+      }
+    }
+    if (website !== undefined && website !== null && typeof website === 'string' && website.length > 0) {
+      if (!website.match(/^https?:\/\/.+/)) {
+        throw new AppError(400, 'INVALID', 'כתובת אתר לא תקינה');
+      }
+    }
 
     const org = await prisma.organization.update({
       where: { id: req.params.id! },
@@ -312,7 +338,7 @@ organizationsRouter.get('/:id/leads', authenticate, async (req, res, next) => {
       where: { organizationId: req.params.id! },
       select: { id: true },
     });
-    const listingIds = orgListings.map((l) => l.id);
+    const listingIds = orgListings.map((l: any) => l.id);
 
     const where: Record<string, unknown> = { listingId: { in: listingIds } };
     if (status) where.status = status;

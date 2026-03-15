@@ -15,6 +15,15 @@ leadsRouter.post('/', authenticate, async (req, res, next) => {
 
     if (!listingId) throw new AppError(400, 'INVALID', 'יש לספק מזהה מודעה');
 
+    // Validate email format if provided
+    if (email && typeof email === 'string' && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      throw new AppError(400, 'INVALID', 'כתובת אימייל לא תקינה');
+    }
+    // Validate phone format if provided (Israeli phone)
+    if (phone && typeof phone === 'string' && !phone.match(/^[0-9+\-\s()]{7,20}$/)) {
+      throw new AppError(400, 'INVALID', 'מספר טלפון לא תקין');
+    }
+
     const leadType = type || 'contact';
     if (!VALID_LEAD_TYPES.includes(leadType)) {
       throw new AppError(400, 'INVALID', 'סוג ליד לא תקין');

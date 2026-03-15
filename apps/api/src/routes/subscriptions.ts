@@ -72,6 +72,16 @@ subscriptionsRouter.post(
       if (!userId || !plan) throw new AppError(400, 'INVALID', 'userId ו-plan נדרשים');
       if (!VALID_PLANS.includes(plan)) throw new AppError(400, 'INVALID', 'תוכנית לא תקינה');
 
+      // Validate user exists
+      const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (!targetUser) throw new AppError(404, 'NOT_FOUND', 'משתמש לא נמצא');
+
+      // Validate org exists if provided
+      if (organizationId) {
+        const org = await prisma.organization.findUnique({ where: { id: organizationId } });
+        if (!org) throw new AppError(404, 'NOT_FOUND', 'ארגון לא נמצא');
+      }
+
       const months = Math.min(Math.max(durationMonths || 1, 1), 24);
       const start = new Date();
       const end = new Date(start);

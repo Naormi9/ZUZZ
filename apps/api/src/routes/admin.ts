@@ -169,6 +169,9 @@ adminRouter.get('/moderation', async (req, res, next) => {
 adminRouter.post('/moderation/:listingId/action', async (req, res, next) => {
   try {
     const { action, reason } = req.body;
+    if (!action || typeof action !== 'string') {
+      throw new AppError(400, 'INVALID', 'פעולה נדרשת');
+    }
     const listing = await prisma.listing.findUnique({ where: { id: req.params.listingId } });
     if (!listing) throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
 
@@ -251,6 +254,10 @@ adminRouter.get('/reports', async (req, res, next) => {
 adminRouter.patch('/reports/:id', async (req, res, next) => {
   try {
     const { status } = req.body;
+    const validStatuses = ['open', 'investigating', 'resolved', 'dismissed'];
+    if (!status || !validStatuses.includes(status)) {
+      throw new AppError(400, 'INVALID', 'סטטוס דיווח לא תקין');
+    }
     await prisma.listingReport.update({
       where: { id: req.params.id },
       data: { status },
@@ -392,6 +399,9 @@ adminRouter.get('/feature-flags', async (_req, res, next) => {
 adminRouter.patch('/feature-flags/:id', async (req, res, next) => {
   try {
     const { isEnabled } = req.body;
+    if (typeof isEnabled !== 'boolean') {
+      throw new AppError(400, 'INVALID', 'isEnabled חייב להיות ערך בוליאני');
+    }
     const flag = await prisma.featureFlag.update({
       where: { id: req.params.id },
       data: { isEnabled },

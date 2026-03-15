@@ -1,21 +1,38 @@
 import { prisma } from '@zuzz/database';
 import { TrustEngine } from '@zuzz/trust-engine';
 import type { ListingBase, ListingVertical, MediaItem } from '@zuzz/types';
-import type {
-  Listing,
-  CarListing,
-  ListingMedia,
-  ListingDocument,
-  UserProfile,
-} from '@zuzz/database';
+import { AppError } from '../middleware/error-handler';
 
 const engine = new TrustEngine();
 
-type ListingWithRelations = Listing & {
-  carDetails?: CarListing | null;
-  media?: ListingMedia[];
-  documents?: ListingDocument[];
-  user?: { profile?: UserProfile | null } | null;
+type ListingWithRelations = {
+  id: string;
+  userId: string;
+  organizationId: string | null;
+  vertical: string;
+  status: string;
+  moderationStatus: string;
+  title: string;
+  description: string | null;
+  priceAmount: number;
+  priceCurrency: string;
+  isNegotiable: boolean;
+  city: string | null;
+  region: string | null;
+  viewCount: number;
+  favoriteCount: number;
+  completenessScore: number;
+  trustScore: number | null;
+  isFeatured: boolean;
+  isPromoted: boolean;
+  publishedAt: Date | null;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  carDetails?: Record<string, any> | null;
+  media?: Array<Record<string, any>>;
+  documents?: Array<Record<string, any>>;
+  user?: { profile?: Record<string, any> | null } | null;
 };
 
 /**
@@ -37,11 +54,11 @@ function toListingBase(listing: ListingWithRelations): ListingBase {
     isNegotiable: listing.isNegotiable,
     location: { city: listing.city ?? undefined, region: listing.region ?? undefined },
     media: (listing.media ?? []).map(
-      (m: ListingMedia): MediaItem => ({
+      (m): MediaItem => ({
         id: m.id,
         url: m.url,
         thumbnailUrl: m.thumbnailUrl ?? undefined,
-        type: m.type as any,
+        type: m.type as MediaItem['type'],
         mimeType: m.mimeType ?? '',
         size: m.size ?? 0,
         width: m.width ?? undefined,
@@ -101,7 +118,7 @@ function toListingBase(listing: ListingWithRelations): ListingBase {
 
   // Attach documents
   if (listing.documents) {
-    (base as any).documents = listing.documents.map((d: ListingDocument) => ({
+    (base as any).documents = listing.documents.map((d: Record<string, any>) => ({
       id: d.id,
       type: d.type,
       name: d.name,
@@ -129,7 +146,7 @@ export async function computeAndPersistTrust(
     },
   });
 
-  if (!listing) throw new Error('Listing not found');
+  if (!listing) throw new AppError(404, 'NOT_FOUND', 'מודעה לא נמצאה');
 
   const listingBase = toListingBase(listing);
 

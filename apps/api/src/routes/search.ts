@@ -8,13 +8,14 @@ export const searchRouter = Router();
 // Global search across verticals
 searchRouter.get('/', optionalAuth, async (req, res, next) => {
   try {
-    const q = req.query.q as string;
+    const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 200) : '';
     const vertical = req.query.vertical as string;
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = Math.min(parseInt(req.query.pageSize as string) || 20, 50);
 
+    const validVerticals = ['cars', 'homes', 'market'];
     const where: any = { status: 'active' };
-    if (vertical) where.vertical = vertical;
+    if (vertical && validVerticals.includes(vertical)) where.vertical = vertical;
     if (q) {
       where.OR = [
         { title: { contains: q, mode: 'insensitive' } },
@@ -125,7 +126,7 @@ searchRouter.get('/recent', authenticate, async (req, res, next) => {
       take: 20,
     });
 
-    res.json({ success: true, data: recent.map((r) => r.listing) });
+    res.json({ success: true, data: recent.map((r: any) => r.listing) });
   } catch (err) {
     next(err);
   }
@@ -134,7 +135,7 @@ searchRouter.get('/recent', authenticate, async (req, res, next) => {
 // Suggest search terms
 searchRouter.get('/suggest', async (req, res, next) => {
   try {
-    const q = req.query.q as string;
+    const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 100) : '';
     if (!q || q.length < 2) {
       return res.json({ success: true, data: [] });
     }
@@ -152,7 +153,7 @@ searchRouter.get('/suggest', async (req, res, next) => {
       take: 5,
     });
 
-    const suggestions = carSuggestions.map((c) => `${c.make} ${c.model}`);
+    const suggestions = carSuggestions.map((c: any) => `${c.make} ${c.model}`);
 
     res.json({ success: true, data: suggestions });
   } catch (err) {

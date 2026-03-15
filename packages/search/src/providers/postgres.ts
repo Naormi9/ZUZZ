@@ -7,6 +7,45 @@ import type {
 } from '../types';
 
 /**
+ * Allowed field names for dynamic filter/facet/sort queries.
+ * Only these identifiers may appear in SQL — prevents injection.
+ */
+const ALLOWED_DATA_FIELDS = new Set([
+  'make',
+  'model',
+  'year',
+  'mileage',
+  'fuelType',
+  'gearbox',
+  'bodyType',
+  'color',
+  'sellerType',
+  'handCount',
+  'engineVolume',
+  'horsepower',
+  'seats',
+  'isElectric',
+  'propertyType',
+  'listingType',
+  'rooms',
+  'sizeSqm',
+  'floor',
+  'category',
+  'condition',
+  'brand',
+]);
+
+const ALLOWED_VERTICALS = new Set(['cars', 'homes', 'market']);
+
+const ALLOWED_SORT_COLUMNS = new Set(['createdAt', 'updatedAt', 'priceAmount', 'trustScore']);
+
+function assertValidIdentifier(name: string): void {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid identifier: ${name}`);
+  }
+}
+
+/**
  * PostgreSQL full-text search provider using pg_trgm and tsvector.
  *
  * This provider executes raw SQL queries against the listings table
@@ -37,9 +76,21 @@ export class PostgresSearchProvider implements SearchProvider {
       geo,
     } = query;
 
-    const conditions: string[] = [`"vertical" = '${vertical}'`, `"status" = 'active'`];
+    // Validate vertical against allowlist
+    if (!ALLOWED_VERTICALS.has(vertical)) {
+      throw new Error(`Invalid vertical: ${vertical}`);
+    }
+
+    const conditions: string[] = [];
     const params: unknown[] = [];
     let paramIndex = 1;
+
+    // Use parameterized query for vertical
+    conditions.push(`"vertical" = $${paramIndex}`);
+    params.push(vertical);
+    paramIndex++;
+
+    conditions.push(`"status" = 'active'`);
 
     // Full-text search condition
     let orderClause = `"createdAt" DESC`;
@@ -68,10 +119,12 @@ export class PostgresSearchProvider implements SearchProvider {
       paramIndex += 3;
     }
 
-    // Dynamic filters
+    // Dynamic filters — only allow whitelisted field names
     if (filters) {
       for (const [key, value] of Object.entries(filters)) {
         if (value === undefined || value === null) continue;
+        if (!ALLOWED_DATA_FIELDS.has(key)) continue;
+        assertValidIdentifier(key);
 
         if (typeof value === 'object' && value !== null && ('min' in value || 'max' in value)) {
           const range = value as { min?: number; max?: number };
@@ -97,14 +150,16 @@ export class PostgresSearchProvider implements SearchProvider {
       }
     }
 
-    // Custom sort
+    // Custom sort — only allow whitelisted columns
     if (sortBy) {
       const direction = sortOrder === 'asc' ? 'ASC' : 'DESC';
-      if (['createdAt', 'updatedAt', 'price'].includes(sortBy)) {
+      if (ALLOWED_SORT_COLUMNS.has(sortBy)) {
         orderClause = `"${sortBy}" ${direction}`;
-      } else {
+      } else if (ALLOWED_DATA_FIELDS.has(sortBy)) {
+        assertValidIdentifier(sortBy);
         orderClause = `"data"->>'${sortBy}' ${direction}`;
       }
+      // If sortBy is not in any allowlist, keep the default order
     }
 
     const whereClause = conditions.join(' AND ');
@@ -146,6 +201,7 @@ export class PostgresSearchProvider implements SearchProvider {
     limit: number = 10,
   ): Promise<SearchSuggestion[]> {
     if (!query.trim()) return [];
+    if (!ALLOWED_VERTICALS.has(vertical)) return [];
 
     const results = (await this.prisma.$queryRawUnsafe(
       `SELECT DISTINCT "title", similarity("title", $1) as similarity
@@ -169,8 +225,8 @@ export class PostgresSearchProvider implements SearchProvider {
     vertical: 'cars' | 'homes' | 'market',
     fields: string[],
   ): Promise<SearchFacetResult[]> {
-    const whereClause = `"vertical" = '${vertical}' AND "status" = 'active'`;
-    return this.computeFacets(fields, whereClause, []);
+    if (!ALLOWED_VERTICALS.has(vertical)) return [];
+    return this.computeFacets(fields, `"vertical" = '${vertical}' AND "status" = 'active'`, []);
   }
 
   private async computeFacets(
@@ -181,6 +237,10 @@ export class PostgresSearchProvider implements SearchProvider {
     const facets: SearchFacetResult[] = [];
 
     for (const field of fields) {
+      // Only allow whitelisted field names to prevent SQL injection
+      if (!ALLOWED_DATA_FIELDS.has(field)) continue;
+      assertValidIdentifier(field);
+
       try {
         const rows = (await this.prisma.$queryRawUnsafe(
           `SELECT "data"->>'${field}' as value, COUNT(*) as count
