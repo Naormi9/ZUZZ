@@ -18,6 +18,9 @@ const mockPrisma = prisma as unknown as {
   notification: {
     create: ReturnType<typeof vi.fn>;
   };
+  deviceToken: {
+    findMany: ReturnType<typeof vi.fn>;
+  };
 };
 
 let authToken: string;
@@ -67,6 +70,7 @@ describe('POST /api/leads', () => {
     mockPrisma.listing.findUnique.mockResolvedValueOnce(listing);
     mockPrisma.lead.create.mockResolvedValueOnce(createdLead);
     mockPrisma.notification.create.mockResolvedValueOnce({});
+    mockPrisma.deviceToken.findMany.mockResolvedValueOnce([]);
 
     const res = await request(app)
       .post('/api/leads')

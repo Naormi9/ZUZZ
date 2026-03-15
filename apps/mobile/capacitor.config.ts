@@ -1,20 +1,24 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const config: CapacitorConfig = {
   appId: 'il.co.zuzz.app',
   appName: 'ZUZZ',
   webDir: 'www',
 
-  // Server configuration — in production, load from deployed web app URL.
-  // In development, point to local Next.js dev server.
-  server: {
-    // For production builds, this should be the deployed web app URL:
-    // url: 'https://app.zuzz.co.il',
-    // For local development:
-    url: 'http://10.0.2.2:3000', // Android emulator localhost alias
-    cleartext: true, // Allow HTTP in dev — disable in production
-    androidScheme: 'https',
-  },
+  server: isProduction
+    ? {
+        // Production: load from deployed web app
+        url: 'https://app.zuzz.co.il',
+        androidScheme: 'https',
+      }
+    : {
+        // Development: point to local Next.js dev server
+        url: 'http://10.0.2.2:3000', // Android emulator localhost alias
+        cleartext: true,
+        androidScheme: 'https',
+      },
 
   plugins: {
     SplashScreen: {
@@ -37,9 +41,7 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
-    Camera: {
-      // Use CameraSource.Photos for gallery-only, CameraSource.Camera for camera-only
-    },
+    Camera: {},
   },
 
   // iOS-specific config

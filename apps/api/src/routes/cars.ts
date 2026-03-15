@@ -10,6 +10,9 @@ import { authenticate, optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/error-handler';
 import { serializeListingCard, serializeSearchResults } from '../serializers/listing';
 import { computeAndPersistTrust } from '../lib/trust';
+import { createLogger } from '@zuzz/logger';
+
+const logger = createLogger('api:cars');
 
 export const carsRouter = Router();
 
@@ -149,14 +152,36 @@ carsRouter.put('/:id/pricing', authenticate, async (req, res, next) => {
 
     const data = carPricingSchema.parse(req.body);
 
+    const oldPrice = listing.priceAmount;
+    const newPrice = data.price.amount;
+
     const updated = await prisma.listing.update({
       where: { id: req.params.id },
       data: {
-        priceAmount: data.price.amount,
+        priceAmount: newPrice,
         priceCurrency: data.price.currency,
         isNegotiable: data.isNegotiable,
       },
     });
+
+    // Create price alerts for watchers if price changed on active listing
+    if (oldPrice > 0 && oldPrice !== newPrice && listing.status === 'active') {
+      const watchers = await prisma.favorite.findMany({
+        where: { listingId: listing.id },
+        select: { userId: true },
+      });
+
+      for (const watcher of watchers) {
+        prisma.priceAlert.create({
+          data: {
+            userId: watcher.userId,
+            listingId: listing.id,
+            oldPrice,
+            newPrice,
+          },
+        }).catch((e: unknown) => logger.error({ err: e }, 'Failed to create price alert'));
+      }
+    }
 
     res.json({ success: true, data: updated });
   } catch (err) {

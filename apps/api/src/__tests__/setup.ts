@@ -8,8 +8,10 @@ vi.mock('@zuzz/database', () => {
     user: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
+      findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      count: vi.fn(),
     },
     otpCode: {
       create: vi.fn(),
@@ -52,34 +54,91 @@ vi.mock('@zuzz/database', () => {
       findMany: vi.fn(),
       create: vi.fn(),
       updateMany: vi.fn(),
+      count: vi.fn(),
     },
     lead: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      count: vi.fn(),
     },
     favorite: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
+      upsert: vi.fn(),
       delete: vi.fn(),
       count: vi.fn(),
     },
     notification: {
+      findUnique: vi.fn(),
       create: vi.fn(),
       findMany: vi.fn(),
       updateMany: vi.fn(),
       update: vi.fn(),
+      count: vi.fn(),
     },
     listingReport: {
       create: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+    },
+    featureFlag: {
+      findMany: vi.fn(),
+      update: vi.fn(),
     },
     moderationCase: {
       create: vi.fn(),
+      findMany: vi.fn(),
     },
     recentlyViewed: {
       upsert: vi.fn(),
+      findMany: vi.fn(),
+    },
+    deviceToken: {
+      findMany: vi.fn(),
+      upsert: vi.fn(),
+      updateMany: vi.fn(),
+      count: vi.fn(),
+    },
+    priceAlert: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    emailDigestPreference: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      upsert: vi.fn(),
+    },
+    analyticsEvent: {
+      create: vi.fn(),
+      count: vi.fn(),
+      groupBy: vi.fn(),
+    },
+    savedSearch: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+    },
+    invoice: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      count: vi.fn(),
+    },
+    payment: {
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      count: vi.fn(),
+      aggregate: vi.fn(),
     },
     listingStatusHistory: {
       create: vi.fn(),
@@ -119,6 +178,8 @@ vi.mock('@zuzz/database', () => {
     },
     auditLog: {
       create: vi.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
     },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(async (ops: any[]) => Promise.all(ops)),
@@ -132,7 +193,7 @@ vi.mock('@zuzz/database', () => {
 // Mock @zuzz/redis
 // ---------------------------------------------------------------------------
 vi.mock('@zuzz/redis', () => ({
-  getRedis: vi.fn(() => ({ call: vi.fn() })),
+  getRedis: vi.fn(() => ({ call: vi.fn(), incr: vi.fn().mockResolvedValue(1), expire: vi.fn(), ping: vi.fn().mockResolvedValue('PONG') })),
   pingRedis: vi.fn(),
   disconnectRedis: vi.fn(),
 }));
