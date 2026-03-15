@@ -1,0 +1,19 @@
+# Capacitor native projects — generated, should be committed for reproducibility
+# but build artifacts should not be
+
+# Android build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
+# iOS build artifacts
+ios/App/build/
+ios/App/Pods/
+ios/DerivedData/
+
+# Generated www directory (copied from web build)
+www/
+
+# Node modules
+node_modules/

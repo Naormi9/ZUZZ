@@ -3,6 +3,8 @@ import { Providers } from '@/lib/providers';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { MobileNav } from '@/components/layout/mobile-nav';
+import { MobileAppShell } from '@/components/mobile/mobile-app-shell';
+import { NetworkBanner } from '@/components/mobile/network-banner';
 import { JsonLd } from '@/components/seo/json-ld';
 import { organizationJsonLd, webSiteJsonLd } from '@/lib/json-ld';
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/seo';
@@ -64,8 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={webSiteJsonLd()} />
         <Providers>
+          <MobileAppShell />
+          <NetworkBanner />
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pb-safe">{children}</main>
           <Footer />
           <MobileNav />
         </Providers>

@@ -116,6 +116,21 @@ Key ideas:
 - Listing cards must be highly scannable
 - Trust information must be visible above the fold where possible
 
+## Mobile App (Capacitor)
+
+ZUZZ has a Capacitor mobile app shell at `apps/mobile/` that wraps the web app for iOS and Android distribution.
+
+Architecture: **Remote URL shell** — loads the deployed Next.js web app inside a native Capacitor container with native plugin access.
+
+Key paths:
+- `apps/mobile/` — Capacitor project (config, native projects, assets)
+- `apps/web/src/lib/mobile/` — Mobile integration layer (platform detection, plugins, storage)
+- `apps/web/src/components/mobile/` — Mobile-specific React components
+
+App identity: `il.co.zuzz.app`, URL scheme `zuzz://`
+
+Docs: `docs/mobile-capacitor.md`, `docs/mobile-build.md`, `docs/store-submission-checklist.md`
+
 ## Commands
 
 ```bash
@@ -128,6 +143,13 @@ pnpm typecheck         # Type-check all packages
 pnpm test              # Run all tests (vitest)
 pnpm test:e2e          # Run Playwright E2E tests
 pnpm format            # Format code with Prettier
+
+# Mobile App
+pnpm mobile:sync              # Sync Capacitor plugins to native projects
+pnpm mobile:open:android      # Open Android project in Android Studio
+pnpm mobile:open:ios          # Open iOS project in Xcode
+pnpm mobile:run:android       # Build and run on Android device/emulator
+pnpm mobile:run:ios           # Build and run on iOS device/simulator
 
 # Database
 pnpm db:generate       # Generate Prisma client
@@ -191,8 +213,9 @@ Prefer focused subagents with narrow responsibilities:
 
 ## Test coverage
 
-- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (15), promotions (7), subscriptions (5)
-- Trust engine: unit tests
+- API tests: auth (19), cars (27), upload (14), health (8), messages (10), leads (8), favorites (4), organizations (17), promotions (7), subscriptions (7)
+- Trust engine: unit tests (5)
+- Web mobile integration: capacitor detection (6), deep links (15), share (2)
 - E2E: Playwright tests for cars flow
 - All tests run via `pnpm test` in CI
 
@@ -215,6 +238,9 @@ Prefer focused subagents with narrow responsibilities:
 
 ## Documentation
 
+- docs/mobile-capacitor.md — Mobile app Capacitor integration architecture
+- docs/mobile-build.md — Mobile app build guide (dev + production)
+- docs/store-submission-checklist.md — App Store + Google Play submission checklist
 - docs/architecture.md — System architecture
 - docs/local-setup.md — Local dev setup
 - docs/deployment.md — Deployment guide & checklist

@@ -18,7 +18,7 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur safe-area-top supports-[backdrop-filter]:bg-white/80">
       <div className="container-app">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
