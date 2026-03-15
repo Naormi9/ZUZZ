@@ -24,7 +24,7 @@ import {
   EmptyState,
 } from '@zuzz/ui';
 import { api } from '@/lib/api';
-import { SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SlidersHorizontal, ChevronLeft, ChevronRight, X, Bell, Search } from 'lucide-react';
 
 interface SearchApiResponse {
   success: boolean;
@@ -547,6 +547,69 @@ function CarsSearchPage() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Active Filter Chips */}
+          {activeFilterCount > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2 items-center">
+              {make && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {make}
+                  <button onClick={() => setMake('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {model && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {model}
+                  <button onClick={() => setModel('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {(yearFrom || yearTo) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  שנתון: {yearFrom || '?'}-{yearTo || '?'}
+                  <button onClick={() => { setYearFrom(''); setYearTo(''); }} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {(priceFrom || priceTo) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  מחיר: {priceFrom ? `₪${Number(priceFrom).toLocaleString()}` : '?'}-{priceTo ? `₪${Number(priceTo).toLocaleString()}` : '?'}
+                  <button onClick={() => { setPriceFrom(''); setPriceTo(''); }} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {fuelType && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {FUEL_TYPES.find(f => f.value === fuelType)?.label ?? fuelType}
+                  <button onClick={() => setFuelType('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {gearbox && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  {GEARBOX_OPTIONS.find(g => g.value === gearbox)?.label ?? gearbox}
+                  <button onClick={() => setGearbox('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {maxMileage && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+                  עד {Number(maxMileage).toLocaleString()} ק&quot;מ
+                  <button onClick={() => setMaxMileage('')} className="hover:text-brand-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {verifiedSeller && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-medium">
+                  מוכר מאומת
+                  <button onClick={() => setVerifiedSeller(false)} className="hover:text-emerald-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {noAccidents && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-medium">
+                  ללא תאונות
+                  <button onClick={() => setNoAccidents(false)} className="hover:text-emerald-900"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              <button onClick={clearFilters} className="text-xs text-gray-500 hover:text-gray-700 underline">
+                נקה הכל
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -569,6 +632,28 @@ function CarsSearchPage() {
 
           {/* Results */}
           <div className="flex-1 min-w-0">
+            {/* Results summary bar */}
+            {!loading && total > 0 && (
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+                <p className="text-sm text-gray-500">
+                  מציג {Math.min((page - 1) * 20 + 1, total)}-{Math.min(page * 20, total)} מתוך {total.toLocaleString('he-IL')} תוצאות
+                </p>
+                <button
+                  className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors"
+                  onClick={() => {
+                    // Save search placeholder - shows alert opt-in
+                    const url = `/cars/search?${buildQuery()}`;
+                    if (typeof window !== 'undefined') {
+                      window.alert('התראות על חיפוש זה יהיו זמינות בקרוב!');
+                    }
+                  }}
+                >
+                  <Bell className="h-4 w-4" />
+                  שמור חיפוש
+                </button>
+              </div>
+            )}
+
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -673,10 +758,36 @@ function CarsSearchPage() {
                 )}
               </>
             ) : (
-              <EmptyState
-                title="לא נמצאו תוצאות"
-                description="נסה לשנות את הסינון או להרחיב את החיפוש"
-              />
+              <div className="py-20 text-center">
+                <Search className="h-16 w-16 text-gray-200 mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-brand-black mb-2 tracking-tight">לא נמצאו תוצאות</h3>
+                <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+                  נסה לשנות את הסינון או להרחיב את החיפוש
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Button variant="outline" onClick={clearFilters}>
+                    נקה את כל הסינונים
+                  </Button>
+                  <Link href="/cars">
+                    <Button variant="ghost">חזור לדף הרכב</Button>
+                  </Link>
+                </div>
+                {/* Suggested alternatives */}
+                <div className="mt-10 pt-8 border-t border-gray-100">
+                  <p className="text-sm font-semibold text-gray-600 mb-4">חיפושים פופולריים</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {['טויוטה', 'יונדאי', 'קיה', 'מאזדה', 'BMW', 'מרצדס'].map((m) => (
+                      <a
+                        key={m}
+                        href={`/cars/search?make=${encodeURIComponent(m)}`}
+                        className="rounded-full border border-gray-100 bg-white px-4 py-2 text-sm font-medium text-brand-black hover:border-brand-300 hover:bg-brand-50 transition-all"
+                      >
+                        {m}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Internal links section — always visible for SEO */}

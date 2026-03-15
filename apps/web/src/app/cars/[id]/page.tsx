@@ -39,6 +39,9 @@ import {
   ClipboardCheck,
 } from 'lucide-react';
 import { CarDetailJsonLd } from './car-detail-jsonld';
+import { useCompare } from '@/lib/hooks/use-compare';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
+import { ArrowLeftRight } from 'lucide-react';
 
 interface CarMedia {
   id: string;
@@ -140,6 +143,9 @@ export default function CarDetailPage() {
   const [leadSent, setLeadSent] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
+  const { addToCompare, removeFromCompare, isInCompare, isFull: compareFull } = useCompare();
+  const { addItem: addRecentlyViewed } = useRecentlyViewed('cars');
+
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -158,7 +164,21 @@ export default function CarDetailPage() {
       }
     }
     if (id) load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Track recently viewed
+  useEffect(() => {
+    if (listing) {
+      addRecentlyViewed({
+        id: listing.id,
+        title: listing.title,
+        price: listing.price.amount,
+        imageUrl: listing.media[0]?.url,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listing?.id]);
 
   async function toggleFavorite() {
     if (!isAuthenticated) {
@@ -419,6 +439,30 @@ export default function CarDetailPage() {
                     <Share2 className="h-5 w-5" />
                   </button>
                   <button
+                    onClick={() => {
+                      if (isInCompare(listing.id)) {
+                        removeFromCompare(listing.id);
+                      } else {
+                        addToCompare({
+                          id: listing.id,
+                          title: listing.title,
+                          price: listing.price.amount,
+                          imageUrl: listing.media[0]?.url,
+                          year: car.year,
+                          mileage: car.mileage,
+                        });
+                      }
+                    }}
+                    className={`p-2 rounded-full border transition-colors ${
+                      isInCompare(listing.id)
+                        ? 'bg-brand-500 border-brand-500 text-white'
+                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                    }`}
+                    title={isInCompare(listing.id) ? 'הסר מהשוואה' : 'הוסף להשוואה'}
+                  >
+                    <ArrowLeftRight className="h-5 w-5" />
+                  </button>
+                  <button
                     onClick={() => setShowReport(!showReport)}
                     className="p-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
                   >
@@ -590,22 +634,43 @@ export default function CarDetailPage() {
                     <Shield className="h-5 w-5 text-brand-500" />
                     גורמי אמון
                   </h2>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {listing.trustFactors.map((factor) => (
-                      <div key={factor.key} className="flex items-start gap-3">
+                      <div
+                        key={factor.key}
+                        className={`flex items-start gap-3 p-3 rounded-lg ${
+                          factor.status === 'positive'
+                            ? 'bg-emerald-50/70'
+                            : factor.status === 'negative'
+                              ? 'bg-red-50/70'
+                              : 'bg-gray-50'
+                        }`}
+                      >
                         <div
-                          className={`flex-shrink-0 mt-0.5 w-2 h-2 rounded-full ${
+                          className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center ${
                             factor.status === 'positive'
-                              ? 'bg-green-500'
+                              ? 'bg-emerald-100 text-emerald-600'
                               : factor.status === 'negative'
-                                ? 'bg-red-500'
-                                : 'bg-gray-300'
+                                ? 'bg-red-100 text-red-600'
+                                : 'bg-gray-200 text-gray-500'
                           }`}
-                        />
+                        >
+                          {factor.status === 'positive' ? (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : factor.status === 'negative' ? (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          )}
+                        </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{factor.label}</p>
                           {factor.description && (
-                            <p className="text-xs text-gray-500">{factor.description}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{factor.description}</p>
                           )}
                         </div>
                       </div>
@@ -806,6 +871,37 @@ export default function CarDetailPage() {
           </div>
         </section>
 
+        {/* Key Highlights */}
+        <section className="mt-8 border-t border-gray-100 pt-6">
+          <h3 className="text-lg font-bold text-brand-black mb-4 tracking-tight">למה הרכב הזה?</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {listing.trustScore >= 70 && (
+              <div className="rounded-xl bg-emerald-50 p-3 text-center">
+                <p className="text-sm font-bold text-emerald-700">ציון אמון גבוה</p>
+                <p className="text-xs text-emerald-600 mt-0.5">{listing.trustScore}/100</p>
+              </div>
+            )}
+            {car.hand <= 2 && (
+              <div className="rounded-xl bg-brand-50 p-3 text-center">
+                <p className="text-sm font-bold text-brand-700">יד {car.hand === 1 ? 'ראשונה' : 'שנייה'}</p>
+                <p className="text-xs text-brand-600 mt-0.5">בעלות מועטה</p>
+              </div>
+            )}
+            {listing.documents.length > 0 && (
+              <div className="rounded-xl bg-blue-50 p-3 text-center">
+                <p className="text-sm font-bold text-blue-700">{listing.documents.length} מסמכים</p>
+                <p className="text-xs text-blue-600 mt-0.5">מידע שקוף</p>
+              </div>
+            )}
+            {listing.seller.isVerified && (
+              <div className="rounded-xl bg-purple-50 p-3 text-center">
+                <p className="text-sm font-bold text-purple-700">מוכר מאומת</p>
+                <p className="text-xs text-purple-600 mt-0.5">זהות מאושרת</p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Similar Cars */}
         {similarCars.length > 0 && (
           <section className="mt-12">
@@ -838,6 +934,41 @@ export default function CarDetailPage() {
             </div>
           </section>
         )}
+      </div>
+
+      {/* Mobile Sticky CTA */}
+      <div className="fixed bottom-12 sm:bottom-0 start-0 end-0 z-30 bg-white/95 backdrop-blur border-t border-gray-100 p-3 safe-area-bottom lg:hidden supports-[backdrop-filter]:bg-white/80">
+        <div className="flex items-center gap-3 max-w-lg mx-auto">
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-bold text-brand-black truncate">
+              {listing.price.currency === 'ILS' ? '₪' : '$'}{listing.price.amount.toLocaleString('he-IL')}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{listing.title}</p>
+          </div>
+          <Button
+            size="sm"
+            className="flex-shrink-0 gap-1.5"
+            onClick={() => {
+              if (!isAuthenticated) {
+                window.location.href = '/auth/login';
+                return;
+              }
+              window.location.href = `/dashboard/messages?to=${listing.seller.id}&listing=${id}`;
+            }}
+          >
+            <MessageCircle className="h-4 w-4" />
+            הודעה
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-shrink-0 gap-1.5"
+            onClick={() => setShowLeadForm(true)}
+          >
+            <Phone className="h-4 w-4" />
+            טלפון
+          </Button>
+        </div>
       </div>
     </div>
   );

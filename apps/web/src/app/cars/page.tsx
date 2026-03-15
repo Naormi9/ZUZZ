@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from '@zuzz/ui';
 import { api } from '../../lib/api';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 
 const POPULAR_MAKES = [
   'טויוטה',
@@ -50,6 +51,7 @@ const YEAR_RANGES = [
 export default function CarsHomePage() {
   const [featuredCars, setFeaturedCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { items: recentlyViewed } = useRecentlyViewed('cars');
   const [selectedMake, setSelectedMake] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
@@ -226,6 +228,32 @@ export default function CarsHomePage() {
           </div>
         )}
       </section>
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-gray-50">
+          <h2 className="section-heading mb-6">נצפו לאחרונה</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {recentlyViewed.slice(0, 8).map((item) => (
+              <a
+                key={item.id}
+                href={`/cars/${item.id}`}
+                className="flex-shrink-0 w-44 rounded-xl border border-gray-100 bg-white overflow-hidden hover:shadow-md transition-shadow"
+              >
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-24 object-cover" />
+                ) : (
+                  <div className="w-full h-24 bg-gray-100" />
+                )}
+                <div className="p-2.5">
+                  <p className="text-xs font-semibold text-brand-black truncate">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">₪{item.price.toLocaleString('he-IL')}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Popular Makes */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">

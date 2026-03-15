@@ -192,6 +192,15 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  /* Hide scrollbar but keep scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Keyboard-aware spacing (set by MobileAppShell) */
   .mb-keyboard {
     margin-bottom: var(--keyboard-height, 0px);
